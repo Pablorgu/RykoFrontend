@@ -56,10 +56,10 @@ export default function Login() {
                 secureTextEntry
                 value={password}
                 onChangeText={setPassword}
-                className="w-full border border-green-400 rounded px-4 py-3 text-white mb-6"
+                className="w-full h-[44px] border-2 border-green-400 rounded px-4 text-white mb-4"
               />
 
-              <Pressable className="w-full bg-lime-400 py-3 rounded mb-6 items-center">
+              <Pressable className="w-full bg-lime-400 py-3 rounded mb-6 items-center h-[44px]">
                 <Text className="font-bold text-black">Inicia sesión</Text>
               </Pressable>
 
