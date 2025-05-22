@@ -1,75 +1,92 @@
-import { View, Text, TextInput, Pressable, Image, ScrollView, Dimensions } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  ScrollView,
+  Dimensions,
+} from 'react-native';
 import { useState } from 'react';
-import Logo from '../../assets/aguacate.svg';
 import { Link } from 'expo-router';
+import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
 
 const screenWidth = Dimensions.get('window').width;
-const screenHeight = Dimensions.get('window').height;
+const MAX_LOGO = 400;
+const logoSize = Math.min(screenWidth * 0.5, MAX_LOGO);
 
 export default function Login() {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   return (
-    <SafeAreaView className="flex-1 bg-black">
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
-        <View className="px-8">
-          <View className="items-center pt-4 pb-2">
-            <Text className="text-white text-4xl font-bold">RYKO</Text>
+    <SafeAreaView
+      className="bg-black h-screen"
+      style={{ paddingTop: insets.top }}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="flex-1 px-4 mt-5">
+          <View className="items-center ">
+            <Text className="text-white text-5xl font-bold">RYKO</Text>
           </View>
 
-          {/* Logo grande */}
-          <View className="items-center mt-4 mb-8">
-            <Logo width={screenWidth * 0.35} height={screenHeight * 0.35} />
-          </View>
-
-          {/* Inputs y acciones */}
-          <View>
-            <TextInput
-              placeholder="Correo"
-              placeholderTextColor="#ccc"
-              className="border border-green-400 rounded px-4 py-3 text-white mb-4"
-              value={email}
-              onChangeText={setEmail}
-            />
-
-            <TextInput
-              placeholder="Contraseña"
-              placeholderTextColor="#ccc"
-              secureTextEntry
-              className="border border-green-400 rounded px-4 py-3 text-white mb-4"
-              value={password}
-              onChangeText={setPassword}
-            />
-
-            <Pressable className="bg-lime-400 py-3 rounded mb-4 items-center">
-              <Text className="font-bold text-black">Inicia sesión</Text>
-            </Pressable>
-
-            <View className="flex-row items-center mb-4">
-              <View className="flex-1 h-px bg-gray-700" />
-              <Text className="text-gray-400 mx-2">ó</Text>
-              <View className="flex-1 h-px bg-gray-700" />
+          <View className="flex-col items-center justify-center">
+            <View className="w-full flex-1 items-center mt-10 mb-10">
+              <Logo width={logoSize} height={logoSize} />
             </View>
+            <View className="w-[90%] max-w-[500px]  justify-end">
+              <TextInput
+                placeholder="Correo"
+                placeholderTextColor="#ccc"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                value={email}
+                onChangeText={setEmail}
+                className="w-full h-[44px] border-2 border-green-400 rounded px-4 text-white mb-4"
+              />
 
-            <Pressable className="flex-row items-center justify-center bg-gray-900 py-3 rounded mb-2">
-              <GoogleIcon className="mr-4 " width={24} height={24} />
-              <Text className="text-white">Inicia sesión con Google</Text>
-            </Pressable>
+              <TextInput
+                placeholder="Contraseña"
+                placeholderTextColor="#ccc"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+                className="w-full border border-green-400 rounded px-4 py-3 text-white mb-6"
+              />
 
-            <Link href="/register/account" asChild>
-              <Pressable>
-                <Text className="text-center text-green-400 underline">
-                  ¿No tienes cuenta? Regístrate ahora
+              <Pressable className="w-full bg-lime-400 py-3 rounded mb-6 items-center">
+                <Text className="font-bold text-black">Inicia sesión</Text>
+              </Pressable>
+
+              <View className="flex-row items-center w-full mb-4">
+                <View className="flex-1 h-px bg-gray-700" />
+                <Text className="text-gray-400 mx-2">ó</Text>
+                <View className="flex-1 h-px bg-gray-700" />
+              </View>
+
+              <Pressable className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
+                <GoogleIcon width={24} height={24} className="mr-2" />
+                <Text className="text-white font-semibold mx-2">
+                  Inicia sesión con Google
                 </Text>
               </Pressable>
-            </Link>
+
+              <Link href="/register/account" asChild>
+                <Pressable className="w-full items-center">
+                  <Text className="text-green-400 underline">
+                    ¿No tienes cuenta? Regístrate ahora
+                  </Text>
+                </Pressable>
+              </Link>
+            </View>
           </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
