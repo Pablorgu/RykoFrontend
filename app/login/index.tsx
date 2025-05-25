@@ -1,8 +1,8 @@
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import FloatingLabelInput from '../utils/FloatingLabel';
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   ScrollView,
   Dimensions,
@@ -21,6 +21,19 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const [emailError, setEmailError] = useState('');
+
+  const handleLogin = () => {
+    setEmailError('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setEmailError('Introduce un correo válido');
+      return;
+    }
+    console.log('Iniciar Sesion con:', { email, password });
+  };
+
   return (
     <SafeAreaView
       className="bg-black h-screen"
@@ -32,7 +45,7 @@ export default function Login() {
       >
         <View className="flex-1 px-4 mt-5">
           <View className="items-center ">
-            <Text className="text-white text-5xl font-bold">RYKO</Text>
+            <Text className="text-white text-5xl font-bold leading-none">RYKO</Text>
           </View>
 
           <View className="flex-col items-center justify-center">
@@ -40,28 +53,30 @@ export default function Login() {
               <Logo width={logoSize} height={logoSize} />
             </View>
             <View className="w-[90%] max-w-[500px]  justify-end">
-              <TextInput
-                placeholder="Correo"
-                placeholderTextColor="#ccc"
-                autoCapitalize="none"
-                keyboardType="email-address"
+              <FloatingLabelInput
+                label="Correo electronico"
                 value={email}
                 onChangeText={setEmail}
-                className="w-full h-[44px] border-2 border-green-400 rounded px-4 text-white mb-4"
+                inputProps={{ keyboardType: 'email-address', autoCapitalize: 'none' }}
               />
 
-              <TextInput
-                placeholder="Contraseña"
-                placeholderTextColor="#ccc"
-                secureTextEntry
+              {emailError !== '' && (
+                <Text className="text-red-500 text-base pl-1 mb-2 -mt-6">{emailError}</Text>
+              )}
+
+              <FloatingLabelInput
+                label="Contraseña"
                 value={password}
                 onChangeText={setPassword}
-                className="w-full h-[44px] border-2 border-green-400 rounded px-4 text-white mb-4"
+                inputProps={{ secureTextEntry: true }}
               />
 
-              <Pressable className="w-full bg-lime-400 py-3 rounded mb-6 items-center h-[44px]">
+              <Pressable onPress={handleLogin}
+                className="w-full bg-lime-400 py-3 rounded mb-6 justify-center items-center h-[44px]"
+              >
                 <Text className="font-bold text-black">Inicia sesión</Text>
               </Pressable>
+
 
               <View className="flex-row items-center w-full mb-4">
                 <View className="flex-1 h-px bg-gray-700" />
@@ -87,6 +102,6 @@ export default function Login() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }
