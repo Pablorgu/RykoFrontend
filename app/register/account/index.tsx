@@ -3,7 +3,6 @@ import FloatingLabelInput from '../../utils/FloatingLabel';
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
@@ -103,7 +102,7 @@ export default function RegisterAccount() {
                   <Text className="text-red-500 text-sm mb-2">{passwordError}</Text>
                 )}
 
-                <Pressable onPress={handleRegister} className="w-full bg-lime-400 py-3 rounded mb-6 items-center h-[44px]">
+                <Pressable onPress={handleRegister} className="w-full bg-lime-400 py-3 rounded mb-6 justify-center items-center h-[44px]">
                   <Text className="font-bold text-black">Registrarse</Text>
                 </Pressable>
 
