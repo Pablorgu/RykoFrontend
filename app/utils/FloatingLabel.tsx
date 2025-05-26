@@ -44,7 +44,12 @@ export default function FloatingLabelInput({
   return (
     <View style={{ marginBottom: 24 }}>
       <View style={styles.container}>
-        <Animated.Text style={labelStyle}>{label}</Animated.Text>
+        <Animated.Text
+          style={labelStyle}
+          pointerEvents="none"
+        >
+          {label}
+        </Animated.Text>
         <TextInput
           value={value}
           onChangeText={onChangeText}
@@ -56,7 +61,7 @@ export default function FloatingLabelInput({
           {...inputProps}
         />
       </View>
-    </View>
+    </View >
   );
 }
 
