@@ -1,0 +1,132 @@
+
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import DropDownPicker, { ValueType, ItemType } from 'react-native-dropdown-picker'
+
+interface Option {
+  label: string
+  value: string
+}
+
+interface FloatingLabelSelectProps {
+  label: string
+  value: string | null
+  onValueChange: (val: string | null) => void
+  options: Option[]
+}
+
+export default function FloatingLabelSelect({
+  label,
+  value,
+  onValueChange,
+  options,
+}: FloatingLabelSelectProps) {
+  const [open, setOpen] = useState(false)
+  const [selected, setSelected] = useState<string | null>(value)
+
+  useEffect(() => {
+    setSelected(value)
+  }, [value])
+
+  const [items, setItems] = useState<ItemType<string>[]>(() =>
+    options.map(opt => ({ label: opt.label, value: opt.value }))
+  )
+
+  return (
+    <View style={[styles.wrapper, open && { zIndex: 1000 }]}>
+      <Text style={styles.staticLabel}>{label}</Text>
+
+      <DropDownPicker
+        open={open}
+        setOpen={setOpen}
+
+        value={selected ?? null}
+        setValue={(val: ValueType | ((prev: ValueType) => ValueType)) => {
+          let newValue: string | undefined
+          if (typeof val === 'function') {
+            newValue = val(selected || '') as string
+          } else {
+            newValue = val as string
+          }
+          setSelected(newValue)
+          onValueChange(newValue ?? null)
+        }}
+
+        items={items}
+        setItems={setItems}
+
+        containerStyle={styles.container}
+        style={styles.picker}
+        dropDownContainerStyle={styles.dropdownContainer}
+
+        listItemContainerStyle={styles.listItemContainer}
+        listItemLabelStyle={styles.listItemLabel}
+
+        selectedItemContainerStyle={styles.selectedItemContainer}
+        selectedItemLabelStyle={styles.selectedItemLabel}
+
+        placeholder={`Selecciona ${label.toLowerCase()}`}
+        placeholderStyle={styles.placeholderLabel}
+
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+
+        textStyle={{ color: '#fff' }}
+      />
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    position: 'relative',
+    marginBottom: 24,
+  },
+  staticLabel: {
+    position: 'absolute',
+    top: -12,
+    left: 12,
+    backgroundColor: '#000',
+    paddingHorizontal: 4,
+    fontSize: 12,
+    color: '#aaa',
+    zIndex: 11,
+  },
+  container: {
+    marginTop: 6,
+    borderWidth: 2,
+    borderColor: '#22c55e',
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  picker: {
+    backgroundColor: 'transparent',
+    height: 56,
+    color: '#fff',
+  },
+  dropdownContainer: {
+    backgroundColor: '#000',
+    borderColor: '#22c55e',
+    position: 'absolute',
+    zIndex: 1000,
+  },
+  listItemContainer: {
+    height: 48,
+    paddingHorizontal: 12,
+  },
+  listItemLabel: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  selectedItemContainer: {
+    backgroundColor: '#002200',
+  },
+  selectedItemLabel: {
+    color: '#22c55e',
+    fontWeight: 'bold',
+  },
+  placeholderLabel: {
+    color: '#000',
+  },
+})
+
