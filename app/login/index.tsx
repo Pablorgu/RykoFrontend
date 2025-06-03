@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { Link } from 'expo-router';
 import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
+import { LogoLetters } from '../utils/LogoLetters';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
@@ -44,8 +45,8 @@ export default function Login() {
         keyboardShouldPersistTaps="handled"
       >
         <View className="flex-1 px-4 mt-5">
-          <View className="items-center ">
-            <Text className="text-white text-5xl font-bold leading-none">RYKO</Text>
+          <View className="items-center">
+            <LogoLetters />
           </View>
 
           <View className="flex-col items-center justify-center">
