@@ -6,44 +6,57 @@ import {
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
-  Dimensions,
   Platform,
+  Animated,
 } from 'react-native';
-import { useState } from 'react';
-import { Link } from 'expo-router';
-import Logo from '../../../assets/aguacate.svg';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useRouter } from 'expo-router';
 import GoogleIcon from '../../../assets/google.svg';
+import { LogoTitle } from '../../utils/LogoTitle';
 
-const screenWidth = Dimensions.get('window').width;
-const MAX_LOGO = 400;
-const logoSize = Math.min(screenWidth * 0.5, MAX_LOGO);
 
 export default function RegisterAccount() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const isPasswordMatch = password.length > 0 && password === confirmPassword
+
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  const fade = useRef(new Animated.Value(0)).current
+  useEffect(() => {
+    Animated.timing(fade, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start()
+  }, [])
+
   const handleRegister = () => {
-    setEmailError('');
-    setPasswordError('');
+    setEmailError('')
+    setPasswordError('')
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      setEmailError('Introduce un correo válido');
-      return;
+    let valid = true
+
+    if (!isEmailValid) {
+      setEmailError('Introduce un correo válido')
+      valid = false
     }
 
-    if (password !== confirmPassword) {
-      setPasswordError('Las contraseñas no coinciden');
-      return;
+    if (!isPasswordMatch) {
+      setPasswordError('Las contraseñas no coinciden')
+      valid = false
     }
 
-    console.log('Registrar con:', { email, password });
-  };
+    if (!valid) return
+
+    router.push('/register/personal')
+  }
 
   return (
     <SafeAreaView
@@ -57,20 +70,15 @@ export default function RegisterAccount() {
       >
         <ScrollView
           contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-start', }}
-
-
           keyboardShouldPersistTaps="handled"
         >
-          <View className="flex-1 px-4 mt-5">
-            <View className="items-center">
-              <Text className="text-white text-5xl font-bold">RYKO</Text>
+          <Animated.View style={{ flex: 1, opacity: fade, paddingVertical: 20 }}>
+            <View className="items-center mb-20">
+              <LogoTitle />
+              <Text className="text-gray-500 mt-2">Paso 1 de 4</Text>
             </View>
 
             <View className="flex-col items-center justify-center">
-              <View className="w-full flex-1 items-center mt-10 mb-10">
-                <Logo width={logoSize} height={logoSize} />
-              </View>
-
               <View className="w-[90%] max-w-[500px] justify-end">
 
                 <FloatingLabelInput
@@ -99,11 +107,11 @@ export default function RegisterAccount() {
                 />
 
                 {passwordError !== '' && (
-                  <Text className="text-red-500 text-sm mb-2">{passwordError}</Text>
+                  <Text className="text-red-500 text-sm -mt-4 mb-6">{passwordError}</Text>
                 )}
 
                 <Pressable onPress={handleRegister} className="w-full bg-lime-400 py-3 rounded mb-6 justify-center items-center h-[44px]">
-                  <Text className="font-bold text-black">Registrarse</Text>
+                  <Text className="font-bold text-black">Siguiente</Text>
                 </Pressable>
 
                 <View className="flex-row items-center w-full mb-4">
@@ -128,10 +136,9 @@ export default function RegisterAccount() {
                 </Link>
               </View>
             </View>
-          </View>
+          </Animated.View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
-
