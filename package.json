@@ -1,6 +1,7 @@
 {
   "name": "rykofrontend",
   "version": "1.0.0",
+  "type": "module",
   "main": "node_modules/expo-router/entry",
   "scripts": {
     "start": "expo start",
@@ -10,6 +11,8 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
+    "@react-native-community/datetimepicker": "8.3.0",
+    "@react-native-picker/picker": "^2.11.0",
     "@react-navigation/native": "^7.1.9",
     "@react-navigation/native-stack": "^7.3.13",
     "@react-navigation/stack": "^7.3.2",
@@ -22,7 +25,11 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
+    "react-native-calendars": "^1.1312.1",
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-paper": "^5.14.5",
+    "react-native-picker-select": "^9.3.1",
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "~4.10.0",

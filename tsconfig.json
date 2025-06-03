@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "jsx": "react-jsx",
-    "module": "Node16",                
-    "moduleResolution": "node16",       
+    "jsx": "react-native",
+    "module": "esnext",                
+    "moduleResolution": "bundler",   
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["nativewind/types"]
   },
-  "exclude": ["node_modules", "babel.config.js"],
+  "exclude": ["node_modules", "babel.config.cjs"],
   "extends": "expo/tsconfig.base"
 }
 
