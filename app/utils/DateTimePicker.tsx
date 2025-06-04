@@ -39,7 +39,7 @@ export function DatePickerField({
           label={label}
           value={formatted}
           onChangeText={() => { }}
-          inputProps={{ editable: false }}
+          inputProps={{ editable: false, pointerEvents: 'none' }}
         />
       </Pressable>
 
