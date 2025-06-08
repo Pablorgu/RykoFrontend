@@ -53,11 +53,15 @@ export default function RegisterPersonal() {
           <Animated.View style={{ flex: 1, opacity: fade, paddingVertical: 20 }}>
             <View className="items-center mb-20">
               <LogoTitle />
-              <Text className="text-gray-500 mt-2">Paso 2 de 4</Text>
+              <Text className="text-gray-500 mt-2">Paso 2 de 3</Text>
             </View>
 
             <View className="flex-1 flex-col items-center">
-              <View className="w-[90%] max-w-[500px] space-y-4">
+              <View style={{
+                width: '90%',
+                maxWidth: 500,
+                gap: 24,
+              }}>
                 <FloatingLabelInput
                   label="Nombre completo"
                   value={name}
@@ -93,16 +97,16 @@ export default function RegisterPersonal() {
                   ]}
                 />
 
-                <View className="space-y-2 mt-4">
+                <View className="space-y-2">
                   <Pressable
                     onPress={() => router.back()}
-                    className="w-full py-3 items-center rounded border border-gray-700"
+                    className="w-full py-3 my-2 items-center rounded border border-gray-700"
                   >
                     <Text className="text-gray-400">Atrás</Text>
                   </Pressable>
 
                   <Pressable
-                    onPress={() => isStepValid && router.push('/register/Measurements')}
+                    onPress={() => isStepValid && router.push('/register/goals')}
                     disabled={!isStepValid}
                     className="w-full py-3 items-center rounded"
                     style={{

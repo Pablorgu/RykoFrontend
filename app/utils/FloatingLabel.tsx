@@ -42,7 +42,7 @@ export default function FloatingLabelInput({
   };
 
   return (
-    <View style={{ marginBottom: 24 }}>
+    <View >
       <View style={styles.container}>
         <Animated.Text
           style={labelStyle}

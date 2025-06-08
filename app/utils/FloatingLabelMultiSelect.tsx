@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import DropDownPicker, { ValueType, ItemType } from 'react-native-dropdown-picker'
@@ -8,29 +7,34 @@ interface Option {
   value: string
 }
 
-interface FloatingLabelSelectProps {
+interface FloatingLabelMultiSelectProps {
   label: string
-  value: string | null
-  onValueChange: (val: string | null) => void
+  values: string[]
+  onChangeValues: (vals: string[]) => void
   options: Option[]
 }
 
-export default function FloatingLabelSelect({
+export default function FloatingLabelMultiSelect({
   label,
-  value,
-  onValueChange,
+  values,
+  onChangeValues,
   options,
-}: FloatingLabelSelectProps) {
+}: FloatingLabelMultiSelectProps) {
   const [open, setOpen] = useState(false)
-  const [selected, setSelected] = useState<string | null>(value)
-
-  useEffect(() => {
-    setSelected(value)
-  }, [value])
-
+  const [selected, setSelected] = useState<string[] | null>(values)
   const [items, setItems] = useState<ItemType<string>[]>(() =>
     options.map(opt => ({ label: opt.label, value: opt.value }))
   )
+
+  useEffect(() => {
+    setSelected(values)
+  }, [values])
+
+  // Construimos un string con los labels de las opciones seleccionadas
+  const selectedLabels = items
+    .filter(item => (selected ?? []).includes(item.value!))
+    .map(item => item.label)
+    .join(', ')
 
   return (
     <View style={[styles.wrapper, open && { zIndex: 1000 }]}>
@@ -41,23 +45,29 @@ export default function FloatingLabelSelect({
         setOpen={setOpen}
         listMode="SCROLLVIEW"
 
-        value={selected ?? null}
-        setValue={(val: ValueType | ((prev: ValueType) => ValueType)) => {
-          let newValue: string | undefined
-          if (typeof val === 'function') {
-            newValue = val(selected || '') as string
+        multiple={true}
+        min={0}
+        max={items.length}
+        closeAfterSelecting={false}
+
+        value={selected ?? []}
+        setValue={(vals: ValueType[] | ((prev: ValueType[]) => ValueType[])) => {
+          let newVals: string[]
+          if (typeof vals === 'function') {
+            newVals = (vals(selected ?? []) as string[])
           } else {
-            newValue = val as string
+            newVals = vals as string[]
           }
-          setSelected(newValue)
-          onValueChange(newValue ?? null)
+          setSelected(newVals)
+          onChangeValues(newVals)
         }}
 
         items={items}
         setItems={setItems}
 
-        containerStyle={styles.container}
+        containerStyle={[styles.container, open && { zIndex: 1000, elevation: 1000 }]}
         style={styles.picker}
+
         dropDownContainerStyle={[styles.dropdownContainer, { position: 'absolute', zIndex: 1000 }]}
 
         listItemContainerStyle={styles.listItemContainer}
@@ -66,8 +76,9 @@ export default function FloatingLabelSelect({
         selectedItemContainerStyle={styles.selectedItemContainer}
         selectedItemLabelStyle={styles.selectedItemLabel}
 
-        placeholder={`Selecciona ${label.toLowerCase()}`}
+        placeholder={selectedLabels || `Selecciona ${label.toLowerCase()}`}
         placeholderStyle={styles.placeholderLabel}
+        multipleText={selectedLabels || `Selecciona ${label.toLowerCase()}`}
 
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -126,7 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   placeholderLabel: {
-    color: '#000',
+    color: '#999',
   },
 })
 

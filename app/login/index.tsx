@@ -53,7 +53,11 @@ export default function Login() {
             <View className="w-full flex-1 items-center mt-10 mb-10">
               <Logo width={logoSize} height={logoSize} />
             </View>
-            <View className="w-[90%] max-w-[500px]  justify-end">
+            <View style={{
+              width: '90%',
+              maxWidth: 500,
+              gap: 24,
+            }}>
               <FloatingLabelInput
                 label="Correo electronico"
                 value={email}
