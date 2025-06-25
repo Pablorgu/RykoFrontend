@@ -8,10 +8,11 @@ import {
   Dimensions,
 } from 'react-native';
 import { useState } from 'react';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
 import { LogoLetters } from '../utils/LogoLetters';
+import { loginLocal } from '../services/auth';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
@@ -21,18 +22,27 @@ export default function Login() {
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [emailError, setEmailError] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setEmailError('');
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setEmailError('Introduce un correo válido');
       return;
     }
-    console.log('Iniciar Sesion con:', { email, password });
+
+    setLoading(true);
+    const ok = await loginLocal(email.trim(), password);
+    setLoading(false);
+
+    if (ok) {
+      router.replace('/home');
+    } else {
+      setEmailError('Email o contraseña incorrectos');
+    }
   };
 
   return (
