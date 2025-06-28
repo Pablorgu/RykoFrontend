@@ -92,7 +92,6 @@ export default function Login() {
                 <Text className="font-bold text-black">Inicia sesión</Text>
               </Pressable>
 
-
               <View className="flex-row items-center w-full mb-4">
                 <View className="flex-1 h-px bg-gray-700" />
                 <Text className="text-gray-400 mx-2">ó</Text>

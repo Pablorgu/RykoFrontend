@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import GoogleIcon from '../../../assets/google.svg';
 import { LogoTitle } from '../../utils/LogoTitle';
+import { registerLocal } from '../../services/auth';
 
 
 export default function RegisterAccount() {
@@ -21,6 +22,7 @@ export default function RegisterAccount() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
   const isPasswordMatch = password.length > 0 && password === confirmPassword
@@ -37,7 +39,7 @@ export default function RegisterAccount() {
     }).start()
   }, [])
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     setEmailError('')
     setPasswordError('')
 
@@ -52,10 +54,15 @@ export default function RegisterAccount() {
       setPasswordError('Las contraseñas no coinciden')
       valid = false
     }
+    setLoading(true);
+    const ok = await registerLocal(email.trim(), password);
+    setLoading(false);
 
-    if (!valid) return
-
-    router.push('/register/personal')
+    if (ok) {
+      router.push('/register/personal');
+    } else {
+      setEmailError('Error al registrar la cuenta');
+    }
   }
 
   return (
