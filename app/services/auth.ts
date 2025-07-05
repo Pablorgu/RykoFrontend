@@ -20,6 +20,12 @@ export async function registerLocal(email: string, password: string): Promise<bo
   }
 }
 
+
+export async function loginWithGoogle(token: string) {
+  console.log('JWT:', token);
+}
+
+
 export async function logout(): Promise<void> {
   await removeToken();
 }

@@ -8,12 +8,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
+  Linking,
 } from 'react-native';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import GoogleIcon from '../../../assets/google.svg';
 import { LogoTitle } from '../../utils/LogoTitle';
-import { registerLocal } from '../../services/auth';
+import { registerLocal, loginWithGoogle } from '../../services/auth';
 
 
 export default function RegisterAccount() {
@@ -38,6 +39,20 @@ export default function RegisterAccount() {
       useNativeDriver: true,
     }).start()
   }, [])
+
+  useEffect(() => {
+    const sub = Linking.addEventListener('url', (event) => {
+      const url = new URL(event.url);
+      const token = url.searchParams.get('token');
+
+      if (token) {
+        loginWithGoogle(token);
+        router.push('/register/personal');
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
 
   const handleRegister = async () => {
     setEmailError('')
@@ -64,6 +79,10 @@ export default function RegisterAccount() {
       setEmailError('Error al registrar la cuenta');
     }
   }
+
+  const handleGoogleRegister = () => {
+    Linking.openURL('http://localhost:3000/auth/google');
+  };
 
   return (
     <SafeAreaView
@@ -131,7 +150,7 @@ export default function RegisterAccount() {
                   <View className="flex-1 h-px bg-gray-700" />
                 </View>
 
-                <Pressable className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
+                <Pressable onPress={() => handleGoogleRegister()} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
                   <GoogleIcon width={24} height={24} className="mr-2" />
                   <Text className="text-white font-semibold mx-2">
                     Regístrate con Google
