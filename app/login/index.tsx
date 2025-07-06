@@ -6,13 +6,14 @@ import {
   Pressable,
   ScrollView,
   Dimensions,
+  Linking,
 } from 'react-native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
 import { LogoLetters } from '../utils/LogoLetters';
-import { loginLocal } from '../services/auth';
+import { loginLocal, loginWithGoogle } from '../services/auth';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
@@ -25,6 +26,21 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const [emailError, setEmailError] = useState('');
+
+
+  useEffect(() => {
+    const sub = Linking.addEventListener('url', (event) => {
+      const url = new URL(event.url);
+      const token = url.searchParams.get('token');
+
+      if (token) {
+        loginWithGoogle(token);
+        router.push('/register/personal');
+      }
+    });
+
+    return () => sub.remove();
+  }, []);
 
   const handleLogin = async () => {
     setEmailError('');
@@ -43,6 +59,10 @@ export default function Login() {
     } else {
       setEmailError('Email o contraseña incorrectos');
     }
+  };
+
+  const handleGoogleLogin = () => {
+    Linking.openURL('http://localhost:3000/auth/google');
   };
 
   return (
@@ -98,7 +118,7 @@ export default function Login() {
                 <View className="flex-1 h-px bg-gray-700" />
               </View>
 
-              <Pressable className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
+              <Pressable onPress={() => handleGoogleLogin()} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
                 <GoogleIcon width={24} height={24} className="mr-2" />
                 <Text className="text-white font-semibold mx-2">
                   Inicia sesión con Google
