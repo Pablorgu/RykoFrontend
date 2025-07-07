@@ -11,10 +11,10 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import FloatingLabelInput from '../../utils/FloatingLabel'
-import FloatingLabelSelect from '../../utils/FloatingLabelSelect'
-import FloatingLabelMultiSelect from '../../utils/FloatingLabelMultiSelect'
-import { LogoTitle } from '../../utils/LogoTitle'
+import FloatingLabelInput from '../../utils/_FloatingLabel'
+import FloatingLabelSelect from '../../utils/_FloatingLabelSelect'
+import FloatingLabelMultiSelect from '../../utils/_FloatingLabelMultiSelect'
+import { LogoTitle } from '../../utils/_LogoTitle'
 
 export default function RegisterGoals() {
   const insets = useSafeAreaInsets()

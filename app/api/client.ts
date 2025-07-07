@@ -1,22 +1,26 @@
-import axios, { AxiosInstance, AxiosRequestHeaders, InternalAxiosRequestConfig } from 'axios';
-import * as SecureStore from 'expo-secure-store';
-import { API_BASE_URL } from '@env';
-import { Platform } from 'react-native';
+import axios, {
+  AxiosInstance,
+  AxiosRequestHeaders,
+  InternalAxiosRequestConfig,
+} from "axios";
+import * as SecureStore from "expo-secure-store";
+import { API_BASE_URL } from "@env";
+import { Platform } from "react-native";
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 5000,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 });
 
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
     let token: string | null = null;
 
-    if (Platform.OS === 'web') {
-      token = localStorage.getItem('userToken');
+    if (Platform.OS === "web") {
+      token = sessionStorage.getItem("userToken");
     } else {
-      token = await SecureStore.getItemAsync('userToken');
+      token = await SecureStore.getItemAsync("userToken");
     }
 
     if (token) {
@@ -28,7 +32,7 @@ api.interceptors.request.use(
 
     return config;
   },
-  error => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 export default api;

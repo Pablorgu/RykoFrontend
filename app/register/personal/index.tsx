@@ -11,10 +11,10 @@ import {
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
-import FloatingLabelInput from '../../utils/FloatingLabel'
-import FloatingLabelSelect from '../../utils/FloatingLabelSelect'
-import { LogoTitle } from '../../utils/LogoTitle'
-import { DatePickerField } from '../../utils/DateTimePicker'
+import FloatingLabelInput from '../../utils/_FloatingLabel'
+import FloatingLabelSelect from '../../utils/_FloatingLabelSelect'
+import { LogoTitle } from '../../utils/_LogoTitle'
+import { DatePickerField } from '../../utils/_DateTimePicker'
 
 export default function RegisterPersonal() {
   const insets = useSafeAreaInsets()

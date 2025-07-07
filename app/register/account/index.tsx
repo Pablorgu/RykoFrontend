@@ -1,5 +1,5 @@
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import FloatingLabelInput from '../../utils/FloatingLabel';
+import FloatingLabelInput from '../../utils/_FloatingLabel';
 import {
   View,
   Text,
@@ -13,8 +13,8 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { Link, useRouter } from 'expo-router';
 import GoogleIcon from '../../../assets/google.svg';
-import { LogoTitle } from '../../utils/LogoTitle';
-import { registerLocal, loginWithGoogle } from '../../services/auth';
+import { LogoTitle } from '../../utils/_LogoTitle';
+import { registerLocal, loginWithGoogle } from '../../services/_auth';
 
 
 export default function RegisterAccount() {

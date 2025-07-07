@@ -1,5 +1,5 @@
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import FloatingLabelInput from '../utils/FloatingLabel';
+import FloatingLabelInput from '../utils/_FloatingLabel';
 import {
   View,
   Text,
@@ -12,8 +12,8 @@ import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
 import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
-import { LogoLetters } from '../utils/LogoLetters';
-import { loginLocal, loginWithGoogle } from '../services/auth';
+import { LogoLetters } from '../utils/_LogoLetters';
+import { loginLocal, loginWithGoogle } from '../services/_auth';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
@@ -26,21 +26,6 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const [emailError, setEmailError] = useState('');
-
-
-  useEffect(() => {
-    const sub = Linking.addEventListener('url', (event) => {
-      const url = new URL(event.url);
-      const token = url.searchParams.get('token');
-
-      if (token) {
-        loginWithGoogle(token);
-        router.push('/register/personal');
-      }
-    });
-
-    return () => sub.remove();
-  }, []);
 
   const handleLogin = async () => {
     setEmailError('');

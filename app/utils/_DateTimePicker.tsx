@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Pressable } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
-import FloatingLabelInput from './FloatingLabel';
-import FloatingLabelSelect from './FloatingLabelSelect';
+import FloatingLabelInput from './_FloatingLabel';
+import FloatingLabelSelect from './_FloatingLabelSelect';
 
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: currentYear - 1899 }, (_, i) => {
