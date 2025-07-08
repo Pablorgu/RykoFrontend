@@ -15,17 +15,18 @@ import FloatingLabelInput from '../../utils/_FloatingLabel'
 import FloatingLabelSelect from '../../utils/_FloatingLabelSelect'
 import { LogoTitle } from '../../utils/_LogoTitle'
 import { DatePickerField } from '../../utils/_DateTimePicker'
+import { useUserProfile } from '../../context/UserProfileContext'
 
 export default function RegisterPersonal() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const { profile, setProfile } = useUserProfile()
 
-  const [name, setName] = useState('')
-  const [birthdate, setBirthdate] = useState<Date | null>(null)
-  const [gender, setGender] = useState<string | null>(null)
-  const [country, setCountry] = useState<string | null>(null)
+  const [fecha, setBirthdate] = useState<Date | null>(null)
+  const [genero, setGender] = useState<string | null>(null)
+  const [pais, setCountry] = useState<string | null>(null)
 
-  const isStepValid = name.trim().length > 0 && !!birthdate
+  const isStepValid = !!fecha
 
   const fade = useRef(new Animated.Value(0)).current
   useEffect(() => {
@@ -35,6 +36,21 @@ export default function RegisterPersonal() {
       useNativeDriver: true,
     }).start()
   }, [])
+
+  const handleNext = () => {
+    if (!isStepValid) return
+    
+    const isoDate = fecha ? fecha.toISOString() : null;
+    
+    setProfile(prev => ({
+      ...prev,
+      fecha: isoDate, 
+      genero,
+      pais
+    }))
+    
+    router.push('/register/goals')
+  }
 
   return (
     <SafeAreaView
@@ -62,21 +78,16 @@ export default function RegisterPersonal() {
                 maxWidth: 500,
                 gap: 24,
               }}>
-                <FloatingLabelInput
-                  label="Nombre completo"
-                  value={name}
-                  onChangeText={setName}
-                />
 
                 <DatePickerField
                   label="Fecha de nacimiento"
-                  date={birthdate}
+                  date={fecha}
                   onChange={setBirthdate}
                 />
 
                 <FloatingLabelSelect
                   label="Género"
-                  value={gender}
+                  value={genero}
                   onValueChange={setGender}
                   options={[
                     { label: 'Masculino', value: 'male' },
@@ -87,7 +98,7 @@ export default function RegisterPersonal() {
 
                 <FloatingLabelSelect
                   label="País"
-                  value={country}
+                  value={pais}
                   onValueChange={setCountry}
                   options={[
                     { label: 'España', value: 'es' },
@@ -106,7 +117,7 @@ export default function RegisterPersonal() {
                   </Pressable>
 
                   <Pressable
-                    onPress={() => isStepValid && router.push('/register/goals')}
+                    onPress={handleNext}
                     disabled={!isStepValid}
                     className="w-full py-3 items-center rounded"
                     style={{

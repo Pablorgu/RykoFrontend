@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Animated,
+  ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -15,27 +16,32 @@ import FloatingLabelInput from '../../utils/_FloatingLabel'
 import FloatingLabelSelect from '../../utils/_FloatingLabelSelect'
 import FloatingLabelMultiSelect from '../../utils/_FloatingLabelMultiSelect'
 import { LogoTitle } from '../../utils/_LogoTitle'
+import { useUserProfile } from '../../context/UserProfileContext'
+import { updateUserProfile } from '../../services/_user'
 
 export default function RegisterGoals() {
   const insets = useSafeAreaInsets()
   const router = useRouter()
+  const { profile} = useUserProfile()
 
-  const [weight, setWeight] = useState('')
-  const [height, setHeight] = useState('')
-  const [aim, setAim] = useState<string | null>(null)
-  const [calorieGoal, setCalorieGoal] = useState('')
-  const [intolerances, setIntolerances] = useState<string[]>([])
+  const [peso, setWeight] = useState('')
+  const [altura, setHeight] = useState('')
+  const [objetivo, setAim] = useState<string | null>(null)
+  const [calorias, setCalorieGoal] = useState('')
+  const [intolerancias, setIntolerances] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Validación paso
-  const w = parseFloat(weight)
-  const h = parseFloat(height)
-  const cg = parseInt(calorieGoal, 10)
+  const w = parseFloat(peso)
+  const h = parseFloat(altura)
+  const cg = parseInt(calorias, 10)
   const isStepValid =
     !isNaN(w) &&
     w > 0 &&
     !isNaN(h) &&
     h > 0 &&
-    !!aim &&
+    !!objetivo &&
     !isNaN(cg) &&
     cg > 0
 
@@ -48,6 +54,38 @@ export default function RegisterGoals() {
       useNativeDriver: true,
     }).start()
   }, [])
+
+  const handleRegister = async () => {
+    if (!isStepValid) return
+    
+    setIsLoading(true)
+    setError(null)
+    
+    const updatedProfile = {
+      ...profile,
+      peso,
+      altura,
+      objetivo,
+      calorias,
+      intolerancias
+    }
+    console.log('Perfil actualizado:', updatedProfile)
+    
+    try {
+      const success = await updateUserProfile(updatedProfile)
+      
+      if (success) {
+        router.replace('/home')
+      } else {
+        setError('No se pudo actualizar el perfil. Inténtalo de nuevo.')
+      }
+    } catch (err) {
+      console.error('Error en registro:', err)
+      setError('Ocurrió un error durante el registro. Inténtalo de nuevo.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <SafeAreaView
@@ -77,21 +115,21 @@ export default function RegisterGoals() {
               }}>
                 <FloatingLabelInput
                   label="Peso (kg)"
-                  value={weight}
+                  value={peso}
                   onChangeText={setWeight}
                   inputProps={{ keyboardType: 'numeric' }}
                 />
 
                 <FloatingLabelInput
                   label="Altura (cm)"
-                  value={height}
+                  value={altura}
                   onChangeText={setHeight}
                   inputProps={{ keyboardType: 'numeric' }}
                 />
 
                 <FloatingLabelSelect
                   label="Objetivo"
-                  value={aim}
+                  value={objetivo}
                   onValueChange={setAim}
                   options={[
                     { label: 'Perder peso', value: 'weight_loss' },
@@ -100,9 +138,16 @@ export default function RegisterGoals() {
                   ]}
                 />
 
+                <FloatingLabelInput
+                  label="Meta de calorías diarias"
+                  value={calorias}
+                  onChangeText={setCalorieGoal}
+                  inputProps={{ keyboardType: 'numeric' }}
+                />
+
                 <FloatingLabelMultiSelect
                   label="Intolerancias"
-                  values={intolerances}
+                  values={intolerancias}
                   onChangeValues={setIntolerances}
                   options={[
                     { label: 'Gluten', value: 'gluten' },
@@ -111,6 +156,10 @@ export default function RegisterGoals() {
                     { label: 'Mariscos', value: 'mariscos' },
                   ]}
                 />
+
+                {error && (
+                  <Text className="text-red-500 text-center">{error}</Text>
+                )}
 
                 <View className="space-y-2">
                   <Pressable
@@ -121,29 +170,22 @@ export default function RegisterGoals() {
                   </Pressable>
 
                   <Pressable
-                    onPress={() => {
-                      if (!isStepValid) return
-                      console.log({
-                        weight,
-                        height,
-                        aim,
-                        calorieGoal,
-                        intolerances,
-                      })
-                      router.replace('/home')
-                    }}
-                    disabled={!isStepValid}
+                    onPress={handleRegister}
+                    disabled={!isStepValid || isLoading}
                     className="w-full py-3 items-center rounded"
                     style={{
-                      backgroundColor: isStepValid ? '#A3FF57' : '#A3F49D',
+                      backgroundColor: isStepValid && !isLoading ? '#A3FF57' : '#A3F49D',
                     }}
                   >
-                    <Text
-                      className={`font-bold ${isStepValid ? 'text-black' : 'text-gray-600'
-                        }`}
-                    >
-                      Registrarse
-                    </Text>
+                    {isLoading ? (
+                      <ActivityIndicator color="#000000" />
+                    ) : (
+                      <Text
+                        className={`font-bold ${isStepValid ? 'text-black' : 'text-gray-600'}`}
+                      >
+                        Registrarse
+                      </Text>
+                    )}
                   </Pressable>
                 </View>
               </View>
