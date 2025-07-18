@@ -22,11 +22,11 @@ export default function RegisterPersonal() {
   const router = useRouter()
   const { profile, setProfile } = useUserProfile()
 
-  const [fecha, setBirthdate] = useState<Date | null>(null)
-  const [genero, setGender] = useState<string | null>(null)
-  const [pais, setCountry] = useState<string | null>(null)
+  const [birthdate, setBirthdate] = useState<Date | null>(null)
+  const [gender, setGender] = useState<string | null>(null)
+  const [country, setCountry] = useState<string | null>(null)
 
-  const isStepValid = !!fecha
+  const isStepValid = !!birthdate
 
   const fade = useRef(new Animated.Value(0)).current
   useEffect(() => {
@@ -40,13 +40,13 @@ export default function RegisterPersonal() {
   const handleNext = () => {
     if (!isStepValid) return
     
-    const isoDate = fecha ? fecha.toISOString() : null;
+    const isoDate = birthdate ? birthdate.toISOString() : null;
     
     setProfile(prev => ({
       ...prev,
-      fecha: isoDate, 
-      genero,
-      pais
+      birthdate: isoDate, 
+      gender,
+      country
     }))
     
     router.push('/register/goals')
@@ -81,13 +81,13 @@ export default function RegisterPersonal() {
 
                 <DatePickerField
                   label="Fecha de nacimiento"
-                  date={fecha}
+                  date={birthdate}
                   onChange={setBirthdate}
                 />
 
                 <FloatingLabelSelect
                   label="Género"
-                  value={genero}
+                  value={gender}
                   onValueChange={setGender}
                   options={[
                     { label: 'Masculino', value: 'male' },
@@ -98,7 +98,7 @@ export default function RegisterPersonal() {
 
                 <FloatingLabelSelect
                   label="País"
-                  value={pais}
+                  value={country}
                   onValueChange={setCountry}
                   options={[
                     { label: 'España', value: 'es' },

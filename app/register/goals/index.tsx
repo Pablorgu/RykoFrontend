@@ -24,24 +24,24 @@ export default function RegisterGoals() {
   const router = useRouter()
   const { profile} = useUserProfile()
 
-  const [peso, setWeight] = useState('')
-  const [altura, setHeight] = useState('')
-  const [objetivo, setAim] = useState<string | null>(null)
-  const [calorias, setCalorieGoal] = useState('')
-  const [intolerancias, setIntolerances] = useState<string[]>([])
+  const [weight, setWeight] = useState('')
+  const [height, setHeight] = useState('')
+  const [aim, setAim] = useState<string | null>(null)
+  const [calorieGoal, setCalorieGoal] = useState('')
+  const [intolerances, setIntolerances] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Validación paso
-  const w = parseFloat(peso)
-  const h = parseFloat(altura)
-  const cg = parseInt(calorias, 10)
+  const w = parseFloat(weight)
+  const h = parseFloat(height)
+  const cg = parseInt(calorieGoal, 10)
   const isStepValid =
     !isNaN(w) &&
     w > 0 &&
     !isNaN(h) &&
     h > 0 &&
-    !!objetivo &&
+    !!aim &&
     !isNaN(cg) &&
     cg > 0
 
@@ -63,11 +63,11 @@ export default function RegisterGoals() {
     
     const updatedProfile = {
       ...profile,
-      peso,
-      altura,
-      objetivo,
-      calorias,
-      intolerancias
+      weight: parseInt(weight),
+      height: parseInt(height),
+      aim,
+      calorieGoal,
+      intolerances
     }
     console.log('Perfil actualizado:', updatedProfile)
     
@@ -115,21 +115,21 @@ export default function RegisterGoals() {
               }}>
                 <FloatingLabelInput
                   label="Peso (kg)"
-                  value={peso}
+                  value={weight}
                   onChangeText={setWeight}
                   inputProps={{ keyboardType: 'numeric' }}
                 />
 
                 <FloatingLabelInput
                   label="Altura (cm)"
-                  value={altura}
+                  value={height}
                   onChangeText={setHeight}
                   inputProps={{ keyboardType: 'numeric' }}
                 />
 
                 <FloatingLabelSelect
                   label="Objetivo"
-                  value={objetivo}
+                  value={aim}
                   onValueChange={setAim}
                   options={[
                     { label: 'Perder peso', value: 'weight_loss' },
@@ -140,14 +140,14 @@ export default function RegisterGoals() {
 
                 <FloatingLabelInput
                   label="Meta de calorías diarias"
-                  value={calorias}
+                  value={calorieGoal}
                   onChangeText={setCalorieGoal}
                   inputProps={{ keyboardType: 'numeric' }}
                 />
 
                 <FloatingLabelMultiSelect
-                  label="Intolerancias"
-                  values={intolerancias}
+                  label="intolerances"
+                  values={intolerances}
                   onChangeValues={setIntolerances}
                   options={[
                     { label: 'Gluten', value: 'gluten' },
