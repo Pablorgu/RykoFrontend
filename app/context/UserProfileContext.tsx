@@ -1,14 +1,14 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react'
 
 export interface UserProfile {
-  fecha?: string | Date | null
-  genero?: string | null
-  pais?: string | null
-  peso?: string
-  altura?: string
-  objetivo?: string | null
-  calorias?: string
-  intolerancias?: string[]
+  birthdate?: string | Date | null
+  gender?: string | null
+  country?: string | null
+  weight?: string
+  height?: string
+  aim?: string | null
+  calorieGoal?: string
+  intolerances?: string[]
 }
 
 interface UserProfileContextType {
