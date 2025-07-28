@@ -483,6 +483,7 @@ const toggleOption = (opt: string) => {
         animationType="slide"
         onRequestClose={closeModal}
       >
+        {/* KeyboardAvoidingView */}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{ flex: 1, justifyContent: 'flex-end' }}
