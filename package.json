@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~5.0.4",
+    "@gorhom/bottom-sheet": "^5.1.6",
     "@nestjs/mapped-types": "^2.1.0",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-native-community/datetimepicker": "^8.3.0",
@@ -21,6 +22,7 @@
     "axios": "^1.9.0",
     "expo": "~53.0.7",
     "expo-auth-session": "~6.2.1",
+    "expo-image-picker": "^16.1.4",
     "expo-router": "~5.0.7",
     "expo-secure-store": "~14.2.3",
     "expo-status-bar": "~2.2.3",
@@ -33,6 +35,7 @@
     "react-native": "0.79.2",
     "react-native-calendars": "^1.1312.1",
     "react-native-dropdown-picker": "^5.4.6",
+    "react-native-gesture-handler": "^2.27.2",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-paper": "^5.14.5",
     "react-native-picker-select": "^9.3.1",
