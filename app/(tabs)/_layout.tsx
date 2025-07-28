@@ -15,10 +15,7 @@ export default function HomeLayout() {
           paddingTop: 5,
           height: 60,
         },
-        headerStyle: {
-          backgroundColor: '#000',
-        },
-        headerTintColor: '#fff',
+        headerShown: false, // Esta línea oculta la cabecera
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
