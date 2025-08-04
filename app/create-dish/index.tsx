@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useEffect } from 'react';
+import React, { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,9 @@ import {
   Image,
   TextInput,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
+import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,17 +22,17 @@ import {
   BottomSheetModalProvider,
   BottomSheetModal,
   BottomSheetScrollView,
+  BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
-import FloatingLabelInput from '../utils/_FloatingLabel';
 import api from '../api/client';
 
 interface Food {
-  id: string;
+  barcode: any;
   name: string;
   brand?: string;
   carbohydrates: number,
   fat: number,
-  protein: number,
+  proteins: number,
 }
 interface Ingredient extends Food { quantity: number; }
 interface DishFormData { name: string; description: string; image: string | null; ingredients: Ingredient[]; }
@@ -56,8 +58,8 @@ export default function CreateDishScreen() {
     () => formData.ingredients.reduce(
       (acc, ing) => {
         const r = ing.quantity / 100;
-        return { carbs: acc.carbs + ing.carbohydrates * r, protein: acc.protein + ing.protein * r, fat: acc.fat + ing.fat * r };
-      }, { carbs: 0, protein: 0, fat: 0 }
+        return { carbs: acc.carbs + ing.carbohydrates * r, proteins: acc.proteins + ing.proteins * r, fat: acc.fat + ing.fat * r };
+      }, { carbs: 0, proteins: 0, fat: 0 }
     ), [formData.ingredients]
   );
   
@@ -88,18 +90,38 @@ export default function CreateDishScreen() {
   // Función para manejar la búsqueda manual únicamente
   const handleSearch = () => {
     if (searchQuery.trim().length >= 2) {
-      fetchFoods(searchQuery.trim());
+      // Primero abrir el bottom sheet
       searchSheetRef.current?.present();
+      // Luego iniciar la búsqueda
+      fetchFoods(searchQuery.trim());
     }
   };
 
-  // Función para abrir el modal de búsqueda
-  const openSearchModal = () => {
-    searchSheetRef.current?.present();
+  // Mantener la función original sin búsqueda automática
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    // Solo limpiar resultados si se borra todo, pero no hacer búsqueda automática
+    if (text.trim().length === 0) {
+      setResults([]);
+    }
   };
 
   const addIngredient = (food: Food) => { 
-    setFormData(d => ({ ...d, ingredients: [...d.ingredients, { ...food, quantity: 100 }] }));
+    // Crear un ingrediente único usando el barcode como identificador
+    const newIngredient = {
+      ...food,
+      quantity: 100,
+      // Si el mismo barcode ya existe, generar una instancia única
+      barcode: formData.ingredients.some(ing => ing.barcode === food.barcode) 
+        ? `${food.barcode}-${Date.now()}` 
+        : food.barcode
+    };
+    
+    setFormData(d => ({ 
+      ...d, 
+      ingredients: [...d.ingredients, newIngredient] 
+    }));
+    
     searchSheetRef.current?.close(); 
     setSearchQuery('');
     setResults([]);
@@ -117,7 +139,7 @@ export default function CreateDishScreen() {
 
   const saveQty = () => { 
     if (!selected) return; 
-    setFormData(d => ({ ...d, ingredients: d.ingredients.map(i => i.id === selected.id ? selected : i) })); 
+    setFormData(d => ({ ...d, ingredients: d.ingredients.map(i => i.barcode === selected.barcode ? selected : i) })); 
     qtySheetRef.current?.close(); 
   };
 
@@ -133,8 +155,8 @@ export default function CreateDishScreen() {
   };
 
   const MiniDonut = ({ onPress }: { onPress: () => void }) => {
-    const size = 60, t = totalMacros, tot = t.carbs + t.fat + t.protein || 1;
-    const steps = [t.carbs, t.fat, t.protein].map(v => (v / tot) * 360);
+    const size = 60, t = totalMacros, tot = t.carbs + t.fat + t.proteins || 1;
+    const steps = [t.carbs, t.fat, t.proteins].map(v => (v / tot) * 360);
     let start = 0;
     return (
       <Pressable onPress={onPress} className="items-center justify-center">
@@ -143,6 +165,133 @@ export default function CreateDishScreen() {
       </Pressable>
     );
   };
+
+  const updateIngredientQuantity = useCallback((ingredientId: string, newQuantity: number) => {
+    setFormData(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.map(ing => 
+        ing.barcode === ingredientId ? { ...ing, quantity: Math.round(newQuantity) } : ing
+      )
+    }));
+  }, []);
+  
+  const removeIngredient = useCallback((ingredientId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      ingredients: prev.ingredients.filter(ing => ing.barcode !== ingredientId)
+    }));
+  }, []);
+  
+  // Componente optimizado para ingrediente
+  const IngredientItem = React.memo(({ ingredient, index }: { ingredient: Ingredient; index: number }) => {
+  // Estado completamente independiente para cada slider
+  const [sliderValue, setSliderValue] = useState(ingredient.quantity);
+  const [isSliding, setIsSliding] = useState(false);
+  
+  // Solo sincronizar cuando el ingrediente cambie desde fuera Y no estemos deslizando
+  useEffect(() => {
+    if (!isSliding) {
+      setSliderValue(ingredient.quantity);
+    }
+  }, [ingredient.quantity, isSliding]);
+  
+  // Usar el valor del slider para los cálculos en tiempo real
+  const displayQuantity = isSliding ? sliderValue : ingredient.quantity;
+  const ratio = displayQuantity / 100;
+  const carbs = (ingredient.carbohydrates * ratio).toFixed(1);
+  const protein = (ingredient.proteins * ratio).toFixed(1);
+  const fat = (ingredient.fat * ratio).toFixed(1);
+  
+  const handleSliderStart = useCallback(() => {
+    setIsSliding(true);
+  }, []);
+  
+  const handleSliderChange = useCallback((value: number) => {
+    setSliderValue(value);
+  }, []);
+  
+  const handleSliderComplete = useCallback((value: number) => {
+    const roundedValue = Math.round(value);
+    setSliderValue(roundedValue);
+    setIsSliding(false);
+    updateIngredientQuantity(ingredient.barcode, roundedValue);
+  }, [ingredient.barcode]);
+  
+  const handleRemove = useCallback(() => {
+    removeIngredient(ingredient.barcode);
+  }, [ingredient.barcode]);
+  
+  return (
+    <View className="bg-slate-700 rounded-xl p-4 mb-3 shadow-lg">
+      {/* Header con nombre y botón eliminar */}
+      <View className="flex-row justify-between items-center mb-4">
+        <View className="flex-1">
+          <Text className="text-white font-semibold text-lg">{ingredient.name}</Text>
+          {ingredient.brand && (
+            <Text className="text-slate-400 text-sm mt-1">{ingredient.brand}</Text>
+          )}
+        </View>
+        <Pressable 
+          onPress={handleRemove}
+          className="bg-red-500 rounded-full p-2.5 shadow-md"
+          style={{ elevation: 3 }}
+        >
+          <Ionicons name="trash" size={16} color="white" />
+        </Pressable>
+      </View>
+      
+      {/* Slider de cantidad con diseño moderno */}
+      <View className="mb-4">
+        <View className="flex-row justify-between items-center mb-3">
+          <Text className="text-slate-300 text-sm font-medium">Cantidad</Text>
+          <View className="bg-[#A3FF57] px-3 py-1 rounded-full">
+            <Text className="text-black font-bold text-sm">{Math.round(displayQuantity)}g</Text>
+          </View>
+        </View>
+        
+        {/* Slider con key única y eventos separados */}
+        <View className="bg-slate-600 rounded-full p-1">
+          <Slider
+            key={`independent-slider-${ingredient.barcode}-${ingredient.name}-${index}`}
+            style={{ width: '100%', height: 40 }}
+            minimumValue={5}
+            maximumValue={500}
+            value={sliderValue}
+            onSlidingStart={handleSliderStart}
+            onValueChange={handleSliderChange}
+            onSlidingComplete={handleSliderComplete}
+            minimumTrackTintColor="#A3FF57"
+            maximumTrackTintColor="#475569"
+            thumbTintColor="#A3FF57"
+            step={5}
+          />
+        </View>
+      </View>
+      
+      {/* Macros con badges de colores */}
+      <View className="flex-row justify-between bg-slate-800 rounded-lg p-3">
+        <View className="items-center flex-1">
+          <View className="bg-[#A3FF57] rounded-full px-2 py-1 mb-1">
+            <Text className="text-black text-xs font-bold">C</Text>
+          </View>
+          <Text className="text-white font-semibold text-sm">{carbs}g</Text>
+        </View>
+        <View className="items-center flex-1">
+          <View className="bg-[#4DABF7] rounded-full px-2 py-1 mb-1">
+            <Text className="text-white text-xs font-bold">P</Text>
+          </View>
+          <Text className="text-white font-semibold text-sm">{protein}g</Text>
+        </View>
+        <View className="items-center flex-1">
+          <View className="bg-[#FFB84D] rounded-full px-2 py-1 mb-1">
+            <Text className="text-white text-xs font-bold">G</Text>
+          </View>
+          <Text className="text-white font-semibold text-sm">{fat}g</Text>
+        </View>
+      </View>
+    </View>
+  );
+});
 
   return (
     <BottomSheetModalProvider>
@@ -233,17 +382,14 @@ export default function CreateDishScreen() {
             {/* Ingredientes */}
             {formData.ingredients.length > 0 && (
               <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-                <Text className="text-slate-300 mb-2">Ingredientes</Text>
-                <View className="flex-row flex-wrap">
-                  {formData.ingredients.map(ing => (
-                    <Pressable key={ing.id} className="bg-slate-700 px-3 py-1 rounded-full mr-2 mb-2" onPress={() => onChipPress(ing)}>
-                      <Text className="text-white text-sm">{ing.name} ({ing.quantity}g)</Text>
-                    </Pressable>
-                  ))}
-                </View>
-                <View className="items-center mt-4">
-                  <MiniDonut onPress={() => {}} />
-                </View>
+                <Text className="text-slate-300 mb-4 text-lg font-semibold">Ingredientes</Text>
+                {formData.ingredients.map((ingredient, index) => (
+                  <IngredientItem 
+                    key={`ingredient-${ingredient.barcode}-${index}`} 
+                    ingredient={ingredient} 
+                    index={index} 
+                  />
+                ))}
               </View>
             )}
           </ScrollView>
@@ -261,31 +407,109 @@ export default function CreateDishScreen() {
           </View>
         )}
         {/* BottomSheet - Buscar */}
-        <BottomSheetModal ref={searchSheetRef} index={0} snapPoints={snapSearch} backgroundStyle={{ backgroundColor: '#1e293b' }} handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}>
-          <View className="p-4">
-            <Text className="text-white text-lg mb-4">Buscar alimentos</Text>
-            <TextInput value={searchQuery} onChangeText={setSearchQuery} placeholder="Escribe para buscar..." placeholderTextColor="#64748B" className="bg-slate-700 rounded-lg px-3 py-2 text-white mb-4" />
-            {loading ? <ActivityIndicator color="#A3FF57" /> : (
-              <BottomSheetScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-                {results.length === 0 && searchQuery.length >= 2 ? (
-                  <Text className="text-slate-400 text-center py-4">No se encontraron alimentos</Text>
-                ) : (
-                  results.map(food => (
-                    <Pressable key={food.id} className="flex-row justify-between items-center bg-slate-800 rounded-lg p-3 mb-2" onPress={() => addIngredient(food)}>
-                      <View className="flex-1">
-                        <Text className="text-white">{food.name}</Text>
-                        {food.brand && <Text className="text-slate-400 text-sm">{food.brand}</Text>}
-                        {food.carbohydrates && food.protein && food.fat && (
-                          <Text className="text-slate-500 text-xs mt-1">
-                            C: {food.carbohydrates}g | P: {food.protein}g | G: {food.fat}g
-                          </Text>
-                        )}
+        <BottomSheetModal 
+          ref={searchSheetRef} 
+          index={0} 
+          snapPoints={snapSearch} 
+          backgroundStyle={{ backgroundColor: '#1e293b' }} 
+          handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}
+        >
+          <View className="p-4 flex-1">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-white text-lg font-semibold">Buscar alimentos</Text>
+              {loading && (
+                <View className="flex-row items-center">
+                  <ActivityIndicator color="#A3FF57" size="small" />
+                  <Text className="text-[#A3FF57] text-sm ml-2">Buscando...</Text>
+                </View>
+              )}
+            </View>
+            
+            <TextInput 
+              value={searchQuery} 
+              onChangeText={setSearchQuery} 
+              placeholder="Escribe para buscar..." 
+              placeholderTextColor="#64748B" 
+              className="bg-slate-700 rounded-lg px-3 py-3 text-white mb-4" 
+              style={{
+                fontSize: 16,
+                color: '#ffffff',
+              }}
+              returnKeyType="search"
+              onSubmitEditing={handleSearch}
+            />
+            
+            {loading ? (
+              <View className="flex-1 justify-center items-center">
+                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                  <ActivityIndicator color="#A3FF57" size="large" />
+                  <Text className="text-white text-base mt-4 font-medium">Buscando ingredientes...</Text>
+                  <Text className="text-slate-400 text-sm mt-2 text-center">
+                    Estamos encontrando los mejores resultados para "{searchQuery}"
+                  </Text>
+                </View>
+              </View>
+            ) : results.length === 0 && searchQuery.length >= 2 ? (
+              <View className="flex-1 justify-center items-center">
+                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                  <Ionicons name="search-outline" size={48} color="#64748B" />
+                  <Text className="text-slate-400 text-base mt-4 font-medium">No se encontraron alimentos</Text>
+                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                    Intenta con otro término de búsqueda
+                  </Text>
+                </View>
+              </View>
+            ) : searchQuery.length < 2 ? (
+              <View className="flex-1 justify-center items-center">
+                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                  <Ionicons name="restaurant-outline" size={48} color="#64748B" />
+                  <Text className="text-slate-400 text-base mt-4 font-medium">Escribe al menos 2 caracteres</Text>
+                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                    Para comenzar a buscar ingredientes
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <BottomSheetFlatList
+                data={results}
+                keyExtractor={(item) => item.barcode}
+                renderItem={({ item: food }) => (
+                  <Pressable 
+                    className="flex-row justify-between items-center bg-slate-800 rounded-xl p-4 mb-3 shadow-sm" 
+                    onPress={() => addIngredient(food)}
+                    style={{ elevation: 2 }}
+                  >
+                    <View className="flex-1">
+                      <Text className="text-white font-semibold text-base">{food.name}</Text>
+                      {food.brand && (
+                        <Text className="text-slate-400 text-sm mt-1">{food.brand}</Text>
+                      )}
+                      <View className="flex-row mt-2">
+                        <View className="bg-[#A3FF57] px-2 py-1 rounded-full mr-2">
+                          <Text className="text-black text-xs font-medium">C: {food.carbohydrates}g</Text>
+                        </View>
+                        <View className="bg-[#4DABF7] px-2 py-1 rounded-full mr-2">
+                          <Text className="text-white text-xs font-medium">P: {food.proteins}g</Text>
+                        </View>
+                        <View className="bg-[#FFB84D] px-2 py-1 rounded-full">
+                          <Text className="text-black text-xs font-medium">G: {food.fat}g</Text>
+                        </View>
                       </View>
-                      <Ionicons name="add-circle" size={24} color="#A3FF57" />
-                    </Pressable>
-                  ))
+                    </View>
+                    <View className="bg-[#A3FF57] rounded-full p-2">
+                      <Ionicons name="add" size={24} color="black" />
+                    </View>
+                  </Pressable>
                 )}
-              </BottomSheetScrollView>
+                contentContainerStyle={{ paddingBottom: 20 }}
+                showsVerticalScrollIndicator={true}
+                ListEmptyComponent={() => (
+                  <View className="flex-1 justify-center items-center py-8">
+                    <Ionicons name="search-outline" size={48} color="#64748B" />
+                    <Text className="text-slate-400 text-base mt-4">Comienza a buscar ingredientes</Text>
+                  </View>
+                )}
+              />
             )}
           </View>
         </BottomSheetModal>
@@ -300,7 +524,7 @@ export default function CreateDishScreen() {
                 <Pressable className="bg-slate-700 rounded-full p-2" onPress={() => changeQty(10)}><Ionicons name="add" size={20} color="white" /></Pressable>
               </View>
               <View className="flex-row justify-between">
-                <Pressable className="flex-row items-center" onPress={() => { setFormData(d => ({ ...d, ingredients: d.ingredients.filter(i => i.id !== selected.id) })); qtySheetRef.current?.close(); }}>
+                <Pressable className="flex-row items-center" onPress={() => { setFormData(d => ({ ...d, ingredients: d.ingredients.filter(i => i.barcode !== selected.barcode) })); qtySheetRef.current?.close(); }}>
                   <Ionicons name="trash" size={20} color="#FF4D4F" />
                   <Text className="text-red-500 ml-2">Eliminar</Text>
                 </Pressable>
