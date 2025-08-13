@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import {
   View,
@@ -53,7 +54,7 @@ function MacroPieChart({ macros, screenWidth }: {
   const fatPercent = (macros.fat / total) * 100;
   const proteinPercent = (macros.protein / total) * 100;
   
-  // Tamaño dinámico del gráfico según el ancho de pantalla
+  // Dynamic size of the graph based on screen width
   const size = screenWidth < 480 ? 50 : screenWidth < 768 ? 55 : 60;
   const center = size / 2;
   const radius = size * 0.37;
@@ -98,7 +99,7 @@ function MacroPieChart({ macros, screenWidth }: {
       alignItems: 'center',
       gap: 8
     }}>
-      {/* Gráfico */}
+      {/* Graph */}
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <Path
@@ -116,7 +117,7 @@ function MacroPieChart({ macros, screenWidth }: {
         </Svg>
       </View>
       
-      {/* Leyenda adaptativa*/}
+      {/* Legend */}
       <View style={{ flexDirection: 'column', gap: 3, width: legendWidth }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
@@ -162,18 +163,19 @@ function handlePlatePress(plateId: string) {
 
 export default function plates() {
   const { width } = useWindowDimensions();
+  const router = useRouter();
   
   const margin = 16;
   let numCols: number;
   
   if (width < 480) {
-    numCols = 2; // Móvil: 2 tarjetas por fila
+    numCols = 2; // Mobile: 2 cards per row
   } else if (width < 768) {
-    numCols = 2; // Tablet pequeña: 2 tarjetas por fila
+    numCols = 2; // Small tablet: 2 cards per row
   } else if (width < 1200) {
-    numCols = 3; // Desktop: 3 tarjetas por fila
+    numCols = 3; // Desktop: 3 cards per row
   } else {
-    numCols = 4; // Desktop grande: 4 tarjetas por fila
+    numCols = 4; // Desktop: 4 cards per row
   }
   
   const cardWidth = (width - (numCols + 1) * margin) / numCols;
@@ -202,10 +204,10 @@ export default function plates() {
             color: '#FFFFFF',
             marginBottom: width < 480 ? 20 : 32
           }}>
-            Mis Platos
+            My plates
           </Text>
           
-          {/* Contenedor de tarjetas con cálculo dinámico */}
+          {/* Container of cards with dynamic calculations for each screen */}
           <View style={{
             flexDirection: 'row',
             flexWrap: 'wrap',
@@ -230,12 +232,12 @@ export default function plates() {
                 }}
                 onPress={() => handlePlatePress(plate.id)}
               >
-                {/* Layout vertical para todas las pantallas */}
+                {/* Vertical layout for all screens */}
                 <View style={{
                   flexDirection: 'column',
                   gap: width >= 768 ? 12 : 8
                 }}>
-                  {/* Imagen */}
+                  {/* Image */}
                   <View style={{
                     width: '100%',
                     marginBottom: width >= 768 ? 8 : 6
@@ -252,7 +254,7 @@ export default function plates() {
                     />
                   </View>
                   
-                  {/* Título e ingredientes */}
+                  {/* Title and ingredients */}
                   <View style={{ marginBottom: width >= 768 ? 8 : 6 }}>
                     <Text style={{
                       fontSize: titleSize,
@@ -282,7 +284,7 @@ export default function plates() {
                     </Text>
                   </View>
                   
-                  {/* Gráfico de macros */}
+                  {/* Macros chart */}
                   <View style={{
                     alignItems: 'center'
                   }}>
@@ -295,25 +297,27 @@ export default function plates() {
         </View>
       </ScrollView>
       
-      {/* Botón flotante + */}
+      {/* Floating button + */}
       <View style={{
         position: 'absolute',
         bottom: 24,
         right: 24
       }}>
-        <Pressable style={{
-          backgroundColor: '#22C55E',
-          width: 56,
-          height: 56,
-          borderRadius: 28,
-          alignItems: 'center',
-          justifyContent: 'center',
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          elevation: 8
-        }}>
+        <Pressable 
+          onPress={() => router.push('/create-dish')} // Agregar esta línea
+          style={{
+            backgroundColor: '#22C55E',
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 8
+          }}>
           <Text style={{
             color: '#FFFFFF',
             fontSize: 24,
