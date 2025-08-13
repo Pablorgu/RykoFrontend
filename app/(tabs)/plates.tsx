@@ -1,49 +1,27 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   Image,
   Pressable,
   ScrollView,
-  useWindowDimensions
+  useWindowDimensions,
+  ActivityIndicator
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import api from '../api/client';
+import { getCurrentUserId } from '../services/_user';
 
-const PLATES = [
-  {
-    id: '1',
-    name: 'Ensalada César',
-    description: 'Lechuga fresca, pollo y aderezo suave.',
-    image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=400&q=80',
-    ingredients: ['Lechuga', 'Pollo', 'Queso', 'Aderezo'],
-    macros: { carbs: 30, fat: 40, protein: 30 }
-  },
-  {
-    id: '2',
-    name: 'Tortilla de patatas',
-    description: 'Clásico español con huevo y patata.',
-    image: 'https://imgs.search.brave.com/MiNbBtaAR3TZGFGifkLd7F5ZbkCgw51T_2S5adex2U8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWFn/ZW5lcy4yMG1pbnV0/b3MuZXMvZmlsZXMv/aW1hZ2VfOTkwXzU1/Ni91cGxvYWRzL2lt/YWdlbmVzLzIwMjMv/MDQvMjYvdG9ydGls/bGEtZGUtcGF0YXRh/cy5qcGVn',
-    ingredients: ['Huevo', 'Patata', 'Cebolla', 'Aceite'],
-    macros: { carbs: 20, fat: 50, protein: 30 }
-  },
-  {
-    id: '3',
-    name: 'Salmón a la plancha',
-    description: 'Salmón fresco con verduras al vapor.',
-    image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=400&q=80',
-    ingredients: ['Salmón', 'Brócoli', 'Zanahoria', 'Limón'],
-    macros: { carbs: 15, fat: 35, protein: 50 }
-  },
-  {
-    id: '4',
-    name: 'Pasta Carbonara',
-    description: 'Pasta cremosa con panceta y queso parmesano.',
-    image: 'https://imgs.search.brave.com/oVAtekUMIzt9IevFPyoBgzJwhO_nx1aqIRy_2D-J5N0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNDY1/MTQyMTMyL3Bob3Rv/L3Bhc3RhLWNhcmJv/bmFyYS5qcGc_cz02/MTJ4NjEyJnc9MCZr/PTIwJmM9WkdXTFRf/X2J3ZG5yUVU0YnVj/b0tMMnVQdHIyWkx2/TVBNZzJVRmt2Q2Ry/bz0',
-    ingredients: ['Pasta', 'Panceta', 'Huevo', 'Parmesano'],
-    macros: { carbs: 55, fat: 25, protein: 20 }
-  }
-];
+// Interface for the dish data from API
+interface Dish {
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  ingredients: string[] | { name: string }[];
+  macros: { carbs: number; fat: number; protein: number };
+}
 
 function MacroPieChart({ macros, screenWidth }: { 
   macros: { carbs: number; fat: number; protein: number };
@@ -164,6 +142,48 @@ function handlePlatePress(plateId: string) {
 export default function plates() {
   const { width } = useWindowDimensions();
   const router = useRouter();
+  const [dishes, setDishes] = useState<Dish[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const fetchUserDishes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const userId = await getCurrentUserId();
+        if (!userId) {
+          setError('No se pudo obtener el ID del usuario');
+          return;
+        }
+        
+        const response = await api.get(`/dishes/user/${userId}/plates`);
+        
+        const dishesData = response.data.map((dish: any) => ({
+          id: dish.id,
+          name: dish.name,
+          description: dish.description || '',
+          image: dish.image || '',
+          ingredients: Array.isArray(dish.ingredients) 
+            ? dish.ingredients.map((ing: any) => 
+                typeof ing === 'string' ? ing : ing.name
+              )
+            : [],
+          macros: dish.macros || { carbs: 0, fat: 0, protein: 0 }
+        }));
+        
+        setDishes(dishesData);
+      } catch (error: any) {
+        console.error('Error fetching user dishes:', error);
+        setError(error.response?.data?.message || 'Error al cargar los platos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchUserDishes();
+  }, []);
   
   const margin = 16;
   let numCols: number;
@@ -186,6 +206,33 @@ export default function plates() {
   const subtitleSize = width < 480 ? 10 : width < 768 ? 11 : 12;
   const cardPadding = width < 480 ? 12 : width < 768 ? 14 : 18;
   
+  // Loading state
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#A3FF57" />
+        <Text style={{ color: '#FFFFFF', marginTop: 16, fontSize: 16 }}>Cargando platos...</Text>
+      </View>
+    );
+  }
+  
+  // Error state
+  if (error) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+        <Text style={{ color: '#FF6B6B', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>
+          {error}
+        </Text>
+        <Pressable 
+          style={{ backgroundColor: '#A3FF57', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8 }}
+          onPress={() => window.location.reload()}
+        >
+          <Text style={{ color: '#000000', fontWeight: '600' }}>Reintentar</Text>
+        </Pressable>
+      </View>
+    );
+  }
+  
   return (
     <View style={{ flex: 1, backgroundColor: '#0F172A' }}>
       <ScrollView 
@@ -207,93 +254,105 @@ export default function plates() {
             My plates
           </Text>
           
-          {/* Container of cards with dynamic calculations for each screen */}
-          <View style={{
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            marginHorizontal: -margin / 2
-          }}>
-            {PLATES.map(plate => (
-              <Pressable 
-                key={plate.id}
-                style={{
-                  width: cardWidth,
-                  marginHorizontal: margin / 2,
-                  marginBottom: margin,
-                  backgroundColor: '#1E293B',
-                  borderRadius: 16,
-                  padding: cardPadding,
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 8,
-                  elevation: 8,
-                  overflow: 'hidden'
-                }}
-                onPress={() => handlePlatePress(plate.id)}
-              >
-                {/* Vertical layout for all screens */}
-                <View style={{
-                  flexDirection: 'column',
-                  gap: width >= 768 ? 12 : 8
-                }}>
-                  {/* Image */}
+          {/* Empty state */}
+          {dishes.length === 0 ? (
+            <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 60 }}>
+              <Text style={{ color: '#94A3B8', fontSize: 18, textAlign: 'center', marginBottom: 16 }}>
+                No tienes platos creados aún
+              </Text>
+              <Text style={{ color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
+                Crea tu primer plato usando el botón +
+              </Text>
+            </View>
+          ) : (
+            /* Container of cards with dynamic calculations for each screen */
+            <View style={{
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              marginHorizontal: -margin / 2
+            }}>
+              {dishes.map(plate => (
+                <Pressable 
+                  key={plate.id}
+                  style={{
+                    width: cardWidth,
+                    marginHorizontal: margin / 2,
+                    marginBottom: margin,
+                    backgroundColor: '#1E293B',
+                    borderRadius: 16,
+                    padding: cardPadding,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 4 },
+                    shadowOpacity: 0.3,
+                    shadowRadius: 8,
+                    elevation: 8,
+                    overflow: 'hidden'
+                  }}
+                  onPress={() => handlePlatePress(plate.id)}
+                >
+                  {/* Vertical layout for all screens */}
                   <View style={{
-                    width: '100%',
-                    marginBottom: width >= 768 ? 8 : 6
+                    flexDirection: 'column',
+                    gap: width >= 768 ? 12 : 8
                   }}>
-                    <Image 
-                      source={{ uri: plate.image }} 
-                      style={{
-                        width: '100%',
-                        height: imageHeight,
-                        borderRadius: 12,
-                        backgroundColor: '#334155'
-                      }}
-                      resizeMode="cover"
-                    />
-                  </View>
-                  
-                  {/* Title and ingredients */}
-                  <View style={{ marginBottom: width >= 768 ? 8 : 6 }}>
-                    <Text style={{
-                      fontSize: titleSize,
-                      fontWeight: '600',
-                      color: '#FFFFFF',
-                      marginBottom: width >= 768 ? 8 : 6,
-                      textAlign: 'center'
-                    }} numberOfLines={2}>
-                      {plate.name}
-                    </Text>
-                    <Text style={{
-                      fontSize: subtitleSize,
-                      color: '#94A3B8',
-                      marginBottom: width >= 768 ? 6 : 4,
-                      textAlign: 'center'
+                    {/* Image */}
+                    <View style={{
+                      width: '100%',
+                      marginBottom: width >= 768 ? 8 : 6
                     }}>
-                      Ingredientes
-                    </Text>
-                    <Text style={{
-                      fontSize: subtitleSize,
-                      color: '#CBD5E1',
-                      textAlign: 'center',
-                      lineHeight: width >= 768 ? 18 : 16
-                    }} numberOfLines={2}>
-                      {plate.ingredients.slice(0, 3).join(', ')}
-                      {plate.ingredients.length > 3 ? '...' : ''}
-                    </Text>
+                      <Image 
+                        source={{ uri: plate.image || 'https://via.placeholder.com/400x300?text=Sin+Imagen' }} 
+                        style={{
+                          width: '100%',
+                          height: imageHeight,
+                          borderRadius: 12,
+                          backgroundColor: '#334155'
+                        }}
+                        resizeMode="cover"
+                      />
+                    </View>
+                    
+                    {/* Title and ingredients */}
+                    <View style={{ marginBottom: width >= 768 ? 8 : 6 }}>
+                      <Text style={{
+                        fontSize: titleSize,
+                        fontWeight: '600',
+                        color: '#FFFFFF',
+                        marginBottom: width >= 768 ? 8 : 6,
+                        textAlign: 'center'
+                      }} numberOfLines={2}>
+                        {plate.name}
+                      </Text>
+                      <Text style={{
+                        fontSize: subtitleSize,
+                        color: '#94A3B8',
+                        marginBottom: width >= 768 ? 6 : 4,
+                        textAlign: 'center'
+                      }}>
+                        Ingredientes
+                      </Text>
+                      <Text style={{
+                        fontSize: subtitleSize,
+                        color: '#CBD5E1',
+                        textAlign: 'center',
+                        lineHeight: width >= 768 ? 18 : 16
+                      }} numberOfLines={2}>
+                        {plate.ingredients.slice(0, 3).join(', ')}
+                        {plate.ingredients.length > 3 ? '...' : ''}
+                      </Text>
+                    </View>
+                    
+                    {/* Macros chart */}
+                    <View style={{
+                      alignItems: 'center'
+                    }}>
+                      <MacroPieChart macros={plate.macros} screenWidth={width} />
+                    </View>
                   </View>
-                  
-                  {/* Macros chart */}
-                  <View style={{
-                    alignItems: 'center'
-                  }}>
-                    <MacroPieChart macros={plate.macros} screenWidth={width} />
-                  </View>
-                </View>
-              </Pressable>
-            ))}
-          </View>
+                </Pressable>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
       
@@ -304,7 +363,7 @@ export default function plates() {
         right: 24
       }}>
         <Pressable 
-          onPress={() => router.push('/create-dish')} // Agregar esta línea
+          onPress={() => router.push('/create-dish')} 
           style={{
             backgroundColor: '#22C55E',
             width: 56,
