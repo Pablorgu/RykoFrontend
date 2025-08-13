@@ -16,7 +16,6 @@ import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
 import {
   BottomSheetModalProvider,
@@ -25,7 +24,8 @@ import {
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
 import api from '../api/client';
-
+import { getCurrentUserId } from '../services/_user';
+import * as ImagePicker from 'expo-image-picker';
 interface Food {
   barcode: any;
   name: string;
@@ -33,6 +33,7 @@ interface Food {
   carbohydrates: number,
   fat: number,
   proteins: number,
+  calories: number, 
 }
 interface Ingredient extends Food { quantity: number; }
 interface DishFormData { name: string; description: string; image: string | null; ingredients: Ingredient[]; }
@@ -65,13 +66,6 @@ export default function CreateDishScreen() {
   
   const valid = formData.name.trim() !== '' && formData.ingredients.length > 0;
 
-  const pickImage = async () => {
-    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) return;
-    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images, allowsEditing: true, aspect: [16, 9], quality: 0.8 });
-    if (!result.canceled) setFormData(d => ({ ...d, image: result.assets[0].uri }));
-  };
-
   const fetchFoods = async (q: string) => {
     setLoading(true);
     try {
@@ -87,31 +81,31 @@ export default function CreateDishScreen() {
     }
   };
 
-  // Función para manejar la búsqueda manual únicamente
+  // Function to handle manual search only
   const handleSearch = () => {
     if (searchQuery.trim().length >= 2) {
-      // Primero abrir el bottom sheet
+      // First open the bottom sheet
       searchSheetRef.current?.present();
-      // Luego iniciar la búsqueda
+      // Then start the search
       fetchFoods(searchQuery.trim());
     }
   };
 
-  // Mantener la función original sin búsqueda automática
+  // Keep the original function without automatic search
   const handleSearchChange = (text: string) => {
     setSearchQuery(text);
-    // Solo limpiar resultados si se borra todo, pero no hacer búsqueda automática
+    // Only clear results if everything is deleted, but don't do automatic search
     if (text.trim().length === 0) {
       setResults([]);
     }
   };
 
   const addIngredient = (food: Food) => { 
-    // Crear un ingrediente único usando el barcode como identificador
+    // Create a unique ingredient using barcode as identifier
     const newIngredient = {
       ...food,
       quantity: 100,
-      // Si el mismo barcode ya existe, generar una instancia única
+      // If the same barcode already exists, generate a unique instance
       barcode: formData.ingredients.some(ing => ing.barcode === food.barcode) 
         ? `${food.barcode}-${Date.now()}` 
         : food.barcode
@@ -142,28 +136,121 @@ export default function CreateDishScreen() {
     setFormData(d => ({ ...d, ingredients: d.ingredients.map(i => i.barcode === selected.barcode ? selected : i) })); 
     qtySheetRef.current?.close(); 
   };
+function dataUrlToFile(dataUrl: string, filename: string): File {
+  const [header, base64] = dataUrl.split(',');
+  const mime = header.match(/data:(.*?);base64/)?.[1] ?? 'image/jpeg';
+  const bin = atob(base64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const blob = new Blob([bytes], { type: mime });
+  return new File([blob], filename, { type: mime });
+}
 
-  const saveDish = () => { if (!valid) { 
-    if (!formData.name.trim()) setErrors({ name: 'Requerido' }); return; 
-    } 
-    setShowToast(true); 
-    setTimeout(() => { 
-      setShowToast(false); 
-      router.back(); 
-    },
-     2000); 
-  };
+async function pickImage() {
+  // 1) Permissions
+  const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!granted) { alert('Se necesitan permisos para acceder a la galería'); return; }
 
-  const MiniDonut = ({ onPress }: { onPress: () => void }) => {
-    const size = 60, t = totalMacros, tot = t.carbs + t.fat + t.proteins || 1;
-    const steps = [t.carbs, t.fat, t.proteins].map(v => (v / tot) * 360);
-    let start = 0;
-    return (
-      <Pressable onPress={onPress} className="items-center justify-center">
-        <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        </Svg>
-      </Pressable>
-    );
+  // 2) Open gallery IMAGES ONLY
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],          // use strings; enums deprecated
+    allowsEditing: true,
+    aspect: [16, 9],
+    quality: 0.8,
+    base64: Platform.OS === 'web',   // useful if data URL comes in web
+    allowsMultipleSelection: false,
+  });
+  if (result.canceled || !result.assets?.[0]) return;
+
+  const a = result.assets[0];
+  const name = a.fileName || `image_${Date.now()}.jpg`;
+  const type = (a as any).mimeType || 'image/jpeg';
+
+  // 3) Size limit (5MB)
+  if (a.fileSize && a.fileSize > 5 * 1024 * 1024) {
+    alert('La imagen es demasiado grande (máx. 5MB).');
+    return;
+  }
+
+  // 4) Build FormData (MUST be called 'file' for FileInterceptor('file'))
+  const form = new FormData();
+
+  if (Platform.OS === 'web') {
+    // Web: prefer asset.file if exists; if not, convert data URL to File
+    const webFile: File =
+      (a as any).file
+        ? (a as any).file
+        : a.uri.startsWith('data:')
+          ? dataUrlToFile(a.uri, name)
+          : new File([await (await fetch(a.uri)).blob()], name, { type });
+
+    form.append('file', webFile);
+  } else {
+    // Native: RN converts {uri,name,type} to binary when sending
+    form.append('file', { uri: a.uri, name, type } as any);
+  }
+
+  // 5) Send (don't force Content-Type, better let it set the boundary)
+  try {
+    const resp = await api.post('/upload/image', form, { timeout: 30000 });
+    // 6) Save the URL returned by the backend in the dish state
+    setFormData(d => ({ ...d, image: resp.data.url }));
+  } catch (err: any) {
+    console.error('Error subiendo imagen:', err?.response?.data || err?.message || err);
+    alert(`Error al subir la imagen: ${err?.response?.data?.message || err?.message || 'desconocido'}`);
+  }
+}
+
+
+  const saveDish = async () => {
+    if (!valid) {
+      if (!formData.name.trim()) setErrors({ name: 'Requerido' });
+      return;
+    }
+  
+    try {
+      const currentUser = await getCurrentUserId();
+      console.log("current user: ", currentUser)
+      if (!currentUser) {
+        console.error('No se pudo obtener el usuario actual');
+        alert('Error obteniendo información del usuario.');
+        return;
+      }
+  
+      // Preparar los datos del plato en el formato requerido
+      const dishData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        image: formData.image || "",
+        UserId: currentUser,
+        ingredients: formData.ingredients.map(ingredient => ({
+          barcode: parseInt(ingredient.barcode) || ingredient.barcode,
+          quantity: ingredient.quantity
+        }))
+      };
+  
+      console.log('Enviando datos del plato:', dishData);
+  
+ 
+      const response = await api.post('/dishes/create', dishData);
+      
+      if (response.status === 201 || response.status === 200) {
+        console.log('Plato guardado exitosamente:', response.data);
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+          router.back();
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Error guardando el plato:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Error desconocido al guardar el plato';
+      
+      alert(`Error al guardar el plato: ${errorMessage}`);
+    }
   };
 
   const updateIngredientQuantity = useCallback((ingredientId: string, newQuantity: number) => {
@@ -182,25 +269,26 @@ export default function CreateDishScreen() {
     }));
   }, []);
   
-  // Componente optimizado para ingrediente
+  // Optimized component for ingredient
   const IngredientItem = React.memo(({ ingredient, index }: { ingredient: Ingredient; index: number }) => {
   // Estado completamente independiente para cada slider
   const [sliderValue, setSliderValue] = useState(ingredient.quantity);
   const [isSliding, setIsSliding] = useState(false);
   
-  // Solo sincronizar cuando el ingrediente cambie desde fuera Y no estemos deslizando
+  // Only synchronize when the ingredient changes externally and we are not sliding
   useEffect(() => {
     if (!isSliding) {
       setSliderValue(ingredient.quantity);
     }
   }, [ingredient.quantity, isSliding]);
   
-  // Usar el valor del slider para los cálculos en tiempo real
+  // Use the slider value for real-time calculations
   const displayQuantity = isSliding ? sliderValue : ingredient.quantity;
   const ratio = displayQuantity / 100;
   const carbs = (ingredient.carbohydrates * ratio).toFixed(1);
   const protein = (ingredient.proteins * ratio).toFixed(1);
   const fat = (ingredient.fat * ratio).toFixed(1);
+  const calories = (ingredient.calories * ratio).toFixed(0);
   
   const handleSliderStart = useCallback(() => {
     setIsSliding(true);
@@ -223,7 +311,7 @@ export default function CreateDishScreen() {
   
   return (
     <View className="bg-slate-700 rounded-xl p-4 mb-3 shadow-lg">
-      {/* Header con nombre y botón eliminar */}
+      {/* Header with name and remove button */}
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-1">
           <Text className="text-white font-semibold text-lg">{ingredient.name}</Text>
@@ -240,16 +328,16 @@ export default function CreateDishScreen() {
         </Pressable>
       </View>
       
-      {/* Slider de cantidad con diseño moderno */}
+      {/* Slider of quantity with modern design */}
       <View className="mb-4">
         <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-slate-300 text-sm font-medium">Cantidad</Text>
+          <Text className="text-slate-300 text-sm font-medium">Quantity</Text>
           <View className="bg-[#A3FF57] px-3 py-1 rounded-full">
             <Text className="text-black font-bold text-sm">{Math.round(displayQuantity)}g</Text>
           </View>
         </View>
         
-        {/* Slider con key única y eventos separados */}
+        {/* Slider with event key and separated handlers */}
         <View className="bg-slate-600 rounded-full p-1">
           <Slider
             key={`independent-slider-${ingredient.barcode}-${ingredient.name}-${index}`}
@@ -268,7 +356,7 @@ export default function CreateDishScreen() {
         </View>
       </View>
       
-      {/* Macros con badges de colores */}
+      {/* Badges with macros */}
       <View className="flex-row justify-between bg-slate-800 rounded-lg p-3">
         <View className="items-center flex-1">
           <View className="bg-[#A3FF57] rounded-full px-2 py-1 mb-1">
@@ -288,10 +376,18 @@ export default function CreateDishScreen() {
           </View>
           <Text className="text-white font-semibold text-sm">{fat}g</Text>
         </View>
+        <View className="items-center flex-1">
+          <View className="bg-[#FF6B6B] rounded-full px-2 py-1 mb-1">
+            <Text className="text-white text-xs font-bold">Cal</Text>
+          </View>
+          <Text className="text-white font-semibold text-sm">{calories}</Text>
+        </View>
       </View>
     </View>
   );
 });
+
+  
 
   return (
     <BottomSheetModalProvider>
@@ -303,7 +399,7 @@ export default function CreateDishScreen() {
         </View>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
           <ScrollView className="px-4 pb-20" showsVerticalScrollIndicator={false}>
-            {/* Nombre */}
+            {/* Name */}
             <View className="bg-slate-800 p-4 rounded-2xl mb-4">
               <Text className="text-slate-300 mb-2">Nombre</Text>
               <TextInput
@@ -325,7 +421,7 @@ export default function CreateDishScreen() {
               />
               {errors.name && <Text className="text-red-500 text-sm mt-1">{errors.name}</Text>}
             </View>
-            {/* Descripción */}
+            {/* Description */}
             <View className="bg-slate-800 p-4 rounded-2xl mb-4">
               <Text className="text-slate-300 mb-2">Descripción</Text>
               <TextInput
@@ -344,14 +440,14 @@ export default function CreateDishScreen() {
                 placeholder="Describe tu plato..."
               />
             </View>
-            {/* Imagen */}
+            {/* Image */}
             <View className="bg-slate-800 p-4 rounded-2xl mb-4">
               <Text className="text-slate-300 mb-2">Imagen</Text>
               <Pressable className="h-40 border-2 border-dashed border-slate-600 rounded-2xl items-center justify-center" onPress={pickImage}>
                 {formData.image ? <Image source={{ uri: formData.image }} className="w-full h-full rounded-2xl" /> : <Ionicons name="add" size={32} color="#A3FF57" />}
               </Pressable>
             </View>
-            {/* Búsqueda */}
+            {/* Search */}
             <View className="bg-slate-800 p-4 rounded-2xl mb-4">
               <Text className="text-slate-300 mb-2">Buscar alimento</Text>
               <View className="flex-row items-center">
@@ -379,7 +475,7 @@ export default function CreateDishScreen() {
                 </Pressable>
               </View>
             </View>
-            {/* Ingredientes */}
+            {/* Ingredients */}
             {formData.ingredients.length > 0 && (
               <View className="bg-slate-800 p-4 rounded-2xl mb-4">
                 <Text className="text-slate-300 mb-4 text-lg font-semibold">Ingredientes</Text>
@@ -394,7 +490,7 @@ export default function CreateDishScreen() {
             )}
           </ScrollView>
         </KeyboardAvoidingView>
-        {/* Botón Guardar */}
+        {/* Save button */}
         <View className="absolute bottom-0 left-0 right-0 bg-slate-900 bg-opacity-90 p-4">
           <Pressable className={`w-full py-4 rounded-2xl items-center ${valid ? 'bg-[#A3FF57]' : 'bg-slate-700'}`} onPress={saveDish} disabled={!valid}>
             <Text className="text-white font-semibold text-lg">Guardar Plato</Text>
@@ -406,7 +502,7 @@ export default function CreateDishScreen() {
             <Text className="text-white font-medium">¡Plato creado!</Text>
           </View>
         )}
-        {/* BottomSheet - Buscar */}
+        {/* BottomSheet - Search */}
         <BottomSheetModal 
           ref={searchSheetRef} 
           index={0} 
@@ -513,7 +609,7 @@ export default function CreateDishScreen() {
             )}
           </View>
         </BottomSheetModal>
-        {/* BottomSheet - Cantidad */}
+        {/* BottomSheet - Quantity */}
         <BottomSheetModal ref={qtySheetRef} index={0} snapPoints={snapQty} backgroundStyle={{ backgroundColor: '#1e293b' }} handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}>
           {selected && (
             <View className="p-4">
