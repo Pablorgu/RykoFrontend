@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
   ActivityIndicator
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import api from '../api/client';
 import { getCurrentUserId } from '../services/_user';
@@ -142,6 +143,7 @@ function handlePlatePress(plateId: string) {
 export default function plates() {
   const { width } = useWindowDimensions();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -242,7 +244,7 @@ export default function plates() {
       >
         <View style={{ 
           paddingHorizontal: margin,
-          paddingTop: width < 480 ? 20 : 32,
+          paddingTop: width < 480 ? insets.top + 20 : 32,
           paddingBottom: 16
         }}>
           <Text style={{
