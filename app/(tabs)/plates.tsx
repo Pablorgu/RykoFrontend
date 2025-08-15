@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -138,6 +138,7 @@ function MacroPieChart({ macros, screenWidth }: {
 
 function handlePlatePress(plateId: string) {
   console.log('Navegando a detalles del plato:', plateId);
+  router.push(`/dish-detail/${plateId}`);
 }
 
 export default function plates() {
@@ -253,7 +254,7 @@ export default function plates() {
             color: '#FFFFFF',
             marginBottom: width < 480 ? 20 : 32
           }}>
-            My plates
+            Mis platos
           </Text>
           
           {/* Empty state */}
