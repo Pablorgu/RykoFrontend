@@ -26,6 +26,7 @@ import {
 import api from '../api/client';
 import { getCurrentUserId } from '../services/_user';
 import * as ImagePicker from 'expo-image-picker';
+import QuantitySlider from '../utils/_QuantitySlider';
 interface Food {
   barcode: any;
   name: string;
@@ -269,40 +270,17 @@ async function pickImage() {
     }));
   }, []);
   
-  // Optimized component for ingredient
+  // Optimized ingredient item component
   const IngredientItem = React.memo(({ ingredient, index }: { ingredient: Ingredient; index: number }) => {
-  // Estado completamente independiente para cada slider
-  const [sliderValue, setSliderValue] = useState(ingredient.quantity);
-  const [isSliding, setIsSliding] = useState(false);
-  
-  // Only synchronize when the ingredient changes externally and we are not sliding
-  useEffect(() => {
-    if (!isSliding) {
-      setSliderValue(ingredient.quantity);
-    }
-  }, [ingredient.quantity, isSliding]);
-  
-  // Use the slider value for real-time calculations
-  const displayQuantity = isSliding ? sliderValue : ingredient.quantity;
+  const displayQuantity = ingredient.quantity;
   const ratio = displayQuantity / 100;
   const carbs = (ingredient.carbohydrates * ratio).toFixed(1);
   const protein = (ingredient.proteins * ratio).toFixed(1);
   const fat = (ingredient.fat * ratio).toFixed(1);
   const calories = (ingredient.calories * ratio).toFixed(0);
   
-  const handleSliderStart = useCallback(() => {
-    setIsSliding(true);
-  }, []);
-  
-  const handleSliderChange = useCallback((value: number) => {
-    setSliderValue(value);
-  }, []);
-  
-  const handleSliderComplete = useCallback((value: number) => {
-    const roundedValue = Math.round(value);
-    setSliderValue(roundedValue);
-    setIsSliding(false);
-    updateIngredientQuantity(ingredient.barcode, roundedValue);
+  const handleQuantityChange = useCallback((newQuantity: number) => {
+    updateIngredientQuantity(ingredient.barcode, newQuantity);
   }, [ingredient.barcode]);
   
   const handleRemove = useCallback(() => {
@@ -311,7 +289,7 @@ async function pickImage() {
   
   return (
     <View className="bg-slate-700 rounded-xl p-4 mb-3 shadow-lg">
-      {/* Header with name and remove button */}
+      {/* Header with name */}
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-1">
           <Text className="text-white font-semibold text-lg">{ingredient.name}</Text>
@@ -319,42 +297,19 @@ async function pickImage() {
             <Text className="text-slate-400 text-sm mt-1">{ingredient.brand}</Text>
           )}
         </View>
-        <Pressable 
-          onPress={handleRemove}
-          className="bg-red-500 rounded-full p-2.5 shadow-md"
-          style={{ elevation: 3 }}
-        >
-          <Ionicons name="trash" size={16} color="white" />
-        </Pressable>
       </View>
       
       {/* Slider of quantity with modern design */}
-      <View className="mb-4">
-        <View className="flex-row justify-between items-center mb-3">
-          <Text className="text-slate-300 text-sm font-medium">Quantity</Text>
-          <View className="bg-[#A3FF57] px-3 py-1 rounded-full">
-            <Text className="text-black font-bold text-sm">{Math.round(displayQuantity)}g</Text>
-          </View>
-        </View>
-        
-        {/* Slider with event key and separated handlers */}
-        <View className="bg-slate-600 rounded-full p-1">
-          <Slider
-            key={`independent-slider-${ingredient.barcode}-${ingredient.name}-${index}`}
-            style={{ width: '100%', height: 40 }}
-            minimumValue={5}
-            maximumValue={500}
-            value={sliderValue}
-            onSlidingStart={handleSliderStart}
-            onValueChange={handleSliderChange}
-            onSlidingComplete={handleSliderComplete}
-            minimumTrackTintColor="#A3FF57"
-            maximumTrackTintColor="#475569"
-            thumbTintColor="#A3FF57"
-            step={5}
-          />
-        </View>
-      </View>
+      <QuantitySlider
+        value={ingredient.quantity}
+        onValueChange={handleQuantityChange}
+        onRemove={handleRemove}
+        showRemoveButton={true}
+        minimumValue={5}
+        maximumValue={500}
+        step={5}
+        label="Cantidad"
+      />
       
       {/* Badges with macros */}
       <View className="flex-row justify-between bg-slate-800 rounded-lg p-3">
