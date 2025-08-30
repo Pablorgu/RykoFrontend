@@ -66,7 +66,7 @@ export default function RegisterGoals() {
       weight: parseInt(weight),
       height: parseInt(height),
       aim,
-      calorieGoal,
+      calorieGoal: parseInt(calorieGoal),
       intolerances
     }
     console.log('Perfil actualizado:', updatedProfile)
