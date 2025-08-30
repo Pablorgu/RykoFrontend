@@ -6,7 +6,6 @@ import { nutrientsForDayAsync } from '../(types)/nutrition';
 import { Dish, MEAL_ORDER } from '../(types)/domain';
 import { MealCarousel } from '../utils/home/_MealCarousel';
 import { DayTotals } from '../utils/home/_DayTotals';
-import { getDishById } from '../services/dishService';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -16,12 +15,6 @@ export default function HomeScreen() {
     const today = new Date().toISOString().split('T')[0];
     loadDayData(today);
   }, [loadDayData]);
-  
-  // Function to get dish by ID
-  const getDishByIdAsync = async (id: string): Promise<Dish | undefined> => {
-    const dish = await getDishById(id);
-    return dish || undefined;
-  };
   
   // Calculate day totals
   const [dayNutrients, setDayNutrients] = React.useState({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
