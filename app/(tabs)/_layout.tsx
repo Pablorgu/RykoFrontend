@@ -15,7 +15,7 @@ export default function HomeLayout() {
           paddingTop: 5,
           height: 60,
         },
-        headerShown: false, // Esta línea oculta la cabecera
+        headerShown: false,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '500',
@@ -23,16 +23,16 @@ export default function HomeLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Inicio',
+          title: 'Día',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" size={size} color={color} />
+            <Ionicons name="calendar-outline" size={size} color={color} />
           ),
         }}
       />
       <Tabs.Screen
-        name="meals"
+        name="plates"
         options={{
           title: 'Comidas',
           tabBarIcon: ({ color, size }) => (
