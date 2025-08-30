@@ -74,7 +74,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         </View>
         <View className="bg-zinc-700 rounded-full h-4 overflow-hidden">
           <View
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full"
+            className="h-full bg-blue-500 rounded-full"
             style={{ width: `${Math.min(caloriesPercentage, 100)}%` }}
           />
         </View>
