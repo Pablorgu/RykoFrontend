@@ -60,9 +60,13 @@ export const addDishToMeal = async (
   dishId: number
 ): Promise<MealItemDto | null> => {
   try {
-    const response = await api.post(`/day/${date}/meals/${mealType}/dishes`, {
+    const addDishToMealDto = {
       dishId,
-    });
+    };
+    const response = await api.post(
+      `/day/${date}/meals/${mealType}/dishes`,
+      addDishToMealDto
+    );
     return response.data;
   } catch (error) {
     console.error("Error adding dish to meal:", error);
