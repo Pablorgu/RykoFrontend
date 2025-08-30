@@ -178,7 +178,7 @@ export const useDayStore = create<DayStore>((set, get) => ({
   ) => {
     const currentDay = get().day;
     const ingredientIdNumber = parseInt(ingredientId);
-
+  
     // Validate mealDishId not undefined
     if (mealDishId === undefined || mealDishId === null) {
       console.error("mealDishId is undefined or null");
@@ -186,35 +186,45 @@ export const useDayStore = create<DayStore>((set, get) => ({
       set({ error });
       throw new Error(error);
     }
-
-    // Optimistic UI update
+  
+    // Optimistic UI update with deep copy
     set((state) => {
-      const newDay = { ...state.day };
-      const meal = newDay.meals.find((m) => m.type === mealType);
-
-      if (meal) {
-        const mealDish = meal.items.find(
-          (item) => item.mealDishId === mealDishId
-        );
-
-        if (mealDish) {
-          const existingOverride = mealDish.overrides.find(
-            (o) => o.ingredientId === ingredientId
-          );
-
-          if (existingOverride) {
-            existingOverride.grams = grams;
-          } else {
-            mealDish.overrides.push({ ingredientId, grams });
+      const newDay = {
+        ...state.day,
+        meals: state.day.meals.map(meal => {
+          if (meal.type === mealType) {
+            return {
+              ...meal,
+              items: meal.items.map(item => {
+                if (item.mealDishId === mealDishId) {
+                  const existingOverrideIndex = item.overrides.findIndex(
+                    (o) => o.ingredientId === ingredientId
+                  );
+                  
+                  let newOverrides;
+                  if (existingOverrideIndex >= 0) {
+                    newOverrides = item.overrides.map((override, index) => 
+                      index === existingOverrideIndex 
+                        ? { ...override, grams }
+                        : override
+                  );
+                  } else {
+                    newOverrides = [...item.overrides, { ingredientId, grams }];
+                  }
+                  
+                  return {
+                    ...item,
+                    overrides: newOverrides
+                  };
+                }
+                return item;
+              })
+            };
           }
-        } else {
-          console.error("MealDish not found with mealDishId:", mealDishId);
-          const error = "Plato no encontrado";
-          set({ error });
-          throw new Error(error);
-        }
-      }
-
+          return meal;
+        })
+      };
+  
       return { day: newDay, error: null };
     });
 

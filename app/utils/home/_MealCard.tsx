@@ -25,31 +25,23 @@ export function MealCard({ mealType }: MealCardProps) {
   
   // Obtener la comida específica del día
   const meal = day?.meals.find(m => m.type === mealType);
-  
-  // Crear una dependencia que cambie cuando los overrides cambien
-  const mealDependency = React.useMemo(() => {
-    if (!meal) return null;
-    // Crear un hash que incluya todos los overrides
-    const overridesHash = meal.items.map(item => {
-      const sortedOverrides = [...item.overrides].sort((a, b) => a.ingredientId.localeCompare(b.ingredientId));
-      return `${item.mealDishId}:${sortedOverrides.map(o => `${o.ingredientId}=${o.grams}`).join(',')}`;
-    }).join('|');
-    
-    return `${meal.type}-${overridesHash}-${meal.items.length}`;
-  }, [meal]);
-  
-  // Calcular nutrientes de la comida de forma asíncrona
-  useEffect(() => {
+
+  React.useEffect(() => {
     const calculateNutrients = async () => {
       if (meal) {
-        const nutrients = await nutrientsForMealAsync(meal);
-        setMealNutrients(nutrients);
+        try {
+          const nutrients = await nutrientsForMealAsync(meal);
+          setMealNutrients(nutrients);
+        } catch (error) {
+          console.error('Error calculating meal nutrients:', error);
+          setMealNutrients({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
+        }
       } else {
         setMealNutrients({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
       }
     };
     calculateNutrients();
-  }, [mealDependency]);
+  }, [meal]);
   
   // Obtener userId al montar el componente
   useEffect(() => {
