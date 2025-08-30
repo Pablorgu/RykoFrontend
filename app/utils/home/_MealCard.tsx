@@ -115,8 +115,11 @@ export function MealCard({ mealType }: MealCardProps) {
     setSearchResults([]);
   };
 
-  const handleRemoveDish = async (index: number) => {
-    await removeDishFromMeal(mealType, index);
+  const handleRemoveDish = async (mealDishId: number) => {
+    try {
+      await removeDishFromMeal(mealType, mealDishId);
+    } catch (error) {
+    }
   };
 
   // Responsive text sizes
