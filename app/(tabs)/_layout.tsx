@@ -34,7 +34,7 @@ export default function HomeLayout() {
       <Tabs.Screen
         name="plates"
         options={{
-          title: 'Comidas',
+          title: 'Platos',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="restaurant-outline" size={size} color={color} />
           ),
