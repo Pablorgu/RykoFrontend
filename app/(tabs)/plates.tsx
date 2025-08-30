@@ -1,5 +1,6 @@
 import { router, useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -149,44 +150,46 @@ export default function plates() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  useEffect(() => {
-    const fetchUserDishes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const userId = await getCurrentUserId();
-        if (!userId) {
-          setError('No se pudo obtener el ID del usuario');
-          return;
-        }
-        
-        const response = await api.get(`/dishes/user/${userId}/plates`);
-        
-        const dishesData = response.data.map((dish: any) => ({
-          id: dish.id,
-          name: dish.name,
-          description: dish.description || '',
-          image: dish.image || '',
-          ingredients: Array.isArray(dish.ingredients) 
-            ? dish.ingredients.map((ing: any) => 
-                typeof ing === 'string' ? ing : ing.name
-              )
-            : [],
-          macros: dish.macros || { carbs: 0, fat: 0, protein: 0 }
-        }));
-        
-        setDishes(dishesData);
-      } catch (error: any) {
-        console.error('Error fetching user dishes:', error);
-        setError(error.response?.data?.message || 'Error al cargar los platos');
-      } finally {
-        setLoading(false);
+  const fetchUserDishes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const userId = await getCurrentUserId();
+      if (!userId) {
+        setError('No se pudo obtener el ID del usuario');
+        return;
       }
-    };
-    
-    fetchUserDishes();
-  }, []);
+      
+      const response = await api.get(`/dishes/user/${userId}/plates`);
+      
+      const dishesData = response.data.map((dish: any) => ({
+        id: dish.id,
+        name: dish.name,
+        description: dish.description || '',
+        image: dish.image || '',
+        ingredients: Array.isArray(dish.ingredients) 
+          ? dish.ingredients.map((ing: any) => 
+              typeof ing === 'string' ? ing : ing.name
+            )
+          : [],
+        macros: dish.macros || { carbs: 0, fat: 0, protein: 0 }
+      }));
+      
+      setDishes(dishesData);
+    } catch (error: any) {
+      console.error('Error fetching user dishes:', error);
+      setError(error.response?.data?.message || 'Error al cargar los platos');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchUserDishes();
+    }, [])
+  );
   
   const margin = 16;
   let numCols: number;
