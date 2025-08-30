@@ -148,3 +148,14 @@ export const convertDayToDayDto = (day: Day): DayDto => {
     })),
   };
 };
+
+// Delete a dish by ID
+export const deleteDish = async (id: string): Promise<boolean> => {
+  try {
+    await api.delete(`/dishes/${id}`);
+    return true;
+  } catch (error) {
+    console.error("Error deleting dish:", error);
+    return false;
+  }
+};

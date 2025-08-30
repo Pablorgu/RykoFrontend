@@ -11,6 +11,8 @@ import {
   TextInput,
   ActivityIndicator,
   Dimensions,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,6 +29,7 @@ import api from '../api/client';
 import { getCurrentUserId } from '../services/_user';
 import * as ImagePicker from 'expo-image-picker';
 import QuantitySlider from '../utils/_QuantitySlider';
+import { deleteDish } from '../services/dishService';
 
 interface Food {
   barcode: any;
@@ -68,6 +71,7 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
   const [errors, setErrors] = useState({ name: '' });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
@@ -392,6 +396,39 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
     }));
   }, []);
 
+
+const handleDeleteDish = () => {
+  setShowConfirmModal(true);
+};
+
+const confirmDelete = async () => {
+  setShowConfirmModal(false);
+  if (!id) return;
+  
+  try {
+    const success = await deleteDish(id as string);
+    if (success) {
+      setToastMessage('Plato eliminado correctamente');
+      setShowToast(true);
+      setTimeout(() => {
+        router.back();
+      }, 1500);
+    } else {
+      setToastMessage('Error al eliminar el plato');
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    }
+  } catch (error) {
+    setToastMessage('Error al eliminar el plato');
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  }
+};
+
+const cancelDelete = () => {
+  setShowConfirmModal(false);
+};
+
   // Optimized ingredient item component
   const IngredientItem = React.memo(({ ingredient, index }: { ingredient: Ingredient; index: number }) => {
     const displayQuantity = ingredient.quantity;
@@ -481,13 +518,20 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
           <Text className="text-lg font-semibold text-white">
             {isEditing ? 'Editar Plato' : 'Detalle del Plato'}
           </Text>
-          <Pressable onPress={() => setIsEditing(!isEditing)}>
-            <Ionicons 
-              name={isEditing ? 'eye-outline' : 'create-outline'} 
-              size={24} 
-              color="white" 
-            />
-          </Pressable>
+          <View className="flex-row items-center space-x-3">
+            {!readOnly && (
+              <Pressable onPress={handleDeleteDish}>
+                <Ionicons name="trash-outline" size={24} color="#ef4444" />
+              </Pressable>
+            )}
+            <Pressable onPress={() => setIsEditing(!isEditing)}>
+              <Ionicons 
+                name={isEditing ? 'eye-outline' : 'create-outline'} 
+                size={24} 
+                color="white" 
+              />
+            </Pressable>
+          </View>
         </View>
 
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
@@ -804,6 +848,37 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
             </View>
           )}
         </BottomSheetModal>
+
+        {/* Confirmation Modal of deletion*/}
+        <Modal
+          visible={showConfirmModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={cancelDelete}
+        >
+          <View className="flex-1 justify-center items-center bg-black/50">
+            <View className="bg-zinc-800 rounded-lg p-6 mx-4 max-w-sm w-full">
+              <Text className="text-white text-lg font-bold mb-2">Eliminar plato</Text>
+              <Text className="text-zinc-300 mb-6">
+                ¿Estás seguro de que quieres eliminar "{formData.name}"?
+              </Text>
+              <View className="flex-row justify-end space-x-3">
+                <TouchableOpacity
+                  onPress={cancelDelete}
+                  className="px-4 py-2 rounded bg-zinc-600 mr-3"
+                >
+                  <Text className="text-white">Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={confirmDelete}
+                  className="px-4 py-2 rounded bg-red-600"
+                >
+                  <Text className="text-white font-bold">Eliminar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </BottomSheetModalProvider>
   );
