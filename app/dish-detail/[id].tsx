@@ -355,7 +355,7 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
       };
 
       console.log('Actualizando ingredientes del plato:', ingredientsData);
-      const ingredientsResponse = await api.put(`/dishes/${id}/food-items`, ingredientsData);
+      const ingredientsResponse = await api.put(`/dishes/${id}/ingredients`, ingredientsData);
 
       if ((dishResponse.status === 200 || dishResponse.status === 201) && 
           (ingredientsResponse.status === 200 || ingredientsResponse.status === 201)) {
