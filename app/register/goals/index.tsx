@@ -67,7 +67,14 @@ export default function RegisterGoals() {
       height: parseInt(height),
       aim,
       calorieGoal: parseInt(calorieGoal),
-      intolerances
+      intolerances,
+      birthdate: profile.birthdate 
+        ? (profile.birthdate instanceof Date 
+            ? profile.birthdate.toISOString().split('T')[0] 
+            : profile.birthdate)
+        : undefined,
+      gender: profile.gender || undefined,
+      country: profile.country || undefined
     }
     console.log('Perfil actualizado:', updatedProfile)
     
