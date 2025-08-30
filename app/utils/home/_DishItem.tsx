@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Modal } from 'react-native';
 import { IngredientQuantity } from './_IngredientQuantity';
 import { NutrientBadges } from '../common/_NutrientBadges';
 import { MealDishIngredientOverrideDto, MealType, Dish } from '../../(types)/domain';
@@ -26,6 +26,7 @@ export function DishItem({
   const [dish, setDish] = useState<Dish | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingUpdates, setPendingUpdates] = useState<Map<string, number>>(new Map());
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     const fetchDish = async () => {
@@ -120,68 +121,102 @@ export function DishItem({
   const overrideMap = new Map(effectiveOverrides.map(o => [o.ingredientId, o.grams]));
 
   const handleRemove = () => {
-    Alert.alert(
-      'Quitar plato',
-      `¿Estás seguro de que quieres quitar "${dish.name}"?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Quitar', style: 'destructive', onPress: onRemove },
-      ]
-    );
+    setShowConfirmModal(true);
+  };
+
+  const confirmRemove = () => {
+    setShowConfirmModal(false);
+    onRemove();
+  };
+
+  const cancelRemove = () => {
+    setShowConfirmModal(false);
   };
 
   return (
-    <View className="bg-zinc-900 rounded-lg p-2 border border-zinc-800">
-      {/* Indicador de error si existe */}
-      {error && (
-        <View className="bg-red-900/20 border border-red-500/30 rounded p-2 mb-2">
-          <Text className="text-red-400 text-xs">{error}</Text>
+    <>
+      <View className="bg-zinc-900 rounded-lg p-2 border border-zinc-800">
+        {/* Indicador de error si existe */}
+        {error && (
+          <View className="bg-red-900/20 border border-red-500/30 rounded p-2 mb-2">
+            <Text className="text-red-400 text-xs">{error}</Text>
+          </View>
+        )}
+        
+        {/* Header del plato */}
+        <View className="flex-row justify-between items-center mb-1">
+          <Text className="text-zinc-100 font-bold text-sm flex-1">{dish.name}</Text>
+          <TouchableOpacity
+            onPress={handleRemove}
+            className="bg-red-600 rounded-full w-6 h-6 items-center justify-center ml-2"
+          >
+            <Text className="text-white text-sm font-bold">×</Text>
+          </TouchableOpacity>
         </View>
-      )}
-      
-      {/* Header del plato */}
-      <View className="flex-row justify-between items-center mb-1">
-        <Text className="text-zinc-100 font-bold text-sm flex-1">{dish.name}</Text>
-        <TouchableOpacity
-          onPress={handleRemove}
-          className="bg-red-600 rounded-full w-6 h-6 items-center justify-center ml-2"
-        >
-          <Text className="text-white text-sm font-bold">×</Text>
-        </TouchableOpacity>
+
+        {/* Nutrientes */}
+        <View className="mb-1">
+          <NutrientBadges nutrients={dishNutrients} />
+        </View>
+
+        {/* Ingredientes con indicadores de estado */}
+        <View>
+          {dish.ingredients.map(ingredient => {
+            const currentGrams = overrideMap.get(ingredient.id) ?? ingredient.baseQuantity;
+            const isPending = pendingUpdates.has(ingredient.id);
+            
+            return (
+              <View key={ingredient.id} className="relative">
+                <IngredientQuantity
+                  value={currentGrams}
+                  onChange={(grams) => handleIngredientChange(ingredient.id, grams)}
+                  ingredientName={ingredient.name}
+                  min={0}
+                  max={ingredient.baseQuantity * 3}
+                  step={5}
+                />
+                {isPending && (
+                  <View className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                    <View className="bg-yellow-500 rounded-full w-2 h-2" />
+                  </View>
+                )}
+              </View>
+            );
+          })}
+        </View>
       </View>
 
-      {/* Nutrientes */}
-      <View className="mb-1">
-        <NutrientBadges nutrients={dishNutrients} />
-      </View>
-
-      {/* Ingredientes con indicadores de estado */}
-      <View>
-        {dish.ingredients.map(ingredient => {
-          const currentGrams = overrideMap.get(ingredient.id) ?? ingredient.baseQuantity;
-          const isPending = pendingUpdates.has(ingredient.id);
-          
-          return (
-            <View key={ingredient.id} className="relative">
-              <IngredientQuantity
-                value={currentGrams}
-                onChange={(grams) => handleIngredientChange(ingredient.id, grams)}
-                ingredientName={ingredient.name}
-                min={0}
-                max={500}
-                step={5}
-              />
-              {/* Indicador de actualización pendiente */}
-              {isPending && (
-                <View className="absolute right-2 top-2">
-                  <View className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse" />
-                </View>
-              )}
+      {/* Modal de confirmación personalizado */}
+      <Modal
+        visible={showConfirmModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={cancelRemove}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-zinc-800 rounded-lg p-6 mx-4 max-w-sm w-full">
+            <Text className="text-white text-lg font-bold mb-2">Quitar plato</Text>
+            <Text className="text-zinc-300 mb-6">
+              ¿Estás seguro de que quieres quitar "{dish?.name}"?
+            </Text>
+            <View className="flex-row justify-end space-x-3">
+              <TouchableOpacity
+                onPress={cancelRemove}
+                className="px-4 py-2 rounded bg-zinc-600 mr-3"
+              >
+                <Text className="text-white">Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmRemove}
+                className="px-4 py-2 rounded bg-red-600"
+              >
+                <Text className="text-white font-bold">Quitar</Text>
+              </TouchableOpacity>
             </View>
-          );
-        })}
-      </View>
-    </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
