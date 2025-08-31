@@ -308,6 +308,16 @@ const toggleOption = (opt: string) => {
       {/* Top Bar */}
       
       <ScrollView className="flex-1 px-6 pt-6" showsVerticalScrollIndicator={false}>
+        {/* Profile Title*/}
+        <Text style={{
+          fontSize: width < 480 ? 20 : width < 768 ? 24 : 28,
+          fontWeight: '600',
+          color: '#FFFFFF',
+          marginBottom: width < 480 ? 20 : 32
+        }}>
+          Perfil
+        </Text>
+        
         {/* Account Information Card */}
         <ProfileCard
           title="Información de cuenta"
@@ -315,12 +325,13 @@ const toggleOption = (opt: string) => {
           <ProfileRow
             label="Nombre de usuario"
             value={formData.username}
-            rightElement={<Text className="text-[#A3FF57] text-base">Cambiar</Text>}
+            rightElement={<Ionicons name="pencil" size={18} color="#A3FF57" />}
             onPress={() => openModal('username', formData.username)}
           />
           <ProfileRow
             label="Email"
             value={formData.email}
+            rightElement={<Ionicons name="copy-outline" size={18} color="#9CA3AF" />}
             onPress={() => {/* Copy email logic */}}
           />
         </ProfileCard>
@@ -332,6 +343,7 @@ const toggleOption = (opt: string) => {
           <ProfileRow
             label="Fecha de nacimiento"
             value={formData.birthdate ? formData.birthdate.slice(0, 10) : 'No especificada'}
+            rightElement={<Ionicons name="pencil" size={18} color="#A3FF57" />}
             onPress={() => openModal('birthDate', formData.birthdate.slice(0, 10))}
           />
           <ProfileRow
@@ -343,7 +355,7 @@ const toggleOption = (opt: string) => {
           <ProfileRow
             label="País"
             value={formData.country || 'No especificado'}
-            rightElement={<Text className="text-2xl">🌍</Text>}
+            rightElement={<Ionicons name="chevron-down" size={20} color="#FFFFFF" />}
             onPress={() => openModal('country', formData.country)}
           />
         </ProfileCard>
@@ -355,11 +367,13 @@ const toggleOption = (opt: string) => {
           <ProfileRow
             label="Peso (kg)"
             value={formData.weight || 'No especificado'}
+            rightElement={<Ionicons name="pencil" size={18} color="#A3FF57" />}
             onPress={() => openModal('weight', formData.weight)}
           />
           <ProfileRow
             label="Altura (cm)"
             value={formData.height || 'No especificada'}
+            rightElement={<Ionicons name="pencil" size={18} color="#A3FF57" />}
             onPress={() => openModal('height', formData.height)}
           />
         </ProfileCard>
