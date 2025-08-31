@@ -157,41 +157,41 @@ export function NutrientBadges({
   return (
     <View className="flex-row flex-wrap gap-1.5">
       {/* Calories */}
-      <View className="bg-zinc-800/80 px-2.5 py-1 rounded-md border border-zinc-700/50">
+      <View className="bg-app-macro-calories px-2.5 py-1 rounded-md border border-app-macro-calories/60">
         <Text className="text-white text-xs font-medium">
           {Math.round(nutrients.kcal)}
         </Text>
-        <Text className="text-zinc-400 text-[10px] uppercase tracking-wide">
+        <Text className="text-white text-[10px] uppercase tracking-wide">
           calorías
         </Text>
       </View>
       
       {/* Proteins */}
-      <View className="bg-emerald-500/20 px-2.5 py-1 rounded-md border border-emerald-500/30">
-        <Text className="text-emerald-300 text-xs font-medium">
+      <View className="bg-app-macro-protein px-2.5 py-1 rounded-md border border-app-macro-protein/60">
+        <Text className="text-white text-xs font-medium">
           {Math.round(nutrients.protein)}g
         </Text>
-        <Text className="text-emerald-400/70 text-[10px] uppercase tracking-wide">
+        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
           proteínas
         </Text>
       </View>
       
       {/* Carbohydrates */}
-      <View className="bg-blue-500/20 px-2.5 py-1 rounded-md border border-blue-500/30">
-        <Text className="text-blue-300 text-xs font-medium">
+      <View className="bg-app-macro-carbs px-2.5 py-1 rounded-md border border-app-macro-carbs/60">
+        <Text className="text-white text-xs font-medium">
           {Math.round(nutrients.carbs)}g
         </Text>
-        <Text className="text-blue-400/70 text-[10px] uppercase tracking-wide">
+        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
           carbohidratos
         </Text>
       </View>
       
       {/* Fats */}
-      <View className="bg-amber-500/20 px-2.5 py-1 rounded-md border border-amber-500/30">
-        <Text className="text-amber-300 text-xs font-medium">
+      <View className="bg-app-macro-fat px-2.5 py-1 rounded-md border border-app-macro-fat/60">
+        <Text className="text-white text-xs font-medium">
           {Math.round(nutrients.fat)}g
         </Text>
-        <Text className="text-amber-400/70 text-[10px] uppercase tracking-wide">
+        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
           grasas
         </Text>
       </View>
