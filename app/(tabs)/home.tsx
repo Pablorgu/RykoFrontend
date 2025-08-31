@@ -87,9 +87,7 @@ export default function HomeScreen() {
       return 'Mañana';
     } else {
       return date.toLocaleDateString('es-ES', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long'
+        weekday: 'long'
       });
     }
   };
