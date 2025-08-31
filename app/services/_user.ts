@@ -1,15 +1,20 @@
 import api from "../api/client";
 import { UserProfile, useUserProfile } from "../context/UserProfileContext";
-import { getToken } from "./_storage";
+import { useAuthStore } from "../(store)/authStore";
 import { UserProfileDto } from "../(types)/_UserProfileDto";
 
 export async function getCurrentUserId(): Promise<number | null> {
+  const { user, loadUserProfile } = useAuthStore.getState();
+
+  if (user) {
+    return user.id;
+  }
+
+  // If no user try to load it
   try {
-    const token = await getToken();
-    console.log("Token sacado:", token);
-    if (!token) return null;
-    const { data } = await api.get(`/auth/me?token=${token}`);
-    return data.id;
+    await loadUserProfile();
+    const { user: updatedUser } = useAuthStore.getState();
+    return updatedUser?.id || null;
   } catch (error) {
     console.error("Error obteniendo ID del usuario:", error);
     return null;
@@ -33,7 +38,13 @@ export async function updateUserProfile(
   try {
     const userId = await getCurrentUserId();
     if (!userId) return false;
+
     await api.put(`/users/update-profile/${userId}`, profileData);
+
+    // Update user in store after update
+    const { loadUserProfile } = useAuthStore.getState();
+    await loadUserProfile();
+
     return true;
   } catch (error) {
     console.error("Error actualizando perfil de usuario:", error);

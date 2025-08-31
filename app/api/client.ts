@@ -45,4 +45,23 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// 401 Interceptor
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Dynamic import to avoid circular dependencies
+      const { useAuthStore } = await import("../(store)/authStore");
+      const { logout } = useAuthStore.getState();
+      await logout();
+
+      // Redirect to login if in a protected route
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;

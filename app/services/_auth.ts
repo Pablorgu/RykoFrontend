@@ -1,5 +1,6 @@
 import api from "../api/client";
 import { storeToken, removeToken } from "../services/_storage";
+import { useAuthStore } from "../(store)/authStore";
 
 export interface User {
   id: number;
@@ -19,7 +20,14 @@ export async function loginLocal(
       email,
       password,
     });
+
     await storeToken(data.access_token);
+
+    // Update store
+    const { setToken, loadUserProfile } = useAuthStore.getState();
+    setToken(data.access_token);
+    await loadUserProfile();
+
     return true;
   } catch (err: any) {
     return false;
@@ -35,7 +43,14 @@ export async function registerLocal(
       "/auth/register",
       { email, password }
     );
+
     await storeToken(data.access_token);
+
+    // Update store
+    const { setToken, loadUserProfile } = useAuthStore.getState();
+    setToken(data.access_token);
+    await loadUserProfile();
+
     return true;
   } catch (error) {
     console.error("Error en registro:", error);
@@ -48,32 +63,11 @@ export async function loginWithGoogle(token: string) {
 }
 
 export async function logout(): Promise<void> {
-  await removeToken();
+  const { logout } = useAuthStore.getState();
+  await logout();
 }
 
-export async function getCurrentUser(token: string): Promise<User | null> {
-  try {
-    const { data } = await api.get<User>("/auth/me", {
-      data: { token },
-    });
-    return data;
-  } catch (error: any) {
-    console.error("Error obteniendo usuario:", error);
-
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      await removeToken();
-    }
-
-    return null;
-  }
+export async function getCurrentUser(): Promise<User | null> {
+  const { user } = useAuthStore.getState();
+  return user;
 }
-
-// export async function getUserId(): Promise<string | null> {
-//   const user = await getCurrentUser(d);
-//   return user?.id.toString() || null;
-// }
-
-// export async function isAuthenticated(): Promise<boolean> {
-//   const user = await getCurrentUser();
-//   return user !== null;
-// }

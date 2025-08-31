@@ -12,7 +12,8 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
-  Keyboard
+  Keyboard,
+  TouchableOpacity
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,11 +53,14 @@ const MODAL_OPTIONS = {
 const { width } = Dimensions.get('window');
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
+import { useAuthStore } from '../(store)/authStore';
+
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
-  const [user, setUser] = useState< User| null > (null);
-  const [loading, setLoading] = useState(true);
+  const { user, setUser, logout: authLogout } = useAuthStore();
+  const [loading, setLoading] = useState(false);
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   // Form states
   const [formData, setFormData] = useState({
@@ -234,22 +238,43 @@ const updateMacro = (
 
   // Modal content
   
-  const handleLogout = async () => {
-    Alert.alert(
-      'Cerrar sesión',
-      '¿Estás seguro de que quieres cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Cerrar sesión',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/login');
-          }
-        }
-      ]
-    );
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        username: user.username || '',
+        email: user.email || '',
+        birthdate: user.birthdate || '',
+        gender: user.gender ? (user.gender === 'male' ? 'Hombre' : user.gender === 'female' ? 'Mujer' : 'Otro') : '',
+        country: user.country ? CODE_TO_NAME[user.country] : '',
+        weight: user.weight?.toString() || '',
+        height: user.height?.toString() || '',
+        aim: user.aim ? AIM_CODE_TO_NAME[user.aim] : '',
+        calorieGoal: user.calorieGoal?.toString() || '',
+        proteinPct: user.proteinPct || 30,
+        carbsPct: user.carbsPct || 40,
+        fatPct: user.fatPct || 30,
+        intolerances: user.intolerances || []
+      }));
+    }
+  }, [user]);
+  
+  const handleLogout = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = async () => {
+    setShowLogoutModal(false);
+    try {
+      authLogout();
+      router.replace('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const isSelected = (opt: string) =>
@@ -477,6 +502,103 @@ const toggleOption = (opt: string) => {
       )}
       
       {/* Modal */}
+      <Modal
+        visible={activeModal !== null}
+        transparent
+        animationType="slide"
+        onRequestClose={closeModal}
+      >
+        {/* KeyboardAvoidingView */}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}
+        >
+          <View className="flex-1 justify-end bg-black/50">
+            <View className="bg-gray-900 rounded-t-3xl p-6">
+              <View className="flex-row justify-between items-center mb-4">
+                <Text className="text-white text-lg font-semibold">Editar</Text>
+                <Pressable onPress={closeModal}>
+                  <Ionicons name="close" size={24} color="#FFFFFF" />
+                </Pressable>
+              </View>
+              
+        {MODAL_OPTIONS[activeModal as keyof typeof MODAL_OPTIONS] ? (
+          MODAL_OPTIONS[activeModal as keyof typeof MODAL_OPTIONS].list.map(opt => {
+            const selected = isSelected(opt);
+            return (
+              <Pressable
+                key={opt}
+                className={`flex-row items-center p-3 rounded-2xl mb-2 ${
+                  selected ? 'bg-[#A3FF57]' : 'bg-gray-800'
+                }`}
+                onPress={() => toggleOption(opt)}
+              >
+                <Text className={`text-base ${selected ? 'text-black font-semibold' : 'text-white'}`}>
+                  {opt}
+                </Text>
+              </Pressable>
+            );
+          })
+        ) : (
+            <TextInput
+              className="bg-gray-800 text-white p-4 rounded-2xl mb-4"
+              value={tempValue}
+              onChangeText={setTempValue}
+              placeholder={activeModal === 'birthDate' ? 'YYYY-MM-DD' : 'Ingresa el valor'}
+              keyboardType={activeModal === 'birthDate' ? 'numeric' : 'default'}
+              placeholderTextColor="#666"
+              autoFocus
+            />
+          )
+        }
+
+        <Pressable onPress={saveModalValue}>
+          <Text>…Guardar…</Text>
+        </Pressable>
+
+                
+                <Pressable
+                  className="bg-[#A3FF57] py-3 rounded-2xl"
+                  onPress={saveModalValue}
+                >
+                  <Text className="text-black text-center font-semibold">Guardar</Text>
+                </Pressable>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
+      {/* Confirmation logout modal */}
+      <Modal
+        visible={showLogoutModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={cancelLogout}
+      >
+        <View className="flex-1 justify-center items-center bg-black/50">
+          <View className="bg-zinc-800 rounded-lg p-6 mx-4 max-w-sm w-full">
+            <Text className="text-white text-lg font-bold mb-2">Cerrar sesión</Text>
+            <Text className="text-zinc-300 mb-6">
+              ¿Estás seguro de que quieres cerrar sesión?
+            </Text>
+            <View className="flex-row justify-end space-x-3">
+              <TouchableOpacity
+                onPress={cancelLogout}
+                className="px-4 py-2 rounded bg-zinc-600 mr-3"
+              >
+                <Text className="text-white">Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={confirmLogout}
+                className="px-4 py-2 rounded bg-red-600"
+              >
+                <Text className="text-white font-bold">Cerrar sesión</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      
+      {/* Existence modal */}
       <Modal
         visible={activeModal !== null}
         transparent
