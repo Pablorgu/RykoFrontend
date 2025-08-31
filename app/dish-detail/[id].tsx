@@ -512,7 +512,7 @@ const cancelDelete = () => {
       <SafeAreaView className={`flex-1 bg-app-bg-primary pt-${insets.top}`}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-4">
-          <Pressable onPress={() => router.back()}>
+          <Pressable onPress={() => router.push('/plates')}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </Pressable>
           <Text className="text-lg font-semibold text-app-text-primary">
