@@ -321,7 +321,6 @@ const toggleOption = (opt: string) => {
           <ProfileRow
             label="Email"
             value={formData.email}
-            rightElement={<Ionicons name="copy-outline" size={20} color="#FFFFFF" />}
             onPress={() => {/* Copy email logic */}}
           />
         </ProfileCard>
@@ -514,7 +513,7 @@ const toggleOption = (opt: string) => {
           style={{ flex: 1, justifyContent: 'flex-end' }}
         >
           <View className="flex-1 justify-end bg-black/50">
-            <View className="bg-gray-900 rounded-t-3xl p-6">
+            <View className="bg-zinc-900 rounded-t-3xl p-6">
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-white text-lg font-semibold">Editar</Text>
                 <Pressable onPress={closeModal}>
@@ -529,7 +528,7 @@ const toggleOption = (opt: string) => {
               <Pressable
                 key={opt}
                 className={`flex-row items-center p-3 rounded-2xl mb-2 ${
-                  selected ? 'bg-[#A3FF57]' : 'bg-gray-800'
+                  selected ? 'bg-[#A3FF57]' : 'bg-[#2D2D30]'
                 }`}
                 onPress={() => toggleOption(opt)}
               >
@@ -541,7 +540,7 @@ const toggleOption = (opt: string) => {
           })
         ) : (
             <TextInput
-              className="bg-gray-800 text-white p-4 rounded-2xl mb-4"
+              className="bg-[#2D2D30] text-white p-4 rounded-2xl mb-4"
               value={tempValue}
               onChangeText={setTempValue}
               placeholder={activeModal === 'birthDate' ? 'YYYY-MM-DD' : 'Ingresa el valor'}
@@ -553,10 +552,7 @@ const toggleOption = (opt: string) => {
         }
 
         <Pressable onPress={saveModalValue}>
-          <Text>…Guardar…</Text>
         </Pressable>
-
-                
                 <Pressable
                   className="bg-[#A3FF57] py-3 rounded-2xl"
                   onPress={saveModalValue}
@@ -611,7 +607,7 @@ const toggleOption = (opt: string) => {
           style={{ flex: 1, justifyContent: 'flex-end' }}
         >
           <View className="flex-1 justify-end bg-black/50">
-            <View className="bg-gray-900 rounded-t-3xl p-6">
+            <View className="bg-zinc-900 rounded-t-3xl p-6">
               <View className="flex-row justify-between items-center mb-4">
                 <Text className="text-white text-lg font-semibold">Editar</Text>
                 <Pressable onPress={closeModal}>
@@ -626,7 +622,7 @@ const toggleOption = (opt: string) => {
               <Pressable
                 key={opt}
                 className={`flex-row items-center p-3 rounded-2xl mb-2 ${
-                  selected ? 'bg-[#A3FF57]' : 'bg-gray-800'
+                  selected ? 'bg-[#A3FF57]' : 'bg-[#2D2D30]'
                 }`}
                 onPress={() => toggleOption(opt)}
               >
@@ -638,7 +634,7 @@ const toggleOption = (opt: string) => {
           })
         ) : (
             <TextInput
-              className="bg-gray-800 text-white p-4 rounded-2xl mb-4"
+              className="bg-[#3D3D40] text-white p-4 rounded-2xl mb-4"
               value={tempValue}
               onChangeText={setTempValue}
               placeholder={activeModal === 'birthDate' ? 'YYYY-MM-DD' : 'Ingresa el valor'}
@@ -650,10 +646,7 @@ const toggleOption = (opt: string) => {
         }
 
         <Pressable onPress={saveModalValue}>
-          <Text>…Guardar…</Text>
-        </Pressable>
-
-                
+           </Pressable>
                 <Pressable
                   className="bg-[#A3FF57] py-3 rounded-2xl"
                   onPress={saveModalValue}

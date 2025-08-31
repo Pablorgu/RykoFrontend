@@ -215,7 +215,7 @@ export default function plates() {
   // Loading state
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#A3FF57" />
         <Text style={{ color: '#FFFFFF', marginTop: 16, fontSize: 16 }}>Cargando platos...</Text>
       </View>
@@ -225,13 +225,13 @@ export default function plates() {
   // Error state
   if (error) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0F172A', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <View style={{ flex: 1, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <Text style={{ color: '#FF6B6B', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>
           {error}
         </Text>
         <Pressable 
           style={{ backgroundColor: '#A3FF57', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8 }}
-          onPress={() => window.location.reload()}
+          onPress={fetchUserDishes}
         >
           <Text style={{ color: '#000000', fontWeight: '600' }}>Reintentar</Text>
         </Pressable>
@@ -240,7 +240,7 @@ export default function plates() {
   }
   
   return (
-    <View style={{ flex: 1, backgroundColor: '#0F172A' }}>
+    <View style={{ flex: 1, backgroundColor: '#000000' }}>
       <ScrollView 
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -284,7 +284,7 @@ export default function plates() {
                     width: cardWidth,
                     marginHorizontal: margin / 2,
                     marginBottom: margin,
-                    backgroundColor: '#1E293B',
+                    backgroundColor: '#27272a',
                     borderRadius: 16,
                     padding: cardPadding,
                     shadowColor: '#000',
@@ -312,7 +312,7 @@ export default function plates() {
                           width: '100%',
                           height: imageHeight,
                           borderRadius: 12,
-                          backgroundColor: '#334155'
+                          backgroundColor: '#3f3f46'
                         }}
                         resizeMode="cover"
                       />

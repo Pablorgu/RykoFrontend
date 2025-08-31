@@ -8,7 +8,7 @@ export interface ProfileCardProps {
 
 export function ProfileCard({ title, children }:ProfileCardProps) {
   return (
-    <View className="bg-gray-900 rounded-2xl p-6 mb-4" style={{
+    <View className="bg-zinc-900 rounded-2xl p-6 mb-4" style={{
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
