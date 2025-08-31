@@ -240,7 +240,7 @@ async function pickImage() {
         setShowToast(true);
         setTimeout(() => {
           setShowToast(false);
-          router.back();
+          router.push('/plates');
         }, 2000);
       }
     } catch (error: any) {
@@ -288,13 +288,13 @@ async function pickImage() {
   }, [ingredient.barcode]);
   
   return (
-    <View className="bg-slate-700 rounded-xl p-4 mb-3 shadow-lg">
+    <View className="bg-app-surface-secondary rounded-xl p-4 mb-3 shadow-lg">
       {/* Header with name */}
       <View className="flex-row justify-between items-center mb-4">
         <View className="flex-1">
-          <Text className="text-white font-semibold text-lg">{ingredient.name}</Text>
+          <Text className="text-app-text-primary font-semibold text-lg">{ingredient.name}</Text>
           {ingredient.brand && (
-            <Text className="text-slate-400 text-sm mt-1">{ingredient.brand}</Text>
+            <Text className="text-app-text-tertiary text-sm mt-1">{ingredient.brand}</Text>
           )}
         </View>
       </View>
@@ -312,30 +312,30 @@ async function pickImage() {
       />
       
       {/* Badges with macros */}
-      <View className="flex-row justify-between bg-slate-800 rounded-lg p-3">
+      <View className="flex-row justify-between bg-app-surface-tertiary rounded-lg p-3">
         <View className="items-center flex-1">
-          <View className="bg-[#A3FF57] rounded-full px-2 py-1 mb-1">
+          <View className="bg-app-macro-carbs rounded-full px-2 py-1 mb-1">
             <Text className="text-black text-xs font-bold">C</Text>
           </View>
-          <Text className="text-white font-semibold text-sm">{carbs}g</Text>
+          <Text className="text-app-text-primary font-semibold text-sm">{carbs}g</Text>
         </View>
         <View className="items-center flex-1">
-          <View className="bg-[#4DABF7] rounded-full px-2 py-1 mb-1">
+          <View className="bg-app-macro-protein rounded-full px-2 py-1 mb-1">
             <Text className="text-white text-xs font-bold">P</Text>
           </View>
-          <Text className="text-white font-semibold text-sm">{protein}g</Text>
+          <Text className="text-app-text-primary font-semibold text-sm">{protein}g</Text>
         </View>
         <View className="items-center flex-1">
-          <View className="bg-[#FFB84D] rounded-full px-2 py-1 mb-1">
-            <Text className="text-white text-xs font-bold">G</Text>
+          <View className="bg-app-macro-fat rounded-full px-2 py-1 mb-1">
+            <Text className="text-black text-xs font-bold">G</Text>
           </View>
-          <Text className="text-white font-semibold text-sm">{fat}g</Text>
+          <Text className="text-app-text-primary font-semibold text-sm">{fat}g</Text>
         </View>
         <View className="items-center flex-1">
-          <View className="bg-[#FF6B6B] rounded-full px-2 py-1 mb-1">
+          <View className="bg-app-macro-calories rounded-full px-2 py-1 mb-1">
             <Text className="text-white text-xs font-bold">Cal</Text>
           </View>
-          <Text className="text-white font-semibold text-sm">{calories}</Text>
+          <Text className="text-app-text-primary font-semibold text-sm">{calories}</Text>
         </View>
       </View>
     </View>
@@ -346,17 +346,17 @@ async function pickImage() {
 
   return (
     <BottomSheetModalProvider>
-      <SafeAreaView className={`flex-1 bg-slate-900 pt-${insets.top}`}>        
+      <SafeAreaView className={`flex-1 bg-app-bg-primary pt-${insets.top}`}>        
         <View className="flex-row items-center justify-between px-4 py-4">
-          <Pressable onPress={() => router.back()}><Ionicons name="arrow-back" size={24} color="white" /></Pressable>
-          <Text className="text-lg font-semibold text-white">Crear Plato</Text>
+          <Pressable onPress={() => router.push('/plates')}><Ionicons name="arrow-back" size={24} color="white" /></Pressable>
+          <Text className="text-lg font-semibold text-app-text-primary">Crear Plato</Text>
           <View className="w-6" />
         </View>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
           <ScrollView className="px-4 pb-20" showsVerticalScrollIndicator={false}>
             {/* Name */}
-            <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-              <Text className="text-slate-300 mb-2">Nombre</Text>
+            <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+              <Text className="text-app-text-secondary mb-2">Nombre</Text>
               <TextInput
                 value={formData.name}
                 onChangeText={text => {
@@ -366,25 +366,25 @@ async function pickImage() {
                 onBlur={() => {
                   if (!formData.name.trim()) setErrors({ name: 'Requerido' });
                 }}
-                className="bg-slate-900 rounded-lg p-3 text-white text-lg"
+                className="bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-base"
                 style={{
-                  fontSize: 18,
+                  fontSize: 16,
                   color: '#ffffff',
                 }}
                 placeholderTextColor="#9ca3af"
                 placeholder="Nombre del plato..."
               />
-              {errors.name && <Text className="text-red-500 text-sm mt-1">{errors.name}</Text>}
+              {errors.name && <Text className="text-app-accent-error text-sm mt-1">{errors.name}</Text>}
             </View>
             {/* Description */}
-            <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-              <Text className="text-slate-300 mb-2">Descripción</Text>
+            <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+              <Text className="text-app-text-secondary mb-2">Descripción</Text>
               <TextInput
                 value={formData.description}
                 onChangeText={text => setFormData(d => ({ ...d, description: text }))}
                 multiline
                 numberOfLines={4}
-                className="bg-slate-900 rounded-lg p-3 text-white text-lg"
+                className="bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-lg"
                 style={{
                   minHeight: 100,
                   textAlignVertical: 'top',
@@ -396,21 +396,21 @@ async function pickImage() {
               />
             </View>
             {/* Image */}
-            <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-              <Text className="text-slate-300 mb-2">Imagen</Text>
-              <Pressable className="h-40 border-2 border-dashed border-slate-600 rounded-2xl items-center justify-center" onPress={pickImage}>
+            <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+              <Text className="text-app-text-secondary mb-2">Imagen</Text>
+              <Pressable className="h-40 border-2 border-dashed border-app-text-muted rounded-2xl items-center justify-center" onPress={pickImage}>
                 {formData.image ? <Image source={{ uri: formData.image }} className="w-full h-full rounded-2xl" /> : <Ionicons name="add" size={32} color="#A3FF57" />}
               </Pressable>
             </View>
             {/* Search */}
-            <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-              <Text className="text-slate-300 mb-2">Buscar alimento</Text>
+            <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+              <Text className="text-app-text-secondary mb-2">Buscar alimento</Text>
               <View className="flex-row items-center">
                 <View className="flex-1 mr-2">
                   <TextInput
                     value={searchQuery}
                     onChangeText={setSearchQuery}
-                    className="bg-slate-900 rounded-lg p-3 text-white text-lg"
+                    className="bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-base"
                     style={{
                       fontSize: 16,
                       color: '#ffffff',
@@ -422,7 +422,7 @@ async function pickImage() {
                   />
                 </View>
                 <Pressable 
-                  className="bg-[#A3FF57] rounded-lg p-3"
+                  className="bg-app-accent-primary rounded-lg p-3"
                   onPress={handleSearch}
                   disabled={searchQuery.trim().length < 2}
                 >
@@ -432,8 +432,8 @@ async function pickImage() {
             </View>
             {/* Ingredients */}
             {formData.ingredients.length > 0 && (
-              <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-                <Text className="text-slate-300 mb-4 text-lg font-semibold">Ingredientes</Text>
+              <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+                <Text className="text-app-text-secondary mb-4 text-lg font-semibold">Ingredientes</Text>
                 {formData.ingredients.map((ingredient, index) => (
                   <IngredientItem 
                     key={`ingredient-${ingredient.barcode}-${index}`} 
@@ -446,15 +446,15 @@ async function pickImage() {
           </ScrollView>
         </KeyboardAvoidingView>
         {/* Save button */}
-        <View className="absolute bottom-0 left-0 right-0 bg-slate-900 bg-opacity-90 p-4">
-          <Pressable className={`w-full py-4 rounded-2xl items-center ${valid ? 'bg-[#A3FF57]' : 'bg-slate-700'}`} onPress={saveDish} disabled={!valid}>
-            <Text className="text-white font-semibold text-lg">Guardar Plato</Text>
+        <View className="absolute bottom-0 left-0 right-0 bg-app-bg-primary bg-opacity-90 p-4">
+          <Pressable className={`w-full py-4 rounded-2xl items-center ${valid ? 'bg-app-accent-primary' : 'bg-app-surface-secondary/50'}`} onPress={saveDish} disabled={!valid}>
+            <Text className={`${valid ? 'text-app-surface-tertiary' : 'text-app-text-primary'  } font-semibold text-lg`}>Guardar Plato</Text>
           </Pressable>
         </View>
         {/* Toast */}
         {showToast && (
-          <View className="absolute top-20 left-4 right-4 bg-green-500 rounded-lg p-3 items-center">
-            <Text className="text-white font-medium">¡Plato creado!</Text>
+          <View className="absolute top-20 left-4 right-4 bg-app-accent-success rounded-lg p-3 items-center">
+            <Text className="text-app-text-primary font-medium">¡Plato creado!</Text>
           </View>
         )}
         {/* BottomSheet - Search */}
@@ -462,16 +462,16 @@ async function pickImage() {
           ref={searchSheetRef} 
           index={0} 
           snapPoints={snapSearch} 
-          backgroundStyle={{ backgroundColor: '#1e293b' }} 
+          backgroundStyle={{ backgroundColor: '#18181B' }} 
           handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}
         >
           <View className="p-4 flex-1">
             <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-white text-lg font-semibold">Buscar alimentos</Text>
+              <Text className="text-app-text-primary text-lg font-semibold">Buscar alimentos</Text>
               {loading && (
                 <View className="flex-row items-center">
                   <ActivityIndicator color="#A3FF57" size="small" />
-                  <Text className="text-[#A3FF57] text-sm ml-2">Buscando...</Text>
+                  <Text className="text-app-accent-primary text-sm ml-2">Buscando...</Text>
                 </View>
               )}
             </View>
@@ -481,7 +481,7 @@ async function pickImage() {
               onChangeText={setSearchQuery} 
               placeholder="Escribe para buscar..." 
               placeholderTextColor="#64748B" 
-              className="bg-slate-700 rounded-lg px-3 py-3 text-white mb-4" 
+              className="bg-app-surface-secondary rounded-lg px-3 py-3 text-app-text-primary mb-4 text-base" 
               style={{
                 fontSize: 16,
                 color: '#ffffff',
@@ -492,30 +492,30 @@ async function pickImage() {
             
             {loading ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <ActivityIndicator color="#A3FF57" size="large" />
-                  <Text className="text-white text-base mt-4 font-medium">Buscando ingredientes...</Text>
-                  <Text className="text-slate-400 text-sm mt-2 text-center">
+                  <Text className="text-app-text-primary text-base mt-4 font-medium">Buscando ingredientes...</Text>
+                  <Text className="text-app-text-tertiary text-sm mt-2 text-center">
                     Estamos encontrando los mejores resultados para "{searchQuery}"
                   </Text>
                 </View>
               </View>
             ) : results.length === 0 && searchQuery.length >= 2 ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <Ionicons name="search-outline" size={48} color="#64748B" />
-                  <Text className="text-slate-400 text-base mt-4 font-medium">No se encontraron alimentos</Text>
-                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                  <Text className="text-app-text-tertiary text-base mt-4 font-medium">No se encontraron alimentos</Text>
+                  <Text className="text-app-text-muted text-sm mt-2 text-center">
                     Intenta con otro término de búsqueda
                   </Text>
                 </View>
               </View>
             ) : searchQuery.length < 2 ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <Ionicons name="restaurant-outline" size={48} color="#64748B" />
-                  <Text className="text-slate-400 text-base mt-4 font-medium">Escribe al menos 2 caracteres</Text>
-                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                  <Text className="text-app-text-tertiary text-base mt-4 font-medium">Escribe al menos 2 caracteres</Text>
+                  <Text className="text-app-text-muted text-sm mt-2 text-center">
                     Para comenzar a buscar ingredientes
                   </Text>
                 </View>
@@ -526,28 +526,28 @@ async function pickImage() {
                 keyExtractor={(item) => item.barcode}
                 renderItem={({ item: food }) => (
                   <Pressable 
-                    className="flex-row justify-between items-center bg-slate-800 rounded-xl p-4 mb-3 shadow-sm" 
+                    className="flex-row justify-between items-center bg-app-surface-secondary rounded-xl p-4 mb-3 shadow-sm" 
                     onPress={() => addIngredient(food)}
                     style={{ elevation: 2 }}
                   >
                     <View className="flex-1">
-                      <Text className="text-white font-semibold text-base">{food.name}</Text>
+                      <Text className="text-app-text-primary font-semibold text-base">{food.name}</Text>
                       {food.brand && (
-                        <Text className="text-slate-400 text-sm mt-1">{food.brand}</Text>
+                        <Text className="text-app-text-tertiary text-sm mt-1">{food.brand}</Text>
                       )}
                       <View className="flex-row mt-2">
-                        <View className="bg-[#A3FF57] px-2 py-1 rounded-full mr-2">
+                        <View className="bg-app-macro-carbs px-2 py-1 rounded-full mr-2">
                           <Text className="text-black text-xs font-medium">C: {food.carbohydrates}g</Text>
                         </View>
-                        <View className="bg-[#4DABF7] px-2 py-1 rounded-full mr-2">
+                        <View className="bg-app-macro-protein px-2 py-1 rounded-full mr-2">
                           <Text className="text-white text-xs font-medium">P: {food.proteins}g</Text>
                         </View>
-                        <View className="bg-[#FFB84D] px-2 py-1 rounded-full">
+                        <View className="bg-app-macro-fat px-2 py-1 rounded-full">
                           <Text className="text-black text-xs font-medium">G: {food.fat}g</Text>
                         </View>
                       </View>
                     </View>
-                    <View className="bg-[#A3FF57] rounded-full p-2">
+                    <View className="bg-app-accent-primary rounded-full p-2">
                       <Ionicons name="add" size={24} color="black" />
                     </View>
                   </Pressable>
@@ -557,7 +557,7 @@ async function pickImage() {
                 ListEmptyComponent={() => (
                   <View className="flex-1 justify-center items-center py-8">
                     <Ionicons name="search-outline" size={48} color="#64748B" />
-                    <Text className="text-slate-400 text-base mt-4">Comienza a buscar ingredientes</Text>
+                    <Text className="text-app-text-tertiary text-base mt-4">Comienza a buscar ingredientes</Text>
                   </View>
                 )}
               />
@@ -565,21 +565,21 @@ async function pickImage() {
           </View>
         </BottomSheetModal>
         {/* BottomSheet - Quantity */}
-        <BottomSheetModal ref={qtySheetRef} index={0} snapPoints={snapQty} backgroundStyle={{ backgroundColor: '#1e293b' }} handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}>
+        <BottomSheetModal ref={qtySheetRef} index={0} snapPoints={snapQty} backgroundStyle={{ backgroundColor: '#18181B' }} handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}>
           {selected && (
             <View className="p-4">
-              <Text className="text-white text-lg mb-4">{selected.name}</Text>
+              <Text className="text-app-text-primary text-lg mb-4">{selected.name}</Text>
               <View className="flex-row items-center justify-center mb-6">
-                <Pressable className="bg-slate-700 rounded-full p-2" onPress={() => changeQty(-10)}><Ionicons name="remove" size={20} color="white" /></Pressable>
-                <Text className="text-white text-2xl mx-4">{selected.quantity} g</Text>
-                <Pressable className="bg-slate-700 rounded-full p-2" onPress={() => changeQty(10)}><Ionicons name="add" size={20} color="white" /></Pressable>
+                <Pressable className="bg-app-surface-secondary rounded-full p-2" onPress={() => changeQty(-10)}><Ionicons name="remove" size={20} color="white" /></Pressable>
+                <Text className="text-app-text-primary text-2xl mx-4">{selected.quantity} g</Text>
+                <Pressable className="bg-app-surface-secondary rounded-full p-2" onPress={() => changeQty(10)}><Ionicons name="add" size={20} color="white" /></Pressable>
               </View>
               <View className="flex-row justify-between">
                 <Pressable className="flex-row items-center" onPress={() => { setFormData(d => ({ ...d, ingredients: d.ingredients.filter(i => i.barcode !== selected.barcode) })); qtySheetRef.current?.close(); }}>
-                  <Ionicons name="trash" size={20} color="#FF4D4F" />
-                  <Text className="text-red-500 ml-2">Eliminar</Text>
+                  <Ionicons name="trash" size={20} color="#ef4444" />
+                  <Text className="text-app-accent-error ml-2">Eliminar</Text>
                 </Pressable>
-                <Pressable className="bg-[#A3FF57] px-6 py-2 rounded-2xl" onPress={saveQty}>
+                <Pressable className="bg-app-accent-primary px-6 py-2 rounded-2xl" onPress={saveQty}>
                   <Text className="text-black font-semibold">OK</Text>
                 </Pressable>
               </View>
