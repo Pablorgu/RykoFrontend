@@ -74,13 +74,9 @@ function MacroPieChart({ macros, screenWidth }: {
   const legendWidth = screenWidth < 480 ? 110 : screenWidth < 768 ? 130 : 150;
   
   return (
-    <View style={{
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 8
-    }}>
+    <View className="flex-col items-center gap-2">
       {/* Graph */}
-      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+      <View className="items-center justify-center">
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <Path
             d={createDonutPath(currentAngle, currentAngle + carbsAngle)}
@@ -98,37 +94,37 @@ function MacroPieChart({ macros, screenWidth }: {
       </View>
       
       {/* Legend */}
-      <View style={{ flexDirection: 'column', gap: 3, width: legendWidth }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#A3FF57' }} />
-            <Text style={{ fontSize: textSize, color: '#D1D5DB', fontWeight: '500' }} numberOfLines={1}>
+      <View className="flex-col gap-1" style={{ width: legendWidth }}>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
+            <View className="w-2 h-2 rounded-sm bg-[#A3FF57]" />
+            <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Carbohidratos
             </Text>
           </View>
-          <Text style={{ fontSize: textSize, color: '#9CA3AF', fontWeight: '500', marginLeft: 8 }}>
+          <Text style={{ fontSize: textSize }} className="text-gray-400 font-medium ml-2">
             {Math.round(carbsPercent)}%
           </Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#FFB84D' }} />
-            <Text style={{ fontSize: textSize, color: '#D1D5DB', fontWeight: '500' }} numberOfLines={1}>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
+            <View className="w-2 h-2 rounded-sm bg-[#FFB84D]" />
+            <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Grasas
             </Text>
           </View>
-          <Text style={{ fontSize: textSize, color: '#9CA3AF', fontWeight: '500', marginLeft: 8 }}>
+          <Text style={{ fontSize: textSize }} className="text-gray-400 font-medium ml-2">
             {Math.round(fatPercent)}%
           </Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, minWidth: 0 }}>
-            <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#4DABF7' }} />
-            <Text style={{ fontSize: textSize, color: '#D1D5DB', fontWeight: '500' }} numberOfLines={1}>
+        <View className="flex-row items-center justify-between">
+          <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
+            <View className="w-2 h-2 rounded-sm bg-[#4DABF7]" />
+            <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Proteínas
             </Text>
           </View>
-          <Text style={{ fontSize: textSize, color: '#9CA3AF', fontWeight: '500', marginLeft: 8 }}>
+          <Text style={{ fontSize: textSize }} className="text-gray-400 font-medium ml-2">
             {Math.round(proteinPercent)}%
           </Text>
         </View>
@@ -215,9 +211,9 @@ export default function plates() {
   // Loading state
   if (loading) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center' }}>
+      <View className="flex-1 bg-black justify-center items-center">
         <ActivityIndicator size="large" color="#A3FF57" />
-        <Text style={{ color: '#FFFFFF', marginTop: 16, fontSize: 16 }}>Cargando platos...</Text>
+        <Text className="text-white mt-4 text-base">Cargando platos...</Text>
       </View>
     );
   }
@@ -225,24 +221,24 @@ export default function plates() {
   // Error state
   if (error) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#000000', justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-        <Text style={{ color: '#FF6B6B', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>
+      <View className="flex-1 bg-black justify-center items-center p-5">
+        <Text className="text-red-400 text-lg text-center mb-5">
           {error}
         </Text>
         <Pressable 
-          style={{ backgroundColor: '#A3FF57', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8 }}
+          className="bg-[#A3FF57] px-5 py-3 rounded-lg"
           onPress={fetchUserDishes}
         >
-          <Text style={{ color: '#000000', fontWeight: '600' }}>Reintentar</Text>
+          <Text className="text-black font-semibold">Reintentar</Text>
         </Pressable>
       </View>
     );
   }
   
   return (
-    <View style={{ flex: 1, backgroundColor: '#000000' }}>
+    <View className="flex-1 bg-black">
       <ScrollView 
-        style={{ flex: 1 }}
+        className="flex-1"
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
@@ -253,20 +249,18 @@ export default function plates() {
         }}>
           <Text style={{
             fontSize: width < 480 ? 20 : width < 768 ? 24 : 28,
-            fontWeight: '600',
-            color: '#FFFFFF',
             marginBottom: width < 480 ? 20 : 32
-          }}>
+          }} className="font-semibold text-white">
             Mis platos
           </Text>
           
           {/* Empty state */}
           {dishes.length === 0 ? (
-            <View style={{ alignItems: 'center', justifyContent: 'center', paddingVertical: 60 }}>
-              <Text style={{ color: '#94A3B8', fontSize: 18, textAlign: 'center', marginBottom: 16 }}>
+            <View className="items-center justify-center py-15">
+              <Text className="text-slate-400 text-lg text-center mb-4">
                 No tienes platos creados aún
               </Text>
-              <Text style={{ color: '#64748B', fontSize: 14, textAlign: 'center', marginBottom: 24 }}>
+              <Text className="text-slate-600 text-sm text-center mb-6">
                 Crea tu primer plato usando el botón +
               </Text>
             </View>
@@ -284,36 +278,30 @@ export default function plates() {
                     width: cardWidth,
                     marginHorizontal: margin / 2,
                     marginBottom: margin,
-                    backgroundColor: '#27272a',
-                    borderRadius: 16,
                     padding: cardPadding,
-                    shadowColor: '#000',
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.3,
                     shadowRadius: 8,
-                    elevation: 8,
-                    overflow: 'hidden'
+                    elevation: 8
                   }}
+                  className="bg-zinc-800 rounded-2xl shadow-black overflow-hidden"
                   onPress={() => handlePlatePress(plate.id)}
                 >
                   {/* Vertical layout for all screens */}
                   <View style={{
-                    flexDirection: 'column',
                     gap: width >= 768 ? 12 : 8
-                  }}>
+                  }} className="flex-col">
                     {/* Image */}
                     <View style={{
-                      width: '100%',
                       marginBottom: width >= 768 ? 8 : 6
-                    }}>
+                    }} className="w-full">
                       <Image 
                         source={{ uri: plate.image || 'https://via.placeholder.com/400x300?text=Sin+Imagen' }} 
                         style={{
                           width: '100%',
-                          height: imageHeight,
-                          borderRadius: 12,
-                          backgroundColor: '#3f3f46'
+                          height: imageHeight
                         }}
+                        className="rounded-xl bg-zinc-600"
                         resizeMode="cover"
                       />
                     </View>
@@ -322,36 +310,27 @@ export default function plates() {
                     <View style={{ marginBottom: width >= 768 ? 8 : 6 }}>
                       <Text style={{
                         fontSize: titleSize,
-                        fontWeight: '600',
-                        color: '#FFFFFF',
-                        marginBottom: width >= 768 ? 8 : 6,
-                        textAlign: 'center'
-                      }} numberOfLines={2}>
+                        marginBottom: width >= 768 ? 8 : 6
+                      }} className="font-semibold text-white text-center" numberOfLines={2}>
                         {plate.name}
                       </Text>
                       <Text style={{
                         fontSize: subtitleSize,
-                        color: '#94A3B8',
-                        marginBottom: width >= 768 ? 6 : 4,
-                        textAlign: 'center'
-                      }}>
+                        marginBottom: width >= 768 ? 6 : 4
+                      }} className="text-slate-400 text-center">
                         Ingredientes
                       </Text>
                       <Text style={{
                         fontSize: subtitleSize,
-                        color: '#CBD5E1',
-                        textAlign: 'center',
                         lineHeight: width >= 768 ? 18 : 16
-                      }} numberOfLines={2}>
+                      }} className="text-slate-300 text-center" numberOfLines={2}>
                         {plate.ingredients.slice(0, 3).join(', ')}
                         {plate.ingredients.length > 3 ? '...' : ''}
                       </Text>
                     </View>
                     
                     {/* Macros chart */}
-                    <View style={{
-                      alignItems: 'center'
-                    }}>
+                    <View className="items-center">
                       <MacroPieChart macros={plate.macros} screenWidth={width} />
                     </View>
                   </View>
@@ -363,37 +342,20 @@ export default function plates() {
       </ScrollView>
       
       {/* Floating button + */}
-      <View style={{
-        position: 'absolute',
-        bottom: 24,
-        right: 24
-      }}>
+      <View className="absolute bottom-6 right-6">
         <Pressable 
           onPress={() => router.push('/create-dish')} 
+          className="bg-green-500 w-14 h-14 rounded-full items-center justify-center shadow-black"
           style={{
-            backgroundColor: '#22C55E',
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#000',
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 8,
             elevation: 8
-          }}>
-          <Text style={{
-            color: '#FFFFFF',
-            fontSize: 24,
-            fontWeight: 'bold',
-            textAlign: 'center',
-            lineHeight: 24,
-            includeFontPadding: false,
-            textAlignVertical: 'center',
-            marginTop: 0,
-            paddingTop: 0
-          }}>+</Text>
+          }}
+        >
+          <Text className="text-white text-2xl font-bold text-center leading-6 mt-0 pt-0">
+            +
+          </Text>
         </Pressable>
       </View>
     </View>
