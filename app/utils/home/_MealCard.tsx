@@ -7,6 +7,7 @@ import { nutrientsForMealAsync, nutrientsForDish } from '../../(types)/nutrition
 import { MEAL_DISPLAY_NAMES, MealType, Dish, Nutrients } from '../../(types)/domain';
 import { searchDishes, getAllDishes } from '../../services/dishService';
 import { getCurrentUserId } from '../../services/_user';
+import { DishSearchItem } from './_DishSearchItem';
 
 interface MealCardProps {
   mealType: MealType;
@@ -149,7 +150,7 @@ export function MealCard({ mealType }: MealCardProps) {
 
   return (
     <View className={`bg-zinc-900 rounded-xl border border-zinc-800 w-full ${responsivePadding}`}>
-      {/* Header con padding responsive */}
+      {/* Responsive Header */}
       <View className={`${responsiveMargin} items-center`}>
         <Text className={`text-zinc-100 font-bold ${textSizes.title} ${screenWidth < 400 ? 'mb-2' : 'mb-3'}`}>
           {MEAL_DISPLAY_NAMES[mealType]}
@@ -166,7 +167,7 @@ export function MealCard({ mealType }: MealCardProps) {
         )}
       </View>
 
-      {/* Lista de platos altura automática */}
+      {/* Plates list*/}
       <View>
         {meal?.items && meal.items.length > 0 ? (
           <View>
@@ -197,12 +198,12 @@ export function MealCard({ mealType }: MealCardProps) {
         )}
       </View>
 
-      {/* Botón con padding responsive */}
+      {/* Responsive Add Button */}
       <View className={screenWidth < 400 ? 'mt-3' : 'mt-4'}>
         <TouchableOpacity
           onPress={() => {
             setShowModal(true);
-            // Cargar todos los platos al abrir el modal
+            // Load all dishes when the modal is opened
             if (userId && searchResults.length === 0 && searchQuery.trim() === '') {
               loadAllDishes();
             }
@@ -245,22 +246,12 @@ export function MealCard({ mealType }: MealCardProps) {
           <FlatList
             data={searchResults}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-              // Calcular nutrientes del plato
-              const dishNutrients = nutrientsForDish(item);
-              
-              return (
-                <TouchableOpacity
-                  className="p-4 border-b border-zinc-800"
-                  onPress={() => handleAddDish(item.id)}
-                >
-                  <Text className="text-zinc-100 font-medium">{item.name}</Text>
-                  <Text className="text-zinc-400 text-sm mt-1">
-                    {Math.round(dishNutrients.kcal)} kcal • {Math.round(dishNutrients.protein)}g proteína
-                  </Text>
-                </TouchableOpacity>
-              );
-            }}
+            renderItem={({ item }) => (
+              <DishSearchItem 
+                dish={item} 
+                onPress={handleAddDish}
+              />
+            )}
             className="flex-1"
           />
         </View>
