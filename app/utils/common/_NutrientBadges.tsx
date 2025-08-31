@@ -35,14 +35,14 @@ export function NutrientBadges({
       label: 'Calorías', 
       short: 'Kcal', 
       value: Math.round(nutrients.kcal), 
-      color: 'bg-orange-500',
+      color: "bg-app-macro-calories",
       icon: '🔥'
     },
     { 
       label: 'Proteínas', 
       short: 'P', 
       value: Math.round(nutrients.protein), 
-      color: 'bg-blue-500',
+      color: "bg-app-macro-protein",
       unit: 'g',
       percentage: proteinPercentage,
       icon: '🥩'
@@ -51,7 +51,7 @@ export function NutrientBadges({
       label: 'Carbohidratos', 
       short: 'C', 
       value: Math.round(nutrients.carbs), 
-      color: 'bg-green-500',
+      color: "bg-app-macro-carbs",
       unit: 'g',
       percentage: carbsPercentage,
       icon: '🍞'
@@ -60,7 +60,7 @@ export function NutrientBadges({
       label: 'Grasas', 
       short: 'G', 
       value: Math.round(nutrients.fat), 
-      color: 'bg-yellow-500',
+      color: "bg-app-macro-fat",
       unit: 'g',
       percentage: fatPercentage,
       icon: '🥑'

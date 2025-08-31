@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Nutrients } from '../../(types)/domain';
+import { THEME_COLORS } from '../../(config)/_colors';
 
 interface DayTotalsProps {
   nutrients: Nutrients;
@@ -91,7 +92,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         current={nutrients.protein}
         goal={DAILY_GOALS.protein}
         unit="g"
-        color="bg-green-500"
+        color={"bg-app-macro-protein"}
         icon="🥩"
       />
       
@@ -100,7 +101,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         current={nutrients.carbs}
         goal={DAILY_GOALS.carbs}
         unit="g"
-        color="bg-yellow-500"
+        color={"bg-app-macro-carbs"}
         icon="🍞"
       />
       
@@ -109,7 +110,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         current={nutrients.fat}
         goal={DAILY_GOALS.fat}
         unit="g"
-        color="bg-purple-500"
+        color={"bg-app-macro-fat"}
         icon="🥑"
       />
       

@@ -97,7 +97,7 @@ function MacroPieChart({ macros, screenWidth }: {
       <View className="flex-col gap-1" style={{ width: legendWidth }}>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
-            <View className="w-2 h-2 rounded-sm bg-[#A3FF57]" />
+            <View className="w-2 h-2 rounded-sm bg-app-macro-carbs" />
             <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Carbohidratos
             </Text>
@@ -108,7 +108,7 @@ function MacroPieChart({ macros, screenWidth }: {
         </View>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
-            <View className="w-2 h-2 rounded-sm bg-[#FFB84D]" />
+            <View className="w-2 h-2 rounded-sm bg-app-macro-fat" />
             <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Grasas
             </Text>
@@ -119,7 +119,7 @@ function MacroPieChart({ macros, screenWidth }: {
         </View>
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center gap-1.5 flex-1 min-w-0">
-            <View className="w-2 h-2 rounded-sm bg-[#4DABF7]" />
+            <View className="w-2 h-2 rounded-sm bg-app-macro-protein" />
             <Text style={{ fontSize: textSize }} className="text-gray-300 font-medium" numberOfLines={1}>
               Proteínas
             </Text>
