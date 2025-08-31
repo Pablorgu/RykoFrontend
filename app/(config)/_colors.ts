@@ -4,7 +4,7 @@ export const THEME_COLORS = {
     primary: "#000000", // Negro principal
     secondary: "#1f2937", // Gris oscuro para contenedores
     tertiary: "#374151", // Gris medio para elementos secundarios
-    modal: "#1f2937", // Fondo de modales
+    modal: "#1f2937",
   },
 
   // Colores de superficie
@@ -32,10 +32,10 @@ export const THEME_COLORS = {
 
   // Colores de macronutrientes
   macros: {
-    carbs: "#A3FF57", // Verde para carbohidratos
-    protein: "#4DABF7", // Azul para proteínas
-    fat: "#FFB84D", // Naranja para grasas
-    calories: "#FF6B6B", // Rojo para calorías
+    carbs: "#0EA5E9",
+    protein: "#10B981",
+    fat: "#F97316",
+    calories: "#E11D48",
   },
   danger: {
     primary: "#FF6B6B",
