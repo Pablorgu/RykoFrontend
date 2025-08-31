@@ -37,6 +37,9 @@ export const THEME_COLORS = {
     fat: "#FFB84D", // Naranja para grasas
     calories: "#FF6B6B", // Rojo para calorías
   },
+  danger: {
+    primary: "#FF6B6B",
+  },
 };
 
 // Exportar colores individuales para fácil acceso

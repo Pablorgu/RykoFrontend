@@ -28,6 +28,7 @@ module.exports = {
           'macro-protein': '#4DABF7',
           'macro-fat': '#FFB84D',
           'macro-calories': '#FF6B6B',
+          'accent-danger': '#ef4444',
         },
       },
     },
