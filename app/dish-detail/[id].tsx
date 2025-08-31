@@ -447,12 +447,12 @@ const cancelDelete = () => {
     }, [ingredient.barcode]);
 
     return (
-      <View className="bg-slate-700 rounded-xl p-4 mb-3 shadow-lg">
+      <View className="bg-app-surface-secondary rounded-xl p-4 mb-3 shadow-lg">
         <View className="flex-row justify-between items-center mb-4">
           <View className="flex-1">
-            <Text className="text-white font-semibold text-lg">{ingredient.name}</Text>
+            <Text className="text-app-text-primary font-semibold text-lg">{ingredient.name}</Text>
             {ingredient.brand && (
-              <Text className="text-slate-400 text-sm mt-1">{ingredient.brand}</Text>
+              <Text className="text-app-text-tertiary text-sm mt-1">{ingredient.brand}</Text>
             )}
           </View>
         </View>
@@ -468,30 +468,30 @@ const cancelDelete = () => {
           step={5}
         />
 
-        <View className="flex-row justify-between bg-slate-800 rounded-lg p-3">
+        <View className="flex-row justify-between bg-app-surface-tertiary rounded-lg p-3">
           <View className="items-center flex-1">
-            <View className="bg-[#A3FF57] rounded-full px-2 py-1 mb-1">
+            <View className="bg-app-macro-carbs rounded-full px-2 py-1 mb-1">
               <Text className="text-black text-xs font-bold">C</Text>
             </View>
-            <Text className="text-white font-semibold text-sm">{carbs}g</Text>
+            <Text className="text-app-text-primary font-semibold text-sm">{carbs}g</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-[#4DABF7] rounded-full px-2 py-1 mb-1">
+            <View className="bg-app-macro-protein rounded-full px-2 py-1 mb-1">
               <Text className="text-white text-xs font-bold">P</Text>
             </View>
-            <Text className="text-white font-semibold text-sm">{protein}g</Text>
+            <Text className="text-app-text-primary font-semibold text-sm">{protein}g</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-[#FFB84D] rounded-full px-2 py-1 mb-1">
+            <View className="bg-app-macro-fat rounded-full px-2 py-1 mb-1">
               <Text className="text-black text-xs font-bold">G</Text>
             </View>
-            <Text className="text-white font-semibold text-sm">{fat}g</Text>
+            <Text className="text-app-text-primary font-semibold text-sm">{fat}g</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-[#FF6B6B] rounded-full px-2 py-1 mb-1">
+            <View className="bg-app-macro-calories rounded-full px-2 py-1 mb-1">
               <Text className="text-white text-xs font-bold">Cal</Text>
             </View>
-            <Text className="text-white font-semibold text-sm">{calories}</Text>
+            <Text className="text-app-text-primary font-semibold text-sm">{calories}</Text>
           </View>
         </View>
       </View>
@@ -500,22 +500,22 @@ const cancelDelete = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-slate-900 justify-center items-center">
+      <SafeAreaView className="flex-1 bg-app-bg-primary justify-center items-center">
         <ActivityIndicator size="large" color="#A3FF57" />
-        <Text className="text-white text-lg mt-4">Cargando plato...</Text>
+        <Text className="text-app-text-primary text-lg mt-4">Cargando plato...</Text>
       </SafeAreaView>
     );
   }
 
   return (
     <BottomSheetModalProvider>
-      <SafeAreaView className={`flex-1 bg-slate-900 pt-${insets.top}`}>
+      <SafeAreaView className={`flex-1 bg-app-bg-primary pt-${insets.top}`}>
         {/* Header */}
         <View className="flex-row items-center justify-between px-4 py-4">
           <Pressable onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="white" />
           </Pressable>
-          <Text className="text-lg font-semibold text-white">
+          <Text className="text-lg font-semibold text-app-text-primary">
             {isEditing ? 'Editar Plato' : 'Detalle del Plato'}
           </Text>
           <View className="flex-row items-center space-x-3">
@@ -546,7 +546,7 @@ const cancelDelete = () => {
                     height: imageHeight,
                     maxHeight: 250 
                   }}
-                  className="bg-slate-800"
+                  className="bg-app-surface-tertiary"
                   resizeMode="cover"
                 />
               ) : (
@@ -556,10 +556,10 @@ const cancelDelete = () => {
                     height: imageHeight,
                     maxHeight: 250
                   }}
-                  className="bg-slate-800 justify-center items-center"
+                  className="bg-app-surface-tertiary justify-center items-center"
                 >
                   <Ionicons name="image-outline" size={64} color="#64748B" />
-                  <Text className="text-slate-400 mt-2">Sin imagen</Text>
+                  <Text className="text-app-text-tertiary mt-2">Sin imagen</Text>
                 </View>
               )}
               
@@ -567,7 +567,7 @@ const cancelDelete = () => {
               {isEditing && (
                 <Pressable 
                   onPress={pickImage}
-                  className="absolute bottom-4 right-4 bg-[#A3FF57] rounded-full p-3 shadow-lg"
+                  className="absolute bottom-4 right-4 bg-app-macro-carbs rounded-full p-3 shadow-lg"
                   style={{ elevation: 5 }}
                 >
                   <Ionicons name="camera" size={24} color="black" />
@@ -577,8 +577,8 @@ const cancelDelete = () => {
 
             <View className="px-4 pb-20">
               {/* Nombre */}
-              <View className="bg-slate-800 p-4 rounded-2xl mb-4 mt-4">
-                <Text className="text-slate-300 mb-2">Nombre</Text>
+              <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4 mt-4">
+                <Text className="text-app-text-primary mb-2">Nombre</Text>
                 <TextInput
                   value={formData.name}
                   onChangeText={text => {
@@ -590,7 +590,7 @@ const cancelDelete = () => {
                     if (isEditing && !formData.name.trim()) setErrors({ name: 'Requerido' });
                   }}
                   editable={isEditing}
-                  className={`bg-slate-900 rounded-lg p-3 text-white text-lg ${
+                  className={`bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-lg ${
                     !isEditing ? 'opacity-70' : ''
                   }`}
                   style={{
@@ -600,12 +600,12 @@ const cancelDelete = () => {
                   placeholderTextColor="#9ca3af"
                   placeholder="Nombre del plato..."
                 />
-                {errors.name && <Text className="text-red-500 text-sm mt-1">{errors.name}</Text>}
+                {errors.name && <Text className="text-app-accent-danger text-sm mt-1">{errors.name}</Text>}
               </View>
 
               {/* Description */}
-              <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-                <Text className="text-slate-300 mb-2">Descripción</Text>
+              <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+                <Text className="text-app-text-secondary mb-2">Descripción</Text>
                 <TextInput
                   value={formData.description}
                   onChangeText={text => {
@@ -615,7 +615,7 @@ const cancelDelete = () => {
                   editable={isEditing}
                   multiline
                   numberOfLines={4}
-                  className={`bg-slate-900 rounded-lg p-3 text-white text-lg ${
+                  className={`bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-lg ${
                     !isEditing ? 'opacity-70' : ''
                   }`}
                   style={{
@@ -631,14 +631,14 @@ const cancelDelete = () => {
 
               {/* Search for ingredients - Only in editing mode */}
               {isEditing && (
-                <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-                  <Text className="text-slate-300 mb-2">Buscar alimento</Text>
+                <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+                  <Text className="text-app-text-secondary mb-2">Buscar alimento</Text>
                   <View className="flex-row items-center">
                     <View className="flex-1 mr-2">
                       <TextInput
                         value={searchQuery}
                         onChangeText={setSearchQuery}
-                        className="bg-slate-900 rounded-lg p-3 text-white text-lg"
+                        className="bg-app-surface-secondary rounded-lg p-3 text-app-text-primary text-lg"
                         style={{
                           fontSize: 16,
                           color: '#ffffff',
@@ -650,7 +650,7 @@ const cancelDelete = () => {
                       />
                     </View>
                     <Pressable
-                      className="bg-[#A3FF57] rounded-lg p-3"
+                      className="bg-app-macro-carbs rounded-lg p-3"
                       onPress={handleSearch}
                       disabled={searchQuery.trim().length < 2}
                     >
@@ -662,8 +662,8 @@ const cancelDelete = () => {
 
               {/* Ingredients */}
               {formData.ingredients.length > 0 && (
-                <View className="bg-slate-800 p-4 rounded-2xl mb-4">
-                  <Text className="text-slate-300 mb-4 text-lg font-semibold">Ingredientes</Text>
+                <View className="bg-app-surface-tertiary p-4 rounded-2xl mb-4">
+                  <Text className="text-app-text-secondary mb-4 text-lg font-semibold">Ingredientes</Text>
                   {formData.ingredients.map((ingredient, index) => (
                     <IngredientItem
                       key={`ingredient-${ingredient.barcode}-${index}`}
@@ -679,23 +679,23 @@ const cancelDelete = () => {
 
         {/* Save Button - Only in editing mode */}
         {isEditing && (
-          <View className="absolute bottom-0 left-0 right-0 bg-slate-900 bg-opacity-90 p-4">
+          <View className="absolute bottom-0 left-0 right-0 bg-app-bg-primary bg-opacity-90 p-4">
             <Pressable
               className={`w-full py-4 rounded-2xl items-center ${
-                valid ? 'bg-[#A3FF57]' : 'bg-slate-700'
+                valid ? 'bg-app-macro-carbs' : 'bg-app-surface-tertiary'
               }`}
               onPress={saveDish}
               disabled={!valid}
             >
-              <Text className="text-white font-semibold text-lg">Guardar Cambios</Text>
+              <Text className="text-app-text-primary font-semibold text-lg">Guardar Cambios</Text>
             </Pressable>
           </View>
         )}
 
         {/* Toast */}
         {showToast && (
-          <View className="absolute top-20 left-4 right-4 bg-green-500 rounded-lg p-3 items-center">
-            <Text className="text-white font-medium">{toastMessage}</Text>
+          <View className="absolute top-20 left-4 right-4 bg-app-accent-secondary rounded-lg p-3 items-center">
+            <Text className="text-app-text-primary font-medium">{toastMessage}</Text>
           </View>
         )}
 
@@ -704,16 +704,16 @@ const cancelDelete = () => {
           ref={searchSheetRef}
           index={0}
           snapPoints={snapSearch}
-          backgroundStyle={{ backgroundColor: '#1e293b' }}
+          backgroundStyle={{ backgroundColor: '#18181B' }}
           handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}
         >
           <View className="p-4 flex-1">
             <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-white text-lg font-semibold">Buscar alimentos</Text>
+              <Text className="text-app-text-primary text-lg font-semibold">Buscar alimentos</Text>
               {searchLoading && (
                 <View className="flex-row items-center">
                   <ActivityIndicator color="#A3FF57" size="small" />
-                  <Text className="text-[#A3FF57] text-sm ml-2">Buscando...</Text>
+                  <Text className="text-app-macro-carbs text-sm ml-2">Buscando...</Text>
                 </View>
               )}
             </View>
@@ -722,8 +722,8 @@ const cancelDelete = () => {
               value={searchQuery}
               onChangeText={setSearchQuery}
               placeholder="Escribe para buscar..."
-              placeholderTextColor="#64748B"
-              className="bg-slate-700 rounded-lg px-3 py-3 text-white mb-4"
+              placeholderTextColor="#9ca3af"
+              className="bg-app-surface-secondary rounded-lg px-3 py-3 text-app-text-primary mb-4"
               style={{
                 fontSize: 16,
                 color: '#ffffff',
@@ -734,30 +734,30 @@ const cancelDelete = () => {
 
             {searchLoading ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <ActivityIndicator color="#A3FF57" size="large" />
-                  <Text className="text-white text-base mt-4 font-medium">Buscando ingredientes...</Text>
-                  <Text className="text-slate-400 text-sm mt-2 text-center">
+                  <Text className="text-app-text-primary text-base mt-4 font-medium">Buscando ingredientes...</Text>
+                  <Text className="text-app-text-tertiary text-sm mt-2 text-center">
                     Estamos encontrando los mejores resultados para "{searchQuery}"
                   </Text>
                 </View>
               </View>
             ) : results.length === 0 && searchQuery.length >= 2 ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <Ionicons name="search-outline" size={48} color="#64748B" />
-                  <Text className="text-slate-400 text-base mt-4 font-medium">No se encontraron alimentos</Text>
-                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                  <Text className="text-app-text-tertiary text-base mt-4 font-medium">No se encontraron alimentos</Text>
+                  <Text className="text-app-text-muted text-sm mt-2 text-center">
                     Intenta con otro término de búsqueda
                   </Text>
                 </View>
               </View>
             ) : searchQuery.length < 2 ? (
               <View className="flex-1 justify-center items-center">
-                <View className="bg-slate-800 rounded-2xl p-8 items-center">
+                <View className="bg-app-surface-tertiary rounded-2xl p-8 items-center">
                   <Ionicons name="restaurant-outline" size={48} color="#64748B" />
-                  <Text className="text-slate-400 text-base mt-4 font-medium">Escribe al menos 2 caracteres</Text>
-                  <Text className="text-slate-500 text-sm mt-2 text-center">
+                  <Text className="text-app-text-tertiary text-base mt-4 font-medium">Escribe al menos 2 caracteres</Text>
+                  <Text className="text-app-text-muted text-sm mt-2 text-center">
                     Para comenzar a buscar ingredientes
                   </Text>
                 </View>
@@ -768,28 +768,28 @@ const cancelDelete = () => {
                 keyExtractor={(item) => item.barcode}
                 renderItem={({ item: food }) => (
                   <Pressable
-                    className="flex-row justify-between items-center bg-slate-800 rounded-xl p-4 mb-3 shadow-sm"
+                    className="flex-row justify-between items-center bg-app-surface-secondary rounded-xl p-4 mb-3 shadow-sm"
                     onPress={() => addIngredient(food)}
                     style={{ elevation: 2 }}
                   >
                     <View className="flex-1">
-                      <Text className="text-white font-semibold text-base">{food.name}</Text>
+                      <Text className="text-app-text-primary font-semibold text-base">{food.name}</Text>
                       {food.brand && (
-                        <Text className="text-slate-400 text-sm mt-1">{food.brand}</Text>
+                        <Text className="text-app-text-tertiary text-sm mt-1">{food.brand}</Text>
                       )}
                       <View className="flex-row mt-2">
-                        <View className="bg-[#A3FF57] px-2 py-1 rounded-full mr-2">
+                        <View className="bg-app-macro-carbs px-2 py-1 rounded-full mr-2">
                           <Text className="text-black text-xs font-medium">C: {food.carbohydrates}g</Text>
                         </View>
-                        <View className="bg-[#4DABF7] px-2 py-1 rounded-full mr-2">
-                          <Text className="text-white text-xs font-medium">P: {food.proteins}g</Text>
+                        <View className="bg-app-macro-protein px-2 py-1 rounded-full mr-2">
+                          <Text className="text-black text-xs font-medium">P: {food.proteins}g</Text>
                         </View>
-                        <View className="bg-[#FFB84D] px-2 py-1 rounded-full">
+                        <View className="bg-app-macro-fat px-2 py-1 rounded-full">
                           <Text className="text-black text-xs font-medium">G: {food.fat}g</Text>
                         </View>
                       </View>
                     </View>
-                    <View className="bg-[#A3FF57] rounded-full p-2">
+                    <View className="bg-app-macro-carbs rounded-full p-2">
                       <Ionicons name="add" size={24} color="black" />
                     </View>
                   </Pressable>
@@ -798,8 +798,8 @@ const cancelDelete = () => {
                 showsVerticalScrollIndicator={true}
                 ListEmptyComponent={() => (
                   <View className="flex-1 justify-center items-center py-8">
-                    <Ionicons name="search-outline" size={48} color="#64748B" />
-                    <Text className="text-slate-400 text-base mt-4">Comienza a buscar ingredientes</Text>
+                    <Ionicons name="search-outline" size={48} color="#27272a" />
+                    <Text className="text-app-text-tertiary text-base mt-4">Comienza a buscar ingredientes</Text>
                   </View>
                 )}
               />
@@ -807,23 +807,23 @@ const cancelDelete = () => {
           </View>
         </BottomSheetModal>
 
-        {/* BottomSheet - Quantity */}
+        {/* BottomSheet*/}
         <BottomSheetModal
           ref={qtySheetRef}
           index={0}
           snapPoints={snapQty}
-          backgroundStyle={{ backgroundColor: '#1e293b' }}
+          backgroundStyle={{ backgroundColor: '#18181B' }}
           handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}
         >
           {selected && (
             <View className="p-4">
-              <Text className="text-white text-lg mb-4">{selected.name}</Text>
+              <Text className="text-app-text-primary text-lg mb-4">{selected.name}</Text>
               <View className="flex-row items-center justify-center mb-6">
-                <Pressable className="bg-slate-700 rounded-full p-2" onPress={() => changeQty(-10)}>
+                <Pressable className="bg-app-surface-secondary rounded-full p-2" onPress={() => changeQty(-10)}>
                   <Ionicons name="remove" size={20} color="white" />
                 </Pressable>
-                <Text className="text-white text-2xl mx-4">{selected.quantity} g</Text>
-                <Pressable className="bg-slate-700 rounded-full p-2" onPress={() => changeQty(10)}>
+                <Text className="text-app-text-primary text-2xl mx-4">{selected.quantity} g</Text>
+                <Pressable className="bg-app-surface-secondary rounded-full p-2" onPress={() => changeQty(10)}>
                   <Ionicons name="add" size={20} color="white" />
                 </Pressable>
               </View>
@@ -839,9 +839,9 @@ const cancelDelete = () => {
                   }}
                 >
                   <Ionicons name="trash" size={20} color="#FF4D4F" />
-                  <Text className="text-red-500 ml-2">Eliminar</Text>
+                  <Text className="text-app-accent-danger ml-2">Eliminar</Text>
                 </Pressable>
-                <Pressable className="bg-[#A3FF57] px-6 py-2 rounded-2xl" onPress={saveQty}>
+                <Pressable className="bg-app-macro-carbs px-6 py-2 rounded-2xl" onPress={saveQty}>
                   <Text className="text-black font-semibold">OK</Text>
                 </Pressable>
               </View>
@@ -857,23 +857,23 @@ const cancelDelete = () => {
           onRequestClose={cancelDelete}
         >
           <View className="flex-1 justify-center items-center bg-black/50">
-            <View className="bg-zinc-800 rounded-lg p-6 mx-4 max-w-sm w-full">
-              <Text className="text-white text-lg font-bold mb-2">Eliminar plato</Text>
-              <Text className="text-zinc-300 mb-6">
+            <View className="bg-app-surface-tertiary rounded-lg p-6 mx-4 max-w-sm w-full">
+              <Text className="text-app-text-primary text-lg font-bold mb-2">Eliminar plato</Text>
+              <Text className="text-app-text-secondary mb-6">
                 ¿Estás seguro de que quieres eliminar "{formData.name}"?
               </Text>
               <View className="flex-row justify-end space-x-3">
                 <TouchableOpacity
                   onPress={cancelDelete}
-                  className="px-4 py-2 rounded bg-zinc-600 mr-3"
+                  className="px-4 py-2 rounded bg-app-surface-tertiary mr-3"
                 >
-                  <Text className="text-white">Cancelar</Text>
+                  <Text className="text-app-text-primary">Cancelar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={confirmDelete}
-                  className="px-4 py-2 rounded bg-red-600"
+                  className="px-4 py-2 rounded bg-app-accent-danger"
                 >
-                  <Text className="text-white font-bold">Eliminar</Text>
+                  <Text className="text-app-text-primary font-bold">Eliminar</Text>
                 </TouchableOpacity>
               </View>
             </View>

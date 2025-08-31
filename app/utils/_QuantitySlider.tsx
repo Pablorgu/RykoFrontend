@@ -77,7 +77,7 @@ export default function QuantitySlider({
       </View>
 
       {!disabled ? (
-        <View className="bg-slate-600 rounded-full p-1">
+        <View className="bg-app-surface-secondary rounded-full p-1">
           <Slider
             style={{ width: '100%', height: 40 }}
             minimumValue={minimumValue}
