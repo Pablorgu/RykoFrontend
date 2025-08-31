@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { THEME_COLORS } from '../../(config)/_colors';
 
 interface IngredientQuantityProps {
   value: number;
@@ -84,9 +85,9 @@ export function IngredientQuantity({
           step={step}
           value={value}
           onValueChange={onChange}
-          minimumTrackTintColor="#22C55E"
+          minimumTrackTintColor={THEME_COLORS.accent.success}
           maximumTrackTintColor="#52525B"
-          thumbTintColor="#16A34A"
+          thumbTintColor={THEME_COLORS.accent.success}
           accessibilityLabel={`Cantidad de ${ingredientName}`}
         />
       </View>
@@ -110,12 +111,12 @@ export function IngredientQuantity({
           keyboardType="numeric"
           selectTextOnFocus
           autoFocus
-          className="text-green-400 text-sm font-mono font-semibold min-w-[32px] text-right bg-zinc-800 px-1 rounded border border-green-500"
+          className="text-app-accent-success text-sm font-mono font-semibold min-w-[32px] text-right bg-zinc-800 px-1 rounded border border-green-500"
           style={{ minWidth: 40 }}
         />
       ) : (
         <TouchableOpacity onPress={handleEditStart}>
-          <Text className="text-green-400 text-sm font-mono font-semibold min-w-[32px] text-right">
+          <Text className="text-app-accent-success text-sm font-mono font-semibold min-w-[32px] text-right">
             {value}g
           </Text>
         </TouchableOpacity>

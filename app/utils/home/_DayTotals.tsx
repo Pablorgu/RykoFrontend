@@ -68,13 +68,13 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
       <View className="bg-zinc-800 rounded-lg p-4 mb-6">
         <View className="flex-row justify-between items-center mb-2">
           <Text className="text-zinc-100 font-bold text-lg">Calorías totales</Text>
-          <Text className="text-2xl font-bold text-blue-400">
+          <Text className="text-2xl font-bold text-app-macro-calories">
             {Math.round(nutrients.kcal)}
           </Text>
         </View>
         <View className="bg-zinc-700 rounded-full h-4 overflow-hidden">
           <View
-            className="h-full bg-blue-500 rounded-full"
+            className="h-full bg-app-macro-calories rounded-full"
             style={{ width: `${Math.min(caloriesPercentage, 100)}%` }}
           />
         </View>

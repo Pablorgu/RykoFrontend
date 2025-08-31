@@ -208,7 +208,7 @@ export function MealCard({ mealType }: MealCardProps) {
               loadAllDishes();
             }
           }}
-          className={`bg-lime-500 rounded-lg items-center w-full ${
+          className={`bg-app-accent-primary rounded-lg items-center w-full ${
             screenWidth < 400 ? 'py-2 px-3' : 'py-3 px-4'
           }`}
           accessibilityLabel={`Añadir plato a ${MEAL_DISPLAY_NAMES[mealType]}`}

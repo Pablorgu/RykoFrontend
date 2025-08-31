@@ -471,7 +471,7 @@ const cancelDelete = () => {
         <View className="flex-row justify-between bg-app-surface-tertiary rounded-lg p-3">
           <View className="items-center flex-1">
             <View className="bg-app-macro-carbs rounded-full px-2 py-1 mb-1">
-              <Text className="text-black text-xs font-bold">C</Text>
+              <Text className="text-white text-xs font-bold">C</Text>
             </View>
             <Text className="text-app-text-primary font-semibold text-sm">{carbs}g</Text>
           </View>
@@ -483,7 +483,7 @@ const cancelDelete = () => {
           </View>
           <View className="items-center flex-1">
             <View className="bg-app-macro-fat rounded-full px-2 py-1 mb-1">
-              <Text className="text-black text-xs font-bold">G</Text>
+              <Text className="text-white text-xs font-bold">G</Text>
             </View>
             <Text className="text-app-text-primary font-semibold text-sm">{fat}g</Text>
           </View>
@@ -491,7 +491,7 @@ const cancelDelete = () => {
             <View className="bg-app-macro-calories rounded-full px-2 py-1 mb-1">
               <Text className="text-white text-xs font-bold">Cal</Text>
             </View>
-            <Text className="text-app-text-primary font-semibold text-sm">{calories}</Text>
+            <Text className="text-white font-semibold text-sm">{calories}</Text>
           </View>
         </View>
       </View>
@@ -779,17 +779,17 @@ const cancelDelete = () => {
                       )}
                       <View className="flex-row mt-2">
                         <View className="bg-app-macro-carbs px-2 py-1 rounded-full mr-2">
-                          <Text className="text-black text-xs font-medium">C: {food.carbohydrates}g</Text>
+                          <Text className="text-white text-xs font-medium">C: {food.carbohydrates}g</Text>
                         </View>
                         <View className="bg-app-macro-protein px-2 py-1 rounded-full mr-2">
-                          <Text className="text-black text-xs font-medium">P: {food.proteins}g</Text>
+                          <Text className="text-white text-xs font-medium">P: {food.proteins}g</Text>
                         </View>
                         <View className="bg-app-macro-fat px-2 py-1 rounded-full">
-                          <Text className="text-black text-xs font-medium">G: {food.fat}g</Text>
+                          <Text className="text-white text-xs font-medium">G: {food.fat}g</Text>
                         </View>
                       </View>
                     </View>
-                    <View className="bg-app-macro-carbs rounded-full p-2">
+                    <View className="bg-app-accent-primary rounded-full p-2">
                       <Ionicons name="add" size={24} color="black" />
                     </View>
                   </Pressable>
