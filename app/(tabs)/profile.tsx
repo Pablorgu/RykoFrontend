@@ -29,6 +29,7 @@ import { GENDERS }    from '../(config)/_genders';
 import { COUNTRIES }  from '../(config)/_countries';
 import { UserProfileDto } from '../(types)/_UserProfileDto';
 import { WEIGHT_AIMS } from '../(config)/_WeightAims';
+import { THEME_COLORS } from '../(config)/_colors';
 
 const CODE_TO_NAME = Object.fromEntries(
   COUNTRIES.map(c => [c.code, c.name])
@@ -432,19 +433,19 @@ const toggleOption = (opt: string) => {
                 label="Proteína"
                 value={formData.proteinPct}
                 onChange={delta => updateMacro('proteinPct', delta)}
-                color="#FF6B6B"
+                color={THEME_COLORS.macros.protein}
               />
               <MacroSlider
                 label="Carbohidratos"
                 value={formData.carbsPct}
                 onChange={delta => updateMacro('carbsPct', delta)}
-                color="#4ECDC4"
+                color={THEME_COLORS.macros.carbs}
               />
               <MacroSlider
                 label="Grasas"
                 value={formData.fatPct}
                 onChange={delta => updateMacro('fatPct', delta)}
-                color="#45B7D1"
+                color={THEME_COLORS.macros.fat}
               />
             </View>
             
