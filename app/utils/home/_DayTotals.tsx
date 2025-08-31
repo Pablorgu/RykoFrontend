@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Nutrients } from '../../(types)/domain';
-import { THEME_COLORS } from '../../(config)/_colors';
 
 interface DayTotalsProps {
   nutrients: Nutrients;
