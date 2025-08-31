@@ -567,7 +567,7 @@ const cancelDelete = () => {
               {isEditing && (
                 <Pressable 
                   onPress={pickImage}
-                  className="absolute bottom-4 right-4 bg-app-macro-carbs rounded-full p-3 shadow-lg"
+                  className="absolute bottom-4 right-4 bg-app-accent-primary rounded-full p-3 shadow-lg"
                   style={{ elevation: 5 }}
                 >
                   <Ionicons name="camera" size={24} color="black" />
@@ -650,7 +650,7 @@ const cancelDelete = () => {
                       />
                     </View>
                     <Pressable
-                      className="bg-app-macro-carbs rounded-lg p-3"
+                      className="bg-app-accent-primary rounded-lg p-3"
                       onPress={handleSearch}
                       disabled={searchQuery.trim().length < 2}
                     >
@@ -682,7 +682,7 @@ const cancelDelete = () => {
           <View className="absolute bottom-0 left-0 right-0 bg-app-bg-primary bg-opacity-90 p-4">
             <Pressable
               className={`w-full py-4 rounded-2xl items-center ${
-                valid ? 'bg-app-macro-carbs' : 'bg-app-surface-tertiary'
+                valid ? 'bg-app-accent-primary' : 'bg-app-surface-tertiary'
               }`}
               onPress={saveDish}
               disabled={!valid}
@@ -713,7 +713,7 @@ const cancelDelete = () => {
               {searchLoading && (
                 <View className="flex-row items-center">
                   <ActivityIndicator color="#A3FF57" size="small" />
-                  <Text className="text-app-macro-carbs text-sm ml-2">Buscando...</Text>
+                  <Text className="text-app-accent-primary text-sm ml-2">Buscando...</Text>
                 </View>
               )}
             </View>
