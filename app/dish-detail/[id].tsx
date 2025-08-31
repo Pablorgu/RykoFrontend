@@ -687,7 +687,7 @@ const cancelDelete = () => {
               onPress={saveDish}
               disabled={!valid}
             >
-              <Text className="text-app-text-primary font-semibold text-lg">Guardar Cambios</Text>
+              <Text className="text-app-surface-tertiary font-semibold text-lg">Guardar Cambios</Text>
             </Pressable>
           </View>
         )}
