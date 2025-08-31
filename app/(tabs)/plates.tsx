@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import api from '../api/client';
 import { getCurrentUserId } from '../services/_user';
+import { THEME_COLORS } from '../(config)/_colors';
 
 // Interface for the dish data from API
 interface Dish {
@@ -80,15 +81,15 @@ function MacroPieChart({ macros, screenWidth }: {
         <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
           <Path
             d={createDonutPath(currentAngle, currentAngle + carbsAngle)}
-            fill="#A3FF57"
+            fill={THEME_COLORS.macros.carbs}
           />
           <Path
             d={createDonutPath(currentAngle + carbsAngle, currentAngle + carbsAngle + fatAngle)}
-            fill="#FFB84D"
+            fill={THEME_COLORS.macros.fat}
           />
           <Path
             d={createDonutPath(currentAngle + carbsAngle + fatAngle, currentAngle + carbsAngle + fatAngle + proteinAngle)}
-            fill="#4DABF7"
+            fill={THEME_COLORS.macros.protein}
           />
         </Svg>
       </View>
