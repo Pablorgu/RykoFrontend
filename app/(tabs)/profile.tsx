@@ -150,32 +150,71 @@ export default function ProfileScreen() {
 
   const saveModalValue = () => {
     if (activeModal === 'birthDate') {
-    if (!DATE_REGEX.test(tempValue)) {
-      Alert.alert('Formato inválido', 'Usa AAAA-MM-DD (ej. 2001-05-23)');
+      if (!DATE_REGEX.test(tempValue)) {
+        // Cambiar Alert por un estado de error visual
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
+
+      const atMidnight = new Date(`${tempValue}T00:00:00.000Z`);
+      if (isNaN(atMidnight.getTime())) {
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        birthdate: atMidnight.toISOString(),
+      }));
+      closeModal();
       return;
     }
 
-    const atMidnight = new Date(`${tempValue}T00:00:00.000Z`);
-    if (isNaN(atMidnight.getTime())) {
-      Alert.alert('Fecha inválida', 'Esa combinación día/mes no existe');
-      return;
+    // Validaciones para campos numéricos
+    if (activeModal === 'weight') {
+      const numValue = parseFloat(tempValue);
+      if (isNaN(numValue) || numValue <= 0 || numValue > 1000) {
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
     }
 
-    setFormData(prev => ({
-      ...prev,
-      birthdate: atMidnight.toISOString(), // "2001-05-23T00:00:00.000Z"
-    }));
+    if (activeModal === 'height') {
+      const numValue = parseFloat(tempValue);
+      if (isNaN(numValue) || numValue <= 0 || numValue > 300) {
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
+    }
+
+    if (activeModal === 'calorieGoal') {
+      const numValue = parseFloat(tempValue);
+      if (isNaN(numValue) || numValue <= 0 || numValue > 10000) {
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
+    }
+
+    if (activeModal === 'username') {
+      if (!tempValue.trim() || tempValue.length < 3 || tempValue.length > 50 || !/^[a-zA-Z0-9_.-]+$/.test(tempValue)) {
+        setShowSnackbar(true);
+        setTimeout(() => setShowSnackbar(false), 3000);
+        return;
+      }
+    }
+
+    if (activeModal === 'addIntolerance') {
+      setFormData(prev => ({ ...prev, intolerances: tempIntolerances }));
+    } else {
+      setFormData(prev => ({ ...prev, [activeModal!]: tempValue }));
+    }
     closeModal();
-    return;
-  }
-
-  if (activeModal === 'addIntolerance') {
-    setFormData(prev => ({ ...prev, intolerances: tempIntolerances }));
-  } else {
-    setFormData(prev => ({ ...prev, [activeModal!]: tempValue }));
-  }
-  closeModal();
-};
+  };
   
 const updateMacro = (
   macro: 'proteinPct' | 'carbsPct' | 'fatPct',
@@ -507,14 +546,6 @@ const toggleOption = (opt: string) => {
           <Text className="text-[#FF4D4F] text-center font-medium text-base">Cerrar sesión</Text>
         </Pressable>
       </View>
-      
-      {/* Snackbar */}
-      {showSnackbar && (
-        <View className="absolute top-20 left-6 right-6 bg-[#A3FF57] px-4 py-3 rounded-2xl flex-row items-center justify-center">
-          <Text className="text-black font-medium mr-2">Cambios guardados</Text>
-        </View>
-      )}
-      
       {/* Modal */}
       <Modal
         visible={activeModal !== null}
@@ -558,14 +589,31 @@ const toggleOption = (opt: string) => {
               className="bg-[#2D2D30] text-white p-4 rounded-2xl mb-4"
               value={tempValue}
               onChangeText={setTempValue}
-              placeholder={activeModal === 'birthDate' ? 'YYYY-MM-DD' : 'Ingresa el valor'}
-              keyboardType={activeModal === 'birthDate' ? 'numeric' : 'default'}
+              placeholder={
+                activeModal === 'birthDate' ? 'YYYY-MM-DD' :
+                activeModal === 'weight' ? 'Ej: 70.5' :
+                activeModal === 'height' ? 'Ej: 175' :
+                activeModal === 'calorieGoal' ? 'Ej: 2000' :
+                activeModal === 'username' ? 'Nombre de usuario' :
+                'Ingresa el valor'
+              }
+              keyboardType={
+                activeModal === 'birthDate' || 
+                activeModal === 'weight' || 
+                activeModal === 'height' || 
+                activeModal === 'calorieGoal' ? 'numeric' : 'default'
+              }
               placeholderTextColor="#666"
               autoFocus
             />
           )
         }
-
+        {/* Error message */}
+        {showSnackbar && (
+          <View className="bg-red-500 px-4 py-3 rounded-xl mb-4">
+            <Text className="text-white font-medium text-center">Valor inválido. Revisa el formato.</Text>
+          </View>
+        )}
         <Pressable onPress={saveModalValue}>
         </Pressable>
                 <Pressable
@@ -608,70 +656,6 @@ const toggleOption = (opt: string) => {
           </View>
         </View>
       </Modal>
-      
-      {/* Existence modal */}
-      <Modal
-        visible={activeModal !== null}
-        transparent
-        animationType="slide"
-        onRequestClose={closeModal}
-      >
-        {/* KeyboardAvoidingView */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={{ flex: 1, justifyContent: 'flex-end' }}
-        >
-          <View className="flex-1 justify-end bg-black/50">
-            <View className="bg-zinc-900 rounded-t-3xl p-6">
-              <View className="flex-row justify-between items-center mb-4">
-                <Text className="text-white text-lg font-semibold">Editar</Text>
-                <Pressable onPress={closeModal}>
-                  <Ionicons name="close" size={24} color="#FFFFFF" />
-                </Pressable>
-              </View>
-              
-        {MODAL_OPTIONS[activeModal as keyof typeof MODAL_OPTIONS] ? (
-          MODAL_OPTIONS[activeModal as keyof typeof MODAL_OPTIONS].list.map(opt => {
-            const selected = isSelected(opt);
-            return (
-              <Pressable
-                key={opt}
-                className={`flex-row items-center p-3 rounded-2xl mb-2 ${
-                  selected ? 'bg-[#A3FF57]' : 'bg-[#2D2D30]'
-                }`}
-                onPress={() => toggleOption(opt)}
-              >
-                <Text className={`text-base ${selected ? 'text-black font-semibold' : 'text-white'}`}>
-                  {opt}
-                </Text>
-              </Pressable>
-            );
-          })
-        ) : (
-            <TextInput
-              className="bg-[#3D3D40] text-white p-4 rounded-2xl mb-4"
-              value={tempValue}
-              onChangeText={setTempValue}
-              placeholder={activeModal === 'birthDate' ? 'YYYY-MM-DD' : 'Ingresa el valor'}
-              keyboardType={activeModal === 'birthDate' ? 'numeric' : 'default'}
-              placeholderTextColor="#666"
-              autoFocus
-            />
-          )
-        }
-
-        <Pressable onPress={saveModalValue}>
-           </Pressable>
-                <Pressable
-                  className="bg-[#A3FF57] py-3 rounded-2xl"
-                  onPress={saveModalValue}
-                >
-                  <Text className="text-black text-center font-semibold">Guardar</Text>
-                </Pressable>
-              </View>
-            </View>
-          </KeyboardAvoidingView>
-        </Modal>
     </SafeAreaView>
   );
 }
