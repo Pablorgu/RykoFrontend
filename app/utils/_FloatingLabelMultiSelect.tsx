@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     fontSize: 12,
     color: '#aaa',
-    zIndex: 11,
+    zIndex: 2000,
   },
   container: {
     borderWidth: 2,
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     borderColor: '#22c55e',
     position: 'absolute',
-    zIndex: 1000,
+    zIndex: 10,
   },
   listItemContainer: {
     height: 48,
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   placeholderLabel: {
-    color: '#999',
+    color: '#000',
   },
 })
 
