@@ -9,6 +9,7 @@ import {
   Platform,
   Animated,
   Alert,
+  ActivityIndicator,
 } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
@@ -31,8 +32,29 @@ export default function RegisterPersonal() {
   const [country, setCountry] = useState<string | null>(null)
   const [error, setError] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
 
-  const isStepValid = !!birthdate
+  // Validación mejorada
+  const validateFields = () => {
+    const errors: {[key: string]: string} = {}
+    
+    if (!birthdate) {
+      errors.birthdate = 'La fecha de nacimiento es obligatoria'
+    } else {
+      const today = new Date()
+      const age = today.getFullYear() - birthdate.getFullYear()
+      if (age < 13) {
+        errors.birthdate = 'Debes tener al menos 13 años'
+      } else if (age > 120) {
+        errors.birthdate = 'Por favor, verifica la fecha de nacimiento'
+      }
+    }
+    
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const isStepValid = !!birthdate && Object.keys(fieldErrors).length === 0
 
   const fade = useRef(new Animated.Value(0)).current
   useEffect(() => {
@@ -44,7 +66,7 @@ export default function RegisterPersonal() {
   }, [])
 
   const handleNext = async () => {
-    if (!isStepValid) return
+    if (!validateFields()) return
     
     setError('') 
     setIsLoading(true)
@@ -68,11 +90,10 @@ export default function RegisterPersonal() {
       const success = await updateUserProfile(profileData);
       
       if (success) {
-        // Update user profile in store
         await loadUserProfile();
         router.push('/register/goals');
       } else {
-        setError('No se pudieron guardar los datos personales. Inténtalo de nuevo.');
+        setError('No se pudieron guardar los datos. Inténtalo de nuevo.');
       }
     } catch (error) {
       console.error('Error al actualizar perfil:', error);
@@ -97,9 +118,13 @@ export default function RegisterPersonal() {
           keyboardShouldPersistTaps="handled"
         >
           <Animated.View style={{ flex: 1, opacity: fade, paddingVertical: 20 }}>
-            <View className="items-center mb-20">
+            <View className="items-center mb-8">
               <LogoTitle />
               <Text className="text-gray-500 mt-2">Paso 2 de 3</Text>
+              <Text className="text-white text-lg font-semibold mt-4 text-center">¡Bienvenido a Ryko!</Text>
+              <Text className="text-gray-400 text-center mt-2 px-6">
+                Cuéntanos un poco sobre ti para personalizar tu experiencia. Estos datos se pueden editar después desde tu perfil.
+              </Text>
             </View>
 
             <View className="flex-1 flex-col items-center">
@@ -109,14 +134,26 @@ export default function RegisterPersonal() {
                 gap: 24,
               }}>
 
-                <DatePickerField
-                  label="Fecha de nacimiento"
-                  date={birthdate}
-                  onChange={setBirthdate}
-                />
+                <View>
+                  <DatePickerField
+                    label="Fecha de nacimiento *"
+                    date={birthdate}
+                    onChange={(date) => {
+                      setBirthdate(date)
+                      if (fieldErrors.birthdate) {
+                        const newErrors = {...fieldErrors}
+                        delete newErrors.birthdate
+                        setFieldErrors(newErrors)
+                      }
+                    }}
+                  />
+                  {fieldErrors.birthdate && (
+                    <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.birthdate}</Text>
+                  )}
+                </View>
 
                 <FloatingLabelSelect
-                  label="Género"
+                  label="Género (opcional)"
                   value={gender}
                   onValueChange={setGender}
                   options={[
@@ -127,37 +164,43 @@ export default function RegisterPersonal() {
                 />
 
                 <FloatingLabelSelect
-                  label="País"
+                  label="País (opcional)"
                   value={country}
                   onValueChange={setCountry}
                   options={[
                     { label: 'España', value: 'es' },
                     { label: 'México', value: 'mx' },
                     { label: 'Argentina', value: 'ar' },
-                    // …
                   ]}
                 />
 
-                <View className="space-y-2">
-                  <Pressable
-                    onPress={() => router.back()}
-                    className="w-full py-3 my-2 items-center rounded border border-gray-700"
-                  >
-                    <Text className="text-gray-400">Atrás</Text>
-                  </Pressable>
+                {error && (
+                  <View className="bg-red-500/20 border border-red-500 rounded-lg p-3">
+                    <Text className="text-red-400 text-center">{error}</Text>
+                  </View>
+                )}
 
+                <View className="space-y-2 mt-6">
                   <Pressable
                     onPress={handleNext}
-                    disabled={!isStepValid}
-                    className="w-full py-3 items-center rounded"
+                    disabled={!isStepValid || isLoading}
+                    className="w-full py-4 items-center rounded-lg"
                     style={{
-                      backgroundColor: isStepValid ? '#A3FF57' : '#A3F49D',
+                      backgroundColor: isStepValid && !isLoading ? '#A3FF57' : '#A3F49D',
                     }}
                   >
-                    <Text className={`font-bold ${isStepValid ? 'text-black' : 'text-gray-600'}`}>
-                      Siguiente
-                    </Text>
+                    {isLoading ? (
+                      <ActivityIndicator color="#000000" />
+                    ) : (
+                      <Text className={`font-bold text-lg ${isStepValid ? 'text-black' : 'text-gray-600'}`}>
+                        Continuar
+                      </Text>
+                    )}
                   </Pressable>
+                  
+                  <Text className="text-gray-500 text-xs text-center mt-2">
+                    * Campo obligatorio
+                  </Text>
                 </View>
               </View>
             </View>

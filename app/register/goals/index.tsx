@@ -31,8 +31,42 @@ export default function RegisterGoals() {
   const [intolerances, setIntolerances] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<{[key: string]: string}>({})
 
-  // Validación paso
+  // Validación mejorada con mensajes específicos
+  const validateFields = () => {
+    const errors: {[key: string]: string} = {}
+    
+    const w = parseFloat(weight)
+    const h = parseFloat(height)
+    const cg = parseInt(calorieGoal, 10)
+    
+    if (!weight || isNaN(w) || w <= 0) {
+      errors.weight = 'El peso debe ser un número mayor a 0'
+    } else if (w < 30 || w > 300) {
+      errors.weight = 'El peso debe estar entre 30 y 300 kg'
+    }
+    
+    if (!height || isNaN(h) || h <= 0) {
+      errors.height = 'La altura debe ser un número mayor a 0'
+    } else if (h < 100 || h > 250) {
+      errors.height = 'La altura debe estar entre 100 y 250 cm'
+    }
+    
+    if (!aim) {
+      errors.aim = 'Debes seleccionar un objetivo'
+    }
+    
+    if (!calorieGoal || isNaN(cg) || cg <= 0) {
+      errors.calorieGoal = 'Las calorías deben ser un número mayor a 0'
+    } else if (cg < 800 || cg > 5000) {
+      errors.calorieGoal = 'Las calorías deben estar entre 800 y 5000'
+    }
+    
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const w = parseFloat(weight)
   const h = parseFloat(height)
   const cg = parseInt(calorieGoal, 10)
@@ -43,7 +77,8 @@ export default function RegisterGoals() {
     h > 0 &&
     !!aim &&
     !isNaN(cg) &&
-    cg > 0
+    cg > 0 &&
+    Object.keys(fieldErrors).length === 0
 
   // Animated fade-in
   const fade = useRef(new Animated.Value(0)).current
@@ -56,7 +91,7 @@ export default function RegisterGoals() {
   }, [])
 
   const handleRegister = async () => {
-    if (!isStepValid) return
+    if (!validateFields()) return
     
     setIsLoading(true)
     setError(null)
@@ -65,7 +100,7 @@ export default function RegisterGoals() {
       ...profile,
       weight: parseInt(weight),
       height: parseInt(height),
-      aim,
+      aim: aim || undefined,
       calorieGoal: parseInt(calorieGoal),
       intolerances,
       birthdate: profile.birthdate 
@@ -76,7 +111,6 @@ export default function RegisterGoals() {
       gender: profile.gender || undefined,
       country: profile.country || undefined
     }
-    console.log('Perfil actualizado:', updatedProfile)
     
     try {
       const success = await updateUserProfile(updatedProfile)
@@ -84,7 +118,7 @@ export default function RegisterGoals() {
       if (success) {
         router.replace('/home')
       } else {
-        setError('No se pudo actualizar el perfil. Inténtalo de nuevo.')
+        setError('No se pudo completar el registro. Inténtalo de nuevo.')
       }
     } catch (err) {
       console.error('Error en registro:', err)
@@ -109,9 +143,13 @@ export default function RegisterGoals() {
           keyboardShouldPersistTaps="handled"
         >
           <Animated.View style={{ flex: 1, opacity: fade, paddingVertical: 20 }}>
-            <View className="items-center mb-20">
+            <View className="items-center mb-8">
               <LogoTitle />
               <Text className="text-gray-500 mt-2">Paso 3 de 3</Text>
+              <Text className="text-white text-lg font-semibold mt-4 text-center">¡Ya casi terminamos!</Text>
+              <Text className="text-gray-400 text-center mt-2 px-6">
+                Configura tus objetivos nutricionales. Podrás modificar estos datos más tarde desde tu perfil.
+              </Text>
             </View>
 
             <View className="flex-1 flex-col items-center">
@@ -120,40 +158,80 @@ export default function RegisterGoals() {
                 maxWidth: 500,
                 gap: 24,
               }}>
-                <FloatingLabelInput
-                  label="Peso (kg)"
-                  value={weight}
-                  onChangeText={setWeight}
-                  inputProps={{ keyboardType: 'numeric' }}
-                />
+                  <FloatingLabelInput
+                    label="Peso (kg)"
+                    value={weight}
+                    onChangeText={(text) => {
+                      setWeight(text)
+                      if (fieldErrors.weight) {
+                        const newErrors = {...fieldErrors}
+                        delete newErrors.weight
+                        setFieldErrors(newErrors)
+                      }
+                    }}
+                    inputProps={{ keyboardType: 'numeric' }}
+                  />
+                  {fieldErrors.weight && (
+                    <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.weight}</Text>
+                  )}
 
-                <FloatingLabelInput
-                  label="Altura (cm)"
-                  value={height}
-                  onChangeText={setHeight}
-                  inputProps={{ keyboardType: 'numeric' }}
-                />
+                  <FloatingLabelInput
+                    label="Altura (cm)"
+                    value={height}
+                    onChangeText={(text) => {
+                      setHeight(text)
+                      if (fieldErrors.height) {
+                        const newErrors = {...fieldErrors}
+                        delete newErrors.height
+                        setFieldErrors(newErrors)
+                      }
+                    }}
+                    inputProps={{ keyboardType: 'numeric' }}
+                  />
+                  {fieldErrors.height && (
+                    <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.height}</Text>
+                  )}
 
-                <FloatingLabelSelect
-                  label="Objetivo"
-                  value={aim}
-                  onValueChange={setAim}
-                  options={[
-                    { label: 'Perder peso', value: 'weight_loss' },
-                    { label: 'Mantener peso', value: 'weight_maintain' },
-                    { label: 'Ganar peso', value: 'weight_gain' },
-                  ]}
-                />
+                  <FloatingLabelSelect
+                    label="Objetivo"
+                    value={aim}
+                    onValueChange={(value) => {
+                      setAim(value)
+                      if (fieldErrors.aim) {
+                        const newErrors = {...fieldErrors}
+                        delete newErrors.aim
+                        setFieldErrors(newErrors)
+                      }
+                    }}
+                    options={[
+                      { label: 'Perder peso', value: 'weight_loss' },
+                      { label: 'Mantener peso', value: 'weight_maintain' },
+                      { label: 'Ganar peso', value: 'weight_gain' },
+                    ]}
+                  />
+                  {fieldErrors.aim && (
+                    <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.aim}</Text>
+                  )}
 
-                <FloatingLabelInput
-                  label="Meta de calorías diarias"
-                  value={calorieGoal}
-                  onChangeText={setCalorieGoal}
-                  inputProps={{ keyboardType: 'numeric' }}
-                />
+                  <FloatingLabelInput
+                    label="Meta de calorías diarias"
+                    value={calorieGoal}
+                    onChangeText={(text) => {
+                      setCalorieGoal(text)
+                      if (fieldErrors.calorieGoal) {
+                        const newErrors = {...fieldErrors}
+                        delete newErrors.calorieGoal
+                        setFieldErrors(newErrors)
+                      }
+                    }}
+                    inputProps={{ keyboardType: 'numeric' }}
+                  />
+                  {fieldErrors.calorieGoal && (
+                    <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.calorieGoal}</Text>
+                  )}
 
                 <FloatingLabelMultiSelect
-                  label="intolerances"
+                  label="Intolerancias (opcional)"
                   values={intolerances}
                   onChangeValues={setIntolerances}
                   options={[
@@ -165,21 +243,16 @@ export default function RegisterGoals() {
                 />
 
                 {error && (
-                  <Text className="text-red-500 text-center">{error}</Text>
+                  <View className="bg-red-500/20 border border-red-500 rounded-lg p-3">
+                    <Text className="text-red-400 text-center">{error}</Text>
+                  </View>
                 )}
 
-                <View className="space-y-2">
-                  <Pressable
-                    onPress={() => router.back()}
-                    className="w-full py-3 items-center rounded border border-gray-700 mt-4 mb-2"
-                  >
-                    <Text className="text-gray-400">Atrás</Text>
-                  </Pressable>
-
+                <View className="space-y-2 mt-6">
                   <Pressable
                     onPress={handleRegister}
                     disabled={!isStepValid || isLoading}
-                    className="w-full py-3 items-center rounded"
+                    className="w-full py-4 items-center rounded-lg"
                     style={{
                       backgroundColor: isStepValid && !isLoading ? '#A3FF57' : '#A3F49D',
                     }}
@@ -188,9 +261,9 @@ export default function RegisterGoals() {
                       <ActivityIndicator color="#000000" />
                     ) : (
                       <Text
-                        className={`font-bold ${isStepValid ? 'text-black' : 'text-gray-600'}`}
+                        className={`font-bold text-lg ${isStepValid ? 'text-black' : 'text-gray-600'}`}
                       >
-                        Registrarse
+                        ¡Completar registro!
                       </Text>
                     )}
                   </Pressable>
