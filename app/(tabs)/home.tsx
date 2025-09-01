@@ -2,19 +2,29 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useDayStore } from '../(store)/dayStore';
 import { nutrientsForDayAsync } from '../(types)/nutrition';
 import { Dish, MEAL_ORDER } from '../(types)/domain';
 import { MealCarousel } from '../utils/home/_MealCarousel';
 import { DayTotals } from '../utils/home/_DayTotals';
+import { DAILY_TIPS } from '../(config)/_dailytips';
+
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { day, loading, loadDayData } = useDayStore();
+  const [dailyTip, setDailyTip] = useState(DAILY_TIPS[0]);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Date().toISOString().split('T')[0];
   });
+  
+  // Seleccionar tip aleatorio al cargar el componente
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * DAILY_TIPS.length);
+    setDailyTip(DAILY_TIPS[randomIndex]);
+  }, []);
   
   useEffect(() => {
     loadDayData(selectedDate);
@@ -169,13 +179,20 @@ export default function HomeScreen() {
         <DayTotals nutrients={dayNutrients} />
         
         {/* More compact daily tip */}
-        <View className="bg-gradient-to-r from-blue-900 to-purple-900 rounded-xl p-5 mx-5 mb-6">
-          <Text className="text-zinc-100 font-bold text-lg mb-2">
-            💡 Tip del día
-          </Text>
-          <Text className="text-zinc-300 leading-5">
-            Mantén un equilibrio entre todos los macronutrientes y no olvides hidratarte bien.
-          </Text>
+        <View className="mx-5 mb-6 rounded-xl overflow-hidden">
+          <LinearGradient
+            colors={['#1e3a8a', '#581c87']} 
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className="p-5"
+          >
+            <Text className="text-zinc-100 font-bold text-lg mb-2">
+              {dailyTip.emoji} {dailyTip.title}
+            </Text>
+            <Text className="text-zinc-300 leading-5">
+              {dailyTip.text}
+            </Text>
+          </LinearGradient>
         </View>
         
         {/* Additional space for scrolling */}
