@@ -6,17 +6,15 @@ import {
   Pressable,
   ScrollView,
   Dimensions,
-  Linking,
-  Platform,
 } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, router } from 'expo-router';
 import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
 import { LogoLetters } from '../utils/_LogoLetters';
-import { loginLocal, loginWithGoogle } from '../services/_auth';
-import * as WebBrowser from "expo-web-browser";
-import * as AuthSession from "expo-auth-session";
+import { loginLocal } from '../services/_auth';
+import { authWithGoogle } from '../services/googleAuth';
+import * as WebBrowser from 'expo-web-browser';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
@@ -46,35 +44,6 @@ export default function Login() {
       router.replace('/home');
     } else {
       setEmailError('Email o contraseña incorrectos');
-    }
-  };
-
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      let redirectUri;
-      if (Platform.OS === "web") {
-        redirectUri = `${window.location.origin}/auth/callback`;
-      } else {
-        redirectUri = AuthSession.makeRedirectUri({
-          scheme: "ryko",
-          path: "auth/callback",
-        });
-      }
-      const authUrl = `${process.env.API_BASE_URL}/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-
-      if (Platform.OS === "web") {
-        window.location.href = authUrl;
-        return;
-      }
-      // Opens auth session and waits for redirect to redirectUri
-      const res = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
-
-      console.log("Auth result:", res);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -131,7 +100,7 @@ export default function Login() {
                 <View className="flex-1 h-px bg-gray-700" />
               </View>
 
-              <Pressable onPress={() => handleGoogleLogin()} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
+              <Pressable onPress={authWithGoogle} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
                 <GoogleIcon width={24} height={24} className="mr-2" />
                 <Text className="text-white font-semibold mx-2">
                   Inicia sesión con Google
