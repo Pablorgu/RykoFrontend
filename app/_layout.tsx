@@ -4,25 +4,14 @@ import { useRouter, useSegments } from 'expo-router';
 import { useAuthStore } from './(store)/authStore';
 import { ActivityIndicator, View } from 'react-native';
 import "../global.css";
-import { getToken } from './services/_storage';
-import api from './api/client';
 import * as WebBrowser from 'expo-web-browser';
 
 WebBrowser.maybeCompleteAuthSession();
 
 export default function RootLayout() {
-  const { user, token, isLoading, isInitialized, initializeAuth } = useAuthStore();
+  const { user, token, isLoading, isInitialized, isHydrated, initializeAuth } = useAuthStore();
   const router = useRouter();
   const segments = useSegments();
-
-  useEffect(() => {
-    (async () => {
-      const token = await getToken();
-      if (token) {
-        api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      }
-    })();
-  }, []);
 
   // Initialize authentication when loading the app
   useEffect(() => {
@@ -31,7 +20,7 @@ export default function RootLayout() {
 
   // Guard de autenticación
   useEffect(() => {
-    if (!isInitialized) return;
+    if (!isInitialized || !isHydrated) return;
 
     const inAuthGroup = segments[0] === '(auth)' || segments[0] === 'login' || segments[0] === 'register';
     const inAppGroup = segments[0] === '(app)' || segments[0] === '(tabs)' || segments[0] === 'home';
@@ -73,9 +62,10 @@ export default function RootLayout() {
         }
       }
     }
-  }, [token, user, isInitialized, segments]);
+  }, [token, user, isInitialized, isHydrated, segments]);
 
-  if (!isInitialized || isLoading) {
+  // Show loading until it is hydrated
+  if (!isInitialized || !isHydrated || isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />

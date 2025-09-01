@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { getToken, removeToken } from "../services/_storage";
+import { getToken, removeToken, storeToken } from "../services/_storage";
 import api from "../api/client";
 
 export interface User {
@@ -26,12 +26,14 @@ interface AuthStore {
   token: string | null;
   isLoading: boolean;
   isInitialized: boolean;
+  isHydrated: boolean; // Nuevo estado
 
   setToken: (token: string) => void;
   setUser: (user: User | null) => void;
   logout: () => Promise<void>;
   initializeAuth: () => Promise<void>;
   loadUserProfile: () => Promise<void>;
+  loginWithToken: (token: string) => Promise<void>; // Nueva función
 }
 
 // Avoid duplicated API calls
@@ -42,9 +44,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   token: null,
   isLoading: false,
   isInitialized: false,
+  isHydrated: false,
 
   setToken: (token: string) => {
     set({ token });
+    api.defaults.headers.common.Authorization = `Bearer ${token}`;
   },
 
   setUser: (user: User | null) => {
@@ -53,8 +57,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   logout: async () => {
     await removeToken();
+    delete api.defaults.headers.common.Authorization;
     set({ user: null, token: null });
     loadUserPromise = null; // Reset promise cache
+  },
+
+  loginWithToken: async (token: string) => {
+    try {
+      set({ isLoading: true });
+      await storeToken(token);
+      get().setToken(token);
+      await get().loadUserProfile();
+      set({ isHydrated: true });
+    } catch (error) {
+      console.error("Error logging in with token:", error);
+      await get().logout();
+    } finally {
+      set({ isLoading: false });
+    }
   },
 
   initializeAuth: async () => {
@@ -64,13 +84,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const token = await getToken();
       if (token) {
-        set({ token });
+        get().setToken(token);
         await get().loadUserProfile();
       }
     } catch (error) {
       console.error("Error initializing auth:", error);
     } finally {
-      set({ isLoading: false, isInitialized: true });
+      set({ isLoading: false, isInitialized: true, isHydrated: true });
     }
   },
 
