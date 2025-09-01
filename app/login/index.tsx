@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Linking,
+  Platform,
 } from 'react-native';
 import { useEffect, useState } from 'react';
 import { Link, router } from 'expo-router';
@@ -14,17 +15,19 @@ import Logo from '../../assets/aguacate.svg';
 import GoogleIcon from '../../assets/google.svg';
 import { LogoLetters } from '../utils/_LogoLetters';
 import { loginLocal, loginWithGoogle } from '../services/_auth';
+import * as WebBrowser from "expo-web-browser";
+import * as AuthSession from "expo-auth-session";
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
 const logoSize = Math.min(screenWidth * 0.5, MAX_LOGO);
+WebBrowser.maybeCompleteAuthSession();
 
 export default function Login() {
   const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
   const [emailError, setEmailError] = useState('');
 
   const handleLogin = async () => {
@@ -46,8 +49,33 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = () => {
-    Linking.openURL('http://localhost:3000/auth/google');
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      let redirectUri;
+      if (Platform.OS === "web") {
+        redirectUri = `${window.location.origin}/auth/callback`;
+      } else {
+        redirectUri = AuthSession.makeRedirectUri({
+          scheme: "ryko",
+          path: "auth/callback",
+        });
+      }
+      const authUrl = `${process.env.API_BASE_URL}/auth/google?redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+
+      if (Platform.OS === "web") {
+        window.location.href = authUrl;
+        return;
+      }
+      // Opens auth session and waits for redirect to redirectUri
+      const res = await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
+
+      console.log("Auth result:", res);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
