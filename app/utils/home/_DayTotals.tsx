@@ -1,17 +1,22 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Nutrients } from '../../(types)/domain';
+import { useAuthStore } from '../../(store)/authStore';
 
 interface DayTotalsProps {
   nutrients: Nutrients;
 }
 
-// Example daily goals
-const DAILY_GOALS = {
-  kcal: 2000,
-  protein: 150, // grams
-  carbs: 250,   // grams
-  fat: 67,      // grams
+// Function to calculate macronutrient grams based on calories and percentages
+const calculateMacroGrams = (calories: number, percentage: number, caloriesPerGram: number): number => {
+  return Math.round((calories * percentage / 100) / caloriesPerGram);
+};
+
+// Constants for calories per gram
+const CALORIES_PER_GRAM = {
+  protein: 4,
+  carbs: 4,
+  fat: 9
 };
 
 interface ProgressBarProps {
@@ -23,6 +28,7 @@ interface ProgressBarProps {
   icon: string;
 }
 
+// Function to render progress bars
 function ProgressBar({ label, current, goal, unit, color, icon }: ProgressBarProps) {
   const percentage = Math.min((current / goal) * 100, 100);
   const isOverGoal = current > goal;
@@ -56,7 +62,34 @@ function ProgressBar({ label, current, goal, unit, color, icon }: ProgressBarPro
 }
 
 export function DayTotals({ nutrients }: DayTotalsProps) {
-  const caloriesPercentage = (nutrients.kcal / DAILY_GOALS.kcal) * 100;
+  const { user } = useAuthStore();
+  
+  // Calculate daily goals based on user profile
+  const dailyGoals = React.useMemo(() => {
+    if (!user || !user.calorieGoal) {
+      // Default values if no user profile
+      return {
+        kcal: 2000,
+        protein: 150,
+        carbs: 250,
+        fat: 67
+      };
+    }
+    
+    const calories = user.calorieGoal;
+    const proteinPct = user.proteinPct || 30;
+    const carbsPct = user.carbsPct || 40;
+    const fatPct = user.fatPct || 30;
+    
+    return {
+      kcal: calories,
+      protein: calculateMacroGrams(calories, proteinPct, CALORIES_PER_GRAM.protein),
+      carbs: calculateMacroGrams(calories, carbsPct, CALORIES_PER_GRAM.carbs),
+      fat: calculateMacroGrams(calories, fatPct, CALORIES_PER_GRAM.fat)
+    };
+  }, [user]);
+  
+  const caloriesPercentage = (nutrients.kcal / dailyGoals.kcal) * 100;
   
   return (
     <View className="bg-zinc-900 rounded-xl p-6 mx-5 mb-6">
@@ -89,7 +122,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
       <ProgressBar
         label="Proteínas"
         current={nutrients.protein}
-        goal={DAILY_GOALS.protein}
+        goal={dailyGoals.protein}
         unit="g"
         color={"bg-app-macro-protein"}
         icon="🥩"
@@ -98,7 +131,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
       <ProgressBar
         label="Carbohidratos"
         current={nutrients.carbs}
-        goal={DAILY_GOALS.carbs}
+        goal={dailyGoals.carbs}
         unit="g"
         color={"bg-app-macro-carbs"}
         icon="🍞"
@@ -107,7 +140,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
       <ProgressBar
         label="Grasas"
         current={nutrients.fat}
-        goal={DAILY_GOALS.fat}
+        goal={dailyGoals.fat}
         unit="g"
         color={"bg-app-macro-fat"}
         icon="🥑"
