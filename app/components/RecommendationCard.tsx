@@ -4,6 +4,7 @@ import { RecommendationDto } from '../(types)/nutrition';
 import { NutrientBadges } from '../utils/common/_NutrientBadges';
 import { getDishById } from '../services/dishService';
 import { Dish, Nutrients } from '../(types)/domain';
+import { Ionicons } from '@expo/vector-icons';
 
 interface RecommendationCardProps {
   recommendation: RecommendationDto | null; 
@@ -243,17 +244,22 @@ export function RecommendationCard({
           
           {/* Actions */}
           <View className="p-4 border-t border-zinc-700">
-            <View className="flex-row gap-3">
-              {/* Accept Button */}
+            <View className="flex-row gap-2">
+              {/* Reject Button */}
               <TouchableOpacity
-                onPress={onAccept}
+                onPress={onReject}
                 disabled={loading}
-                className={`flex-1 bg-green-600 rounded-lg py-3 items-center justify-center ${
+                className={`flex-1 bg-app-surface-primary border border-red-500/30 rounded-lg py-2.5 px-3 flex-row items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold text-center">
-                  {loading ? '⏳' : ''} Aceptar
+                {loading ? (
+                  <Ionicons name="refresh-outline" size={16} color="#ef4444" className="mr-1" />
+                ) : (
+                  <Ionicons name="close-outline" size={16} color="#ef4444" style={{ marginRight: 4 }} />
+                )}
+                <Text className="text-red-400 font-medium text-sm">
+                  Rechazar
                 </Text>
               </TouchableOpacity>
               
@@ -261,25 +267,35 @@ export function RecommendationCard({
               <TouchableOpacity
                 onPress={onTryAnother}
                 disabled={loading}
-                className={`flex-1 bg-purple-600 rounded-lg py-3 items-center justify-center ${
+                className={`flex-1 bg-app-surface-primary border border-purple-500/30 rounded-lg py-2.5 px-3 flex-row items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold text-center">
-                  {loading ? '⏳' : ''} No me convence
+                {loading ? (
+                  <Ionicons name="refresh-outline" size={16} color="#a855f7" className="mr-1" />
+                ) : (
+                  <Ionicons name="shuffle-outline" size={16} color="#a855f7" style={{ marginRight: 4 }} />
+                )}
+                <Text className="text-purple-400 font-medium text-sm">
+                  Otro plato
                 </Text>
               </TouchableOpacity>
               
-              {/* Reject Button */}
+              {/* Accept Button */}
               <TouchableOpacity
-                onPress={onReject}
+                onPress={onAccept}
                 disabled={loading}
-                className={`flex-1 bg-red-600 rounded-lg py-3 items-center justify-center ${
+                className={`flex-1 bg-app-accent-primary rounded-lg py-2.5 px-3 flex-row items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold text-center">
-                  {loading ? '⏳' : ''} Rechazar
+                {loading ? (
+                  <Ionicons name="refresh-outline" size={16} color="#000" className="mr-1" />
+                ) : (
+                  <Ionicons name="checkmark-outline" size={16} color="#000" style={{ marginRight: 4 }} />
+                )}
+                <Text className="text-black font-medium text-sm">
+                  Aceptar
                 </Text>
               </TouchableOpacity>
             </View>
