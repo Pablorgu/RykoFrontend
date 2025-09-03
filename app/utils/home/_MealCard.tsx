@@ -29,7 +29,7 @@ export function MealCard({ mealType }: MealCardProps) {
   // Recommendation hook only for dinner
   const recommendation = useRecommendation(
     day?.date || new Date().toISOString().split('T')[0],
-    mealType === 'dinner' ? mealType : 'dinner'
+    'dinner'
   );
   
   // Obtener la comida específica del día
@@ -282,10 +282,11 @@ export function MealCard({ mealType }: MealCardProps) {
       </Modal>
       
       {/* Recommendation card only for dinner */}
-      {mealType === 'dinner' && recommendation.current && (
+      {mealType === 'dinner' && (recommendation.current || recommendation.reason) && (
         <RecommendationCard
           recommendation={recommendation.current}
           loading={recommendation.loading}
+          reason={recommendation.reason}
           onAccept={async () => {
             await recommendation.accept();
           }}

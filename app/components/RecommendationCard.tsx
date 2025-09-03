@@ -6,8 +6,9 @@ import { getDishById } from '../services/dishService';
 import { Dish, Nutrients } from '../(types)/domain';
 
 interface RecommendationCardProps {
-  recommendation: RecommendationDto;
+  recommendation: RecommendationDto | null; 
   loading: boolean;
+  reason?: string;
   onAccept: () => void;
   onReject: () => void;
   onTryAnother: () => void; 
@@ -19,6 +20,7 @@ const { width: screenWidth } = Dimensions.get('window');
 export function RecommendationCard({
   recommendation,
   loading,
+  reason,
   onAccept,
   onReject,
   onTryAnother,
@@ -27,26 +29,25 @@ export function RecommendationCard({
   const [dish, setDish] = useState<Dish | null>(null);
   const [dishLoading, setDishLoading] = useState(true);
   const [nutrients, setNutrients] = useState<Nutrients>({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
-  
   const isSmall = screenWidth < 400;
   const cardWidth = isSmall ? screenWidth - 40 : screenWidth - 60;
   
   // Obtain dish data
   useEffect(() => {
     const fetchDish = async () => {
-      if (!recommendation.dishId) return;
+      if (!recommendation?.dishId) return;  // ← Usar optional chaining
       
       setDishLoading(true);
       try {
-        const dishData = await getDishById(recommendation.dishId.toString());
+        const dishData = await getDishById(recommendation?.dishId?.toString() || '');
         setDish(dishData);
         
         // Calculate nutrients
         const calculatedNutrients: Nutrients = {
-          kcal: recommendation.macros.kcal,
-          protein: recommendation.macros.protein,
-          carbs: recommendation.macros.carbs,
-          fat: recommendation.macros.fat
+          kcal: recommendation.macros?.kcal || 0,  // ← Usar optional chaining
+          protein: recommendation.macros?.protein || 0,
+          carbs: recommendation.macros?.carbs || 0,
+          fat: recommendation.macros?.fat || 0
         };
         setNutrients(calculatedNutrients);
       } catch (error) {
@@ -57,7 +58,56 @@ export function RecommendationCard({
     };
     
     fetchDish();
-  }, [recommendation.dishId, recommendation.macros]);
+  }, [recommendation?.dishId, recommendation?.macros]);
+  
+  // Check if no more dishes available
+  console.log('Reason value:', reason);
+  console.log('Reason type:', typeof reason);
+  
+  const noMoreDishes = reason === 'All dishes were excluded by filters' || 
+                      reason === 'Unexpected error: could not select any dish' ||
+                      (reason && reason.includes('could not select any dish'));
+  
+  console.log('No more dishes check:', noMoreDishes);
+  
+  if (noMoreDishes) {
+    return (
+      <Modal
+        visible={true}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={onClose}
+      >
+        <View className="flex-1 bg-black/50 justify-center items-center px-5">
+          <View 
+            className="bg-zinc-900 rounded-xl border border-zinc-700 shadow-2xl p-8"
+            style={{ width: cardWidth, maxWidth: 400 }}
+          >
+            <View className="items-center">
+              <Text className="text-6xl mb-4">🍽️</Text>
+              <Text className="text-zinc-100 text-xl font-bold text-center mb-2">
+                ¡No hay más platos!
+              </Text>
+              <Text className="text-zinc-400 text-center mb-6">
+                Ya no tenemos más platos para recomendarte con tus filtros actuales.
+              </Text>
+              <TouchableOpacity 
+                onPress={onClose} 
+                className="bg-app-accent-primary rounded-lg py-3 px-6 w-full"
+              >
+                <Text className="text-app-surface-secondary text-center font-bold">Entendido</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+  
+  // Return null if no recommendation and no reason
+  if (!recommendation) {
+    return null;
+  }
   
   if (dishLoading) {
     return (
@@ -119,7 +169,7 @@ export function RecommendationCard({
           {/* Header */}
           <View className="p-4 border-b border-zinc-700">
             <View className="flex-row justify-between items-center">
-              <Text className="text-zinc-100 text-lg font-bold">✨ Recomendación</Text>
+              <Text className="text-zinc-100 text-lg font-bold">Recomendación</Text>
               <TouchableOpacity onPress={onClose}>
                 <Text className="text-zinc-400 text-xl">×</Text>
               </TouchableOpacity>
@@ -136,11 +186,11 @@ export function RecommendationCard({
               
               {/* Scale Factor */}
               <Text className="text-zinc-300 text-sm mb-4">
-                Factor de escala: {recommendation.scale}x
+                Factor de escala: {recommendation?.scale || 1}x
               </Text>
               
               {/* Score Badge */}
-              {recommendation.score && (
+              {recommendation?.score && (
                 <View className="bg-purple-600 rounded-full px-3 py-1 self-start mb-4">
                   <Text className="text-white text-sm font-medium">
                     Puntuación: {Math.round(recommendation.score)}
@@ -149,7 +199,7 @@ export function RecommendationCard({
               )}
               
               {/* Nutrients */}
-              {recommendation.macros && (
+              {recommendation?.macros && (
                 <View className="mb-4">
                   <Text className="text-zinc-300 text-sm font-medium mb-2">Macronutrientes:</Text>
                   <View className="bg-zinc-800 rounded-lg p-3">
@@ -163,15 +213,15 @@ export function RecommendationCard({
               )}
               
               {/* Ingredients */}
-              {dish.ingredients && dish.ingredients.length > 0 && (
+              {dish?.ingredients && dish.ingredients.length > 0 && (
                 <View className="mb-4">
                   <Text className="text-zinc-300 text-sm font-medium mb-2">Ingredientes:</Text>
                   <View className="bg-zinc-800 rounded-lg p-3">
                     {dish.ingredients.slice(0, 5).map((ingredient, index) => {
                       // Calcular la cantidad con el factor de escala
-                      const scaledGrams = Math.round(ingredient.baseQuantity * recommendation.scale);
+                      const scaledGrams = Math.round(ingredient.baseQuantity * (recommendation?.scale || 1));
                       // Verificar si hay override para este ingrediente
-                      const override = recommendation.overrides.find(o => o.ingredientId === ingredient.id);
+                      const override = recommendation?.overrides?.find(o => o.ingredientId === ingredient.id);
                       const finalGrams = override ? override.grams : scaledGrams;
                       
                       return (
@@ -190,7 +240,7 @@ export function RecommendationCard({
               )}
               
               {/* Overrides info */}
-              {recommendation.overrides && recommendation.overrides.length > 0 && (
+              {recommendation?.overrides && recommendation.overrides.length > 0 && (
                 <View className="bg-blue-900/30 border border-blue-600 rounded-lg p-3 mb-4">
                   <Text className="text-blue-400 text-sm">
                     ℹ️ Esta recomendación incluye {recommendation.overrides.length} ajuste(s) de ingredientes
@@ -202,17 +252,17 @@ export function RecommendationCard({
           
           {/* Actions */}
           <View className="p-4 border-t border-zinc-700">
-            <View className="flex-row gap-2">
+            <View className="flex-row gap-3">
               {/* Accept Button */}
               <TouchableOpacity
                 onPress={onAccept}
                 disabled={loading}
-                className={`flex-1 bg-green-600 rounded-lg py-3 items-center ${
+                className={`flex-1 bg-green-600 rounded-lg py-3 items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold">
-                  {loading ? '⏳' : '✅'} Aceptar
+                <Text className="text-white font-bold text-center">
+                  {loading ? '⏳' : ''} Aceptar
                 </Text>
               </TouchableOpacity>
               
@@ -220,12 +270,12 @@ export function RecommendationCard({
               <TouchableOpacity
                 onPress={onTryAnother}
                 disabled={loading}
-                className={`flex-1 bg-purple-600 rounded-lg py-3 items-center ${
+                className={`flex-1 bg-purple-600 rounded-lg py-3 items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold">
-                  {loading ? '⏳' : '🔄'} Otra
+                <Text className="text-white font-bold text-center">
+                  {loading ? '⏳' : ''} No me convence
                 </Text>
               </TouchableOpacity>
               
@@ -233,12 +283,12 @@ export function RecommendationCard({
               <TouchableOpacity
                 onPress={onReject}
                 disabled={loading}
-                className={`flex-1 bg-red-600 rounded-lg py-3 items-center ${
+                className={`flex-1 bg-red-600 rounded-lg py-3 items-center justify-center ${
                   loading ? 'opacity-50' : ''
                 }`}
               >
-                <Text className="text-white font-bold">
-                  {loading ? '⏳' : '❌'} Rechazar
+                <Text className="text-white font-bold text-center">
+                  {loading ? '⏳' : ''} Rechazar
                 </Text>
               </TouchableOpacity>
             </View>
