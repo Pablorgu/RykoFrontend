@@ -57,7 +57,7 @@ function ProgressBar({ label, current, goal, unit, color, icon }: ProgressBarPro
             {Math.round(current)}
           </Text>
           <Text className={isOverGoal ? 'text-red-400 font-normal' : 'text-zinc-400 font-normal'}>/{Math.round(goal)}</Text>
-          <Text className="text-zinc-100"> {unit}</Text>
+          <Text className={isOverGoal ? 'text-red-400' : 'text-zinc-100'}> {unit}</Text>
         </Text>
       </View>
       
