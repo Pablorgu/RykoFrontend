@@ -73,11 +73,14 @@ export const useDayStore = create<DayStore>((set, get) => ({
     };
 
     set((state) => {
-      const newDay = { ...state.day };
-      const meal = newDay.meals.find((m) => m.type === mealType);
-      if (meal) {
-        meal.items = [...meal.items, optimisticMealDish];
-      }
+      const newDay = {
+        ...state.day,
+        meals: state.day.meals.map(meal => 
+          meal.type === mealType 
+            ? { ...meal, items: [...meal.items, optimisticMealDish] }
+            : meal
+        )
+      };
       return { day: newDay, error: null };
     });
 
@@ -95,23 +98,29 @@ export const useDayStore = create<DayStore>((set, get) => ({
         });
       } else {
         set((state) => {
-          const newDay = { ...state.day };
-          const meal = newDay.meals.find((m) => m.type === mealType);
-          if (meal) {
-            const tempIndex = meal.items.findIndex(
-              (item) => item.mealDishId === -1
-            );
-            if (tempIndex !== -1) {
-              meal.items[tempIndex] = {
-                mealDishId: result.mealDishId,
-                dishId: result.dishId.toString(),
-                overrides: result.overrides.map((override) => ({
-                  ingredientId: override.ingredientId.toString(),
-                  grams: override.grams,
-                })),
-              };
-            }
-          }
+          const newDay = {
+            ...state.day,
+            meals: state.day.meals.map(meal => {
+              if (meal.type === mealType) {
+                const tempIndex = meal.items.findIndex(
+                  (item) => item.mealDishId === -1
+                );
+                if (tempIndex !== -1) {
+                  const newItems = [...meal.items];
+                  newItems[tempIndex] = {
+                    mealDishId: result.mealDishId,
+                    dishId: result.dishId.toString(),
+                    overrides: result.overrides.map((override) => ({
+                      ingredientId: override.ingredientId.toString(),
+                      grams: override.grams,
+                    })),
+                  };
+                  return { ...meal, items: newItems };
+                }
+              }
+              return meal;
+            })
+          };
           return { day: newDay, error: null };
         });
       }
@@ -130,18 +139,22 @@ export const useDayStore = create<DayStore>((set, get) => ({
 
     // Optimistic UI update
     set((state) => {
-      const newDay = { ...state.day };
-      const meal = newDay.meals.find((m) => m.type === mealType);
-
-      if (meal) {
-        const itemIndex = meal.items.findIndex(
-          (item) => item.mealDishId === mealDishId
-        );
-        if (itemIndex !== -1) {
-          meal.items.splice(itemIndex, 1);
-        }
-      }
-
+      const newDay = {
+        ...state.day,
+        meals: state.day.meals.map(meal => {
+          if (meal.type === mealType) {
+            const itemIndex = meal.items.findIndex(
+              (item) => item.mealDishId === mealDishId
+            );
+            if (itemIndex !== -1) {
+              const newItems = [...meal.items];
+              newItems.splice(itemIndex, 1);
+              return { ...meal, items: newItems };
+            }
+          }
+          return meal;
+        })
+      };
       return { day: newDay, error: null };
     });
 

@@ -37,6 +37,8 @@ export default function HomeScreen() {
   const dayDependency = React.useMemo(() => {
     if (!day) return null;
     return JSON.stringify({
+      id: day.id,
+      date: day.date,
       meals: day.meals.map(meal => ({
         type: meal.type,
         items: meal.items.map(item => ({
@@ -63,7 +65,7 @@ export default function HomeScreen() {
       }
     };
     calculateNutrients();
-  }, [dayDependency]);
+  }, [day, dayDependency]);
 
   const goToPreviousDay = () => {
     const currentDate = new Date(selectedDate);
