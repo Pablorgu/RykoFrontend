@@ -120,18 +120,18 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingBottom: 20 }}
       >
         {/* Header con navegación de fechas */}
-        <View className="px-5 py-6 border-b border-zinc-800">
-          <Text className="text-3xl font-bold text-zinc-100 mb-4">
-            Hola! 👋
+        <View className="px-5 py-4 border-b border-zinc-800">
+          <Text className="text-2xl font-semibold text-zinc-100 mb-3">
+            Bienvenido
           </Text>
           
           {/* Navegador de fechas */}
           <View className="flex-row items-center justify-between">
             <TouchableOpacity 
               onPress={goToPreviousDay}
-              className="p-2 rounded-full bg-zinc-800"
+              className="p-1.5 rounded-lg bg-zinc-800"
             >
-              <Ionicons name="chevron-back" size={24} color="#f4f4f5" />
+              <Ionicons name="chevron-back" size={20} color="#f4f4f5" />
             </TouchableOpacity>
             
             <View className="flex-1 mx-4">
@@ -149,9 +149,9 @@ export default function HomeScreen() {
             
             <TouchableOpacity 
               onPress={goToNextDay}
-              className="p-2 rounded-full bg-zinc-800"
+              className="p-1.5 rounded-lg bg-zinc-800"
             >
-              <Ionicons name="chevron-forward" size={24} color="#f4f4f5" />
+              <Ionicons name="chevron-forward" size={20} color="#f4f4f5" />
             </TouchableOpacity>
           </View>
           
@@ -159,18 +159,18 @@ export default function HomeScreen() {
           {!isToday && (
             <TouchableOpacity 
               onPress={goToToday}
-              className="mt-3 py-2 px-4 bg-gray-100 border border-gray-300 rounded-full self-center flex-row items-center"
+              className="mt-3 py-1.5 px-3 bg-zinc-100 border border-zinc-200 rounded-md self-center flex-row items-center"
             >
-              <Ionicons name="today-outline" size={16} color="#374151" />
-              <Text className="text-gray-700 font-medium text-sm ml-2">Ir a Hoy</Text>
+              <Ionicons name="calendar-outline" size={14} color="#6b7280" style={{ marginRight: 4 }} />
+              <Text className="text-zinc-600 font-medium text-xs">Hoy</Text>
             </TouchableOpacity>
           )}
         </View>
         
         {/* Meal carousel*/}
-        <View className="pt-6">
-          <Text className="text-xl font-bold text-zinc-100 px-5 mb-6">
-            🍽️ Tus comidas de {isToday ? 'hoy' : formatDate(selectedDate).toLowerCase()}
+        <View className="pt-5">
+          <Text className="text-lg font-semibold text-zinc-100 px-5 mb-4">
+            Comidas de {isToday ? 'hoy' : formatDate(selectedDate).toLowerCase()}
           </Text>
           <MealCarousel meals={MEAL_ORDER} />
         </View>
@@ -179,17 +179,17 @@ export default function HomeScreen() {
         <DayTotals nutrients={dayNutrients} />
         
         {/* More compact daily tip */}
-        <View className="mx-5 mb-6 rounded-xl overflow-hidden">
+        <View className="mx-5 mb-6 rounded-lg overflow-hidden">
           <LinearGradient
             colors={['#1e3a8a', '#581c87']} 
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            className="p-5"
+            className="p-4"
           >
-            <Text className="text-zinc-100 font-bold text-lg mb-2">
-              {dailyTip.emoji} {dailyTip.title}
+            <Text className="text-zinc-100 font-semibold text-base mb-2">
+              {dailyTip.title}
             </Text>
-            <Text className="text-zinc-300 leading-5">
+            <Text className="text-zinc-300 leading-5 text-sm">
               {dailyTip.text}
             </Text>
           </LinearGradient>

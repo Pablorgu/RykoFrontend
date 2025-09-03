@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Nutrients } from '../../(types)/domain';
+import { macros } from '../../(config)/_colors';
 
 interface NutrientBadgesProps {
   nutrients: Nutrients;
@@ -36,7 +38,7 @@ export function NutrientBadges({
       short: 'Kcal', 
       value: Math.round(nutrients.kcal), 
       color: "bg-app-macro-calories",
-      icon: '🔥'
+      icon: 'flash-outline'
     },
     { 
       label: 'Proteínas', 
@@ -45,7 +47,7 @@ export function NutrientBadges({
       color: "bg-app-macro-protein",
       unit: 'g',
       percentage: proteinPercentage,
-      icon: '🥩'
+      icon: 'barbell-outline'
     },
     { 
       label: 'Carbohidratos', 
@@ -54,7 +56,7 @@ export function NutrientBadges({
       color: "bg-app-macro-carbs",
       unit: 'g',
       percentage: carbsPercentage,
-      icon: '🍞'
+      icon: 'battery-charging-outline'
     },
     { 
       label: 'Grasas', 
@@ -63,7 +65,7 @@ export function NutrientBadges({
       color: "bg-app-macro-fat",
       unit: 'g',
       percentage: fatPercentage,
-      icon: '🥑'
+      icon: 'water-outline'
     },
   ];
 
@@ -71,10 +73,10 @@ export function NutrientBadges({
     return (
       <View className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
         {/* Total calories */}
-        <View className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-lg p-3 mb-4">
+        <View className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 mb-4">
           <View className="flex-row items-center justify-center">
-            <Text className="text-2xl mr-3">🔥</Text>
-            <Text className="text-orange-300 font-bold text-xl">
+            <Ionicons name="flash-outline" size={24} color="#E11D48" style={{ marginRight: 8 }} />
+            <Text className="text-zinc-100 font-semibold text-lg">
               {Math.round(nutrients.kcal)} kcal
             </Text>
           </View>
@@ -102,7 +104,16 @@ export function NutrientBadges({
               <View className="flex-row items-center py-3">
                 {/* Nutrient column */}
                 <View className="flex-row items-center flex-1">
-                  <Text className="text-lg mr-3">{item.icon}</Text>
+                  <Ionicons 
+                    name={item.icon as any} 
+                    size={18} 
+                    color={
+                      item.icon === 'barbell-outline' ? macros.protein : 
+                      item.icon === 'battery-charging-outline' ? macros.carbs : 
+                      item.icon === 'water-outline' ? macros.fat : '#a1a1aa'
+                    } 
+                    style={{ marginRight: 8 }} 
+                  />
                   <Text className="text-zinc-200 font-medium text-sm">{item.label}</Text>
                 </View>
                 
@@ -136,7 +147,7 @@ export function NutrientBadges({
               <View className="border-b border-zinc-800/40" />
               <View className="flex-row items-center py-3">
                 <View className="flex-row items-center flex-1">
-                  <Text className="text-lg mr-3">🌾</Text>
+                  <Ionicons name="leaf-outline" size={18} color="#22c55e" style={{ marginRight: 8 }} />
                   <Text className="text-zinc-200 font-medium text-sm">Fibra</Text>
                 </View>
                 <View className="w-16 items-center">
@@ -155,44 +166,36 @@ export function NutrientBadges({
 
   // Compact version for badges
   return (
-    <View className="flex-row flex-wrap gap-1.5">
+    <View className="flex-row flex-wrap gap-2">
       {/* Calories */}
-      <View className="bg-app-macro-calories px-2.5 py-1 rounded-md border border-app-macro-calories/60">
-        <Text className="text-white text-xs font-medium">
-          {Math.round(nutrients.kcal)}
-        </Text>
-        <Text className="text-white text-[10px] uppercase tracking-wide">
-          calorías
+      <View className="bg-red-500/20 border border-red-500/30 px-3 py-2 rounded-lg flex-row items-center">
+        <Ionicons name="flash-outline" size={16} color="#E11D48" style={{ marginRight: 6 }} />
+        <Text className="text-zinc-100 text-xs font-medium mr-1">
+          {Math.round(nutrients.kcal)}kcal
         </Text>
       </View>
       
       {/* Proteins */}
-      <View className="bg-app-macro-protein px-2.5 py-1 rounded-md border border-app-macro-protein/60">
-        <Text className="text-white text-xs font-medium">
+      <View className="bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-lg flex-row items-center">
+        <Ionicons name="barbell-outline" size={16} color={macros.protein} style={{ marginRight: 6 }} />
+        <Text className="text-zinc-100 text-xs font-medium mr-1">
           {Math.round(nutrients.protein)}g
-        </Text>
-        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
-          proteínas
         </Text>
       </View>
       
       {/* Carbohydrates */}
-      <View className="bg-app-macro-carbs px-2.5 py-1 rounded-md border border-app-macro-carbs/60">
-        <Text className="text-white text-xs font-medium">
+      <View className="bg-sky-500/20 border border-sky-500/30 px-3 py-2 rounded-lg flex-row items-center">
+        <Ionicons name="battery-charging-outline" size={16} color={macros.carbs} style={{ marginRight: 6 }} />
+        <Text className="text-zinc-100 text-xs font-medium mr-1">
           {Math.round(nutrients.carbs)}g
-        </Text>
-        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
-          carbohidratos
         </Text>
       </View>
       
       {/* Fats */}
-      <View className="bg-app-macro-fat px-2.5 py-1 rounded-md border border-app-macro-fat/60">
-        <Text className="text-white text-xs font-medium">
+      <View className="bg-orange-500/20 border border-orange-500/30 px-3 py-2 rounded-lg flex-row items-center">
+        <Ionicons name="water-outline" size={16} color={macros.fat} style={{ marginRight: 6 }} />
+        <Text className="text-zinc-100 text-xs font-medium mr-1">
           {Math.round(nutrients.fat)}g
-        </Text>
-        <Text className="text-white/70 text-[10px] uppercase tracking-wide">
-          grasas
         </Text>
       </View>
     </View>

@@ -89,11 +89,9 @@ export function MealCarousel({ meals }: MealCarouselProps) {
         }}
       >
         <TouchableOpacity
+          className="bg-zinc-800/60 border border-zinc-700/40 rounded-xl items-center justify-center"
           onPress={goToPrevious}
           disabled={currentIndex === 0}
-          className={`rounded-full items-center justify-center shadow-lg ${
-            currentIndex === 0 ? 'bg-zinc-800' : 'bg-zinc-700'
-          }`}
           style={{
             width: buttonSize,
             height: buttonSize
@@ -101,8 +99,8 @@ export function MealCarousel({ meals }: MealCarouselProps) {
         >
           <Ionicons
             name="chevron-back"
-            size={iconSize}
-            color={currentIndex === 0 ? '#52525b' : '#ffffff'}
+            size={iconSize * 0.8}
+            color={currentIndex === 0 ? '#52525b' : '#e4e4e7'}
           />
         </TouchableOpacity>
       </View>
@@ -115,11 +113,9 @@ export function MealCarousel({ meals }: MealCarouselProps) {
         }}
       >
         <TouchableOpacity
+          className="bg-zinc-800/60 border border-zinc-700/40 rounded-xl items-center justify-center"
           onPress={goToNext}
           disabled={currentIndex === meals.length - 1}
-          className={`rounded-full items-center justify-center shadow-lg ${
-            currentIndex === meals.length - 1 ? 'bg-zinc-800' : 'bg-zinc-700'
-          }`}
           style={{
             width: buttonSize,
             height: buttonSize
@@ -127,8 +123,8 @@ export function MealCarousel({ meals }: MealCarouselProps) {
         >
           <Ionicons
             name="chevron-forward"
-            size={iconSize}
-            color={currentIndex === meals.length - 1 ? '#52525b' : '#ffffff'}
+            size={iconSize * 0.8}
+            color={currentIndex === meals.length - 1 ? '#52525b' : '#e4e4e7'}
           />
         </TouchableOpacity>
       </View>
@@ -167,9 +163,9 @@ export function MealCarousel({ meals }: MealCarouselProps) {
       </ScrollView>
 
       {/* Dots Indicator*/}
-      <View className="flex-row justify-center py-2" style={{ gap: isSmall ? 6 : 8 }}>
+      <View className="flex-row justify-center py-2" style={{ gap: isSmall ? 4 : 6 }}>
         {meals.map((_, index) => {
-          const dotSize = isSmall ? 8 : isMedium ? 10 : 12;
+          const dotSize = isSmall ? 6 : isMedium ? 7 : 8;
           return (
             <TouchableOpacity
               key={index}
@@ -185,7 +181,9 @@ export function MealCarousel({ meals }: MealCarouselProps) {
               }`}
               style={{
                 width: dotSize,
-                height: dotSize
+                height: dotSize,
+                borderRadius: dotSize / 2,
+                backgroundColor: index === currentIndex ? '#71717a' : '#3f3f46'
               }}
             />
           );

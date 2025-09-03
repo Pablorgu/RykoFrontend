@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { Nutrients } from '../../(types)/domain';
 import { useAuthStore } from '../../(store)/authStore';
+import { macros } from '../../(config)/_colors';
 
 interface DayTotalsProps {
   nutrients: Nutrients;
@@ -25,7 +27,7 @@ interface ProgressBarProps {
   goal: number;
   unit: string;
   color: string;
-  icon: string;
+  icon?: string;
 }
 
 // Function to render progress bars
@@ -33,27 +35,41 @@ function ProgressBar({ label, current, goal, unit, color, icon }: ProgressBarPro
   const percentage = Math.min((current / goal) * 100, 100);
   const isOverGoal = current > goal;
 
+  const getIconColor = (iconName: string) => {
+    switch (iconName) {
+      case 'barbell-outline': return macros.protein;
+      case 'battery-charging-outline': return macros.carbs;
+      case 'water-outline': return macros.fat;
+      case 'leaf-outline': return '#22c55e'; // Fibra (accent-success)
+      default: return '#71717a';
+    }
+  };
+
   return (
     <View className="mb-4">
       <View className="flex-row justify-between items-center mb-2">
         <View className="flex-row items-center">
-          <Text className="text-2xl mr-2">{icon}</Text>
-          <Text className="text-zinc-100 font-medium">{label}</Text>
+          {icon && <Ionicons name={icon as any} size={18} color={getIconColor(icon)} style={{ marginRight: 8 }} />}
+          <Text className="text-zinc-200 font-medium text-sm">{label}</Text>
         </View>
-        <Text className={`font-bold ${isOverGoal ? 'text-red-400' : 'text-zinc-100'}`}>
-          {Math.round(current)}/{goal} {unit}
+        <Text className="font-semibold text-sm">
+          <Text className={isOverGoal ? 'text-red-400' : 'text-zinc-100'}>
+            {Math.round(current)}
+          </Text>
+          <Text className={isOverGoal ? 'text-red-400 font-normal' : 'text-zinc-400 font-normal'}>/{Math.round(goal)}</Text>
+          <Text className="text-zinc-100"> {unit}</Text>
         </Text>
       </View>
       
-      <View className="bg-zinc-800 rounded-full h-3 overflow-hidden">
+      <View className="bg-zinc-800/60 rounded-full h-1.5 overflow-hidden">
         <View
           className={`h-full rounded-full ${color}`}
-          style={{ width: `${percentage}%` }}
+          style={{ width: `${Math.min(percentage, 100)}%` }}
         />
       </View>
       
       {isOverGoal && (
-        <Text className="text-red-400 text-xs mt-1">
+        <Text className="text-red-400 text-xs mt-1.5 font-medium">
           +{Math.round(current - goal)} {unit} sobre el objetivo
         </Text>
       )}
@@ -93,19 +109,19 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
   
   return (
     <View className="bg-zinc-900 rounded-xl p-6 mx-5 mb-6">
-      <Text className="text-xl font-bold text-zinc-100 mb-6 text-center">
-        📊 Resumen del día
+      <Text className="text-lg font-semibold text-zinc-100 mb-5 text-center">
+        Resumen del día
       </Text>
       
       {/* Main calories */}
-      <View className="bg-zinc-800 rounded-lg p-4 mb-6">
+      <View className="bg-zinc-800 rounded-lg p-4 mb-5">
         <View className="flex-row justify-between items-center mb-2">
           <Text className="text-zinc-100 font-bold text-lg">Calorías totales</Text>
           <Text className="text-2xl font-bold text-app-macro-calories">
             {Math.round(nutrients.kcal)}
           </Text>
         </View>
-        <View className="bg-zinc-700 rounded-full h-4 overflow-hidden">
+        <View className="bg-zinc-700 rounded-full h-3 overflow-hidden">
           <View
             className="h-full bg-app-macro-calories rounded-full"
             style={{ width: `${Math.min(caloriesPercentage, 100)}%` }}
@@ -117,7 +133,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
       </View>
 
       {/* Macronutrientes */}
-      <Text className="text-lg font-bold text-zinc-100 mb-4">Macronutrientes</Text>
+      <Text className="text-sm font-semibold text-zinc-200 mb-4 uppercase tracking-wide">Macronutrientes</Text>
       
       <ProgressBar
         label="Proteínas"
@@ -125,7 +141,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         goal={dailyGoals.protein}
         unit="g"
         color={"bg-app-macro-protein"}
-        icon="🥩"
+        icon="barbell-outline"
       />
       
       <ProgressBar
@@ -134,7 +150,7 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         goal={dailyGoals.carbs}
         unit="g"
         color={"bg-app-macro-carbs"}
-        icon="🍞"
+        icon="battery-charging-outline"
       />
       
       <ProgressBar
@@ -143,19 +159,19 @@ export function DayTotals({ nutrients }: DayTotalsProps) {
         goal={dailyGoals.fat}
         unit="g"
         color={"bg-app-macro-fat"}
-        icon="🥑"
+        icon="water-outline"
       />
       
-      {/* Fiber if available */}
+      {/* Fiber */}
       {nutrients.fiber && nutrients.fiber > 0 && (
-        <View className="mt-2 pt-4 border-t border-zinc-700">
-          <View className="flex-row justify-between items-center">
+        <View className="mt-4 pt-4 border-t border-zinc-800/60">
+          <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
-              <Text className="text-lg mr-2">🌾</Text>
-              <Text className="text-zinc-100 font-medium">Fibra</Text>
+              <Ionicons name="leaf-outline" size={18} color="#22c55e" style={{ marginRight: 8 }} />
+              <Text className="text-zinc-200 font-medium text-sm">Fibra</Text>
             </View>
-            <Text className="text-zinc-100 font-bold">
-              {Math.round(nutrients.fiber)} g
+            <Text className="text-zinc-100 font-semibold text-sm">
+              {Math.round(nutrients.fiber)}g
             </Text>
           </View>
         </View>

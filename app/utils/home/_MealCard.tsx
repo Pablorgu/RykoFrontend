@@ -10,6 +10,7 @@ import { getCurrentUserId } from '../../services/_user';
 import { DishSearchItem } from './_DishSearchItem';
 import { useRecommendation } from '../../hooks/useRecommendation';
 import { RecommendationCard } from '../../components/RecommendationCard';
+import { Ionicons } from '@expo/vector-icons';
 
 interface MealCardProps {
   mealType: MealType;
@@ -193,13 +194,15 @@ export function MealCard({ mealType }: MealCardProps) {
           </View>
         ) : (
           <View className={`bg-zinc-800 rounded-lg items-center justify-center ${screenWidth < 400 ? 'px-4 py-8' : 'px-6 py-12'}`}>
-            <View className="items-center">
-              <Text className={`${textSizes.emoji} ${screenWidth < 400 ? 'mb-2' : 'mb-3'}`}>🍽️</Text>
-              <Text className={`text-zinc-300 text-center ${textSizes.emptyTitle} font-medium`}>
+            <View className="flex-1 justify-center items-center py-12">
+              <View className="bg-zinc-800/40 rounded-full p-4 mb-3">
+                <Ionicons name="restaurant-outline" size={24} color="#71717a" />
+              </View>
+              <Text className="text-zinc-400 text-sm text-center font-medium">
                 No hay platos añadidos
               </Text>
-              <Text className={`text-zinc-500 text-center ${textSizes.emptySubtitle} ${screenWidth < 400 ? 'mt-1' : 'mt-2'}`}>
-                Toca el botón de abajo para añadir tu primer plato
+              <Text className="text-zinc-500 text-xs text-center mt-1">
+                Añade tu primer plato
               </Text>
             </View>
           </View>
@@ -229,14 +232,36 @@ export function MealCard({ mealType }: MealCardProps) {
           <TouchableOpacity
             onPress={() => recommendation.load()}
             disabled={recommendation.loading}
-            className={`bg-purple-600 rounded-lg items-center w-full ${
-              screenWidth < 400 ? 'py-2 px-3 mt-2' : 'py-3 px-4 mt-3'
+            className={`border border-purple-500/30 rounded-lg items-center justify-center w-full flex-row ${
+              screenWidth < 400 ? 'py-2 px-3 mt-2' : 'py-2.5 px-4 mt-2.5'
             } ${recommendation.loading ? 'opacity-50' : ''}`}
             accessibilityLabel="Recomendar plato para cena"
           >
-            <Text className={`text-white font-bold ${textSizes.button}`}>
-              {recommendation.loading ? '🔄 Cargando...' : '✨ Recomendar'}
-            </Text>
+            {recommendation.loading ? (
+              <>
+                <Ionicons 
+                  name="refresh-outline" 
+                  size={16} 
+                  color="#a855f7" 
+                  style={{ marginRight: 6 }}
+                />
+                <Text className={`text-purple-400 font-medium text-sm`}>
+                  Cargando...
+                </Text>
+              </>
+            ) : (
+              <>
+                <Ionicons 
+                  name="sparkles-outline" 
+                  size={16} 
+                  color="#a855f7" 
+                  style={{ marginRight: 6 }}
+                />
+                <Text className={`text-purple-400 font-medium text-sm`}>
+                  Recomendar
+                </Text>
+              </>
+            )}
           </TouchableOpacity>
         )}
       </View>
