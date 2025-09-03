@@ -192,15 +192,50 @@ export async function nutrientsForMealAsync(meal: Meal): Promise<Nutrients> {
 }
 
 export async function nutrientsForDayAsync(day: Day): Promise<Nutrients> {
-  let totalNutrients: Nutrients = { kcal: 0, protein: 0, carbs: 0, fat: 0 };
+  const nutrients: Nutrients = {
+    kcal: 0,
+    protein: 0,
+    carbs: 0,
+    fat: 0,
+    fiber: 0,
+    satFat: 0,
+  };
 
   for (const meal of day.meals) {
     const mealNutrients = await nutrientsForMealAsync(meal);
-    totalNutrients.kcal += mealNutrients.kcal;
-    totalNutrients.protein += mealNutrients.protein;
-    totalNutrients.carbs += mealNutrients.carbs;
-    totalNutrients.fat += mealNutrients.fat;
+    Object.assign(nutrients, addNutrients(nutrients, mealNutrients));
   }
 
-  return totalNutrients;
+  return nutrients;
 }
+
+// Types for recommendation system
+export type MacroVector = {
+  protein: number;
+  carbs: number;
+  fat: number;
+  kcal: number;
+};
+
+export type IngredientOverride = {
+  ingredientId: string | number;
+  grams: number;
+};
+
+export type RecommendationDto = {
+  dishId: number;
+  scale: number;
+  score: number;
+  overrides: IngredientOverride[];
+  macros: MacroVector;
+};
+
+export type RecommendationResp = {
+  recommendation: RecommendationDto;
+  diagnostics: {
+    remainingMacros: MacroVector;
+    availableDishes: number;
+    filteredDishes: number;
+    reason?: string;
+  };
+};

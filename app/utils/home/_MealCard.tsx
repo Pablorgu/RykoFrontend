@@ -8,6 +8,8 @@ import { MEAL_DISPLAY_NAMES, MealType, Dish, Nutrients } from '../../(types)/dom
 import { searchDishes, getAllDishes } from '../../services/dishService';
 import { getCurrentUserId } from '../../services/_user';
 import { DishSearchItem } from './_DishSearchItem';
+import { useRecommendation } from '../../hooks/useRecommendation';
+import { RecommendationCard } from '../../components/RecommendationCard';
 
 interface MealCardProps {
   mealType: MealType;
@@ -16,13 +18,19 @@ interface MealCardProps {
 const { width: screenWidth } = Dimensions.get('window');
 
 export function MealCard({ mealType }: MealCardProps) {
-  const { day, addDishToMeal, removeDishFromMeal } = useDayStore();
+  const { day, addDishToMeal, removeDishFromMeal, loadDayData } = useDayStore();
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Dish[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [mealNutrients, setMealNutrients] = useState<Nutrients>({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
+  
+  // Recommendation hook only for dinner
+  const recommendation = useRecommendation(
+    day?.date || new Date().toISOString().split('T')[0],
+    mealType === 'dinner' ? mealType : 'dinner'
+  );
   
   // Obtener la comida específica del día
   const meal = day?.meals.find(m => m.type === mealType);
@@ -215,9 +223,25 @@ export function MealCard({ mealType }: MealCardProps) {
         >
           <Text className={`text-black font-bold ${textSizes.button}`}>+ Añadir plato</Text>
         </TouchableOpacity>
+        
+        {/* Recommendation button only for dinner */}
+        {mealType === 'dinner' && (
+          <TouchableOpacity
+            onPress={() => recommendation.load()}
+            disabled={recommendation.loading}
+            className={`bg-purple-600 rounded-lg items-center w-full ${
+              screenWidth < 400 ? 'py-2 px-3 mt-2' : 'py-3 px-4 mt-3'
+            } ${recommendation.loading ? 'opacity-50' : ''}`}
+            accessibilityLabel="Recomendar plato para cena"
+          >
+            <Text className={`text-white font-bold ${textSizes.button}`}>
+              {recommendation.loading ? '🔄 Cargando...' : '✨ Recomendar'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Modal */}
+      {/* Modal de búsqueda */}
       <Modal
         visible={showModal}
         animationType="slide"
@@ -256,6 +280,26 @@ export function MealCard({ mealType }: MealCardProps) {
           />
         </View>
       </Modal>
+      
+      {/* Recommendation card only for dinner */}
+      {mealType === 'dinner' && recommendation.current && (
+        <RecommendationCard
+          recommendation={recommendation.current}
+          loading={recommendation.loading}
+          onAccept={async () => {
+            await recommendation.accept();
+          }}
+          onReject={() => {
+            recommendation.reject();
+          }}
+          onTryAnother={() => {
+            recommendation.another();
+          }}
+          onClose={() => {
+            recommendation.reset();
+          }}
+        />
+      )}
     </View>
   );
 }
