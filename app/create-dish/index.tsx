@@ -225,7 +225,13 @@ async function pickImage() {
         UserId: currentUser,
         ingredients: formData.ingredients.map(ingredient => ({
           barcode: parseInt(ingredient.barcode) || ingredient.barcode,
-          quantity: ingredient.quantity
+          quantity: ingredient.quantity,
+          name: ingredient.name,
+          brand: ingredient.brand,
+          carbohydrates: ingredient.carbohydrates,
+          fat: ingredient.fat,
+          proteins: ingredient.proteins,
+          calories: ingredient.calories
         }))
       };
   

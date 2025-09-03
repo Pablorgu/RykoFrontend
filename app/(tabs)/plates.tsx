@@ -135,7 +135,6 @@ function MacroPieChart({ macros, screenWidth }: {
 }
 
 function handlePlatePress(plateId: string) {
-  console.log('Navegando a detalles del plato:', plateId);
   router.push(`/dish-detail/${plateId}`);
 }
 

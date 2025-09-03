@@ -48,7 +48,7 @@ interface Ingredient extends Food {
 interface DishFormData {
   name: string;
   description: string;
-  image: string | null;
+  image: string | "";
   ingredients: Ingredient[];
 }
 
@@ -65,7 +65,7 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
   const [formData, setFormData] = useState<DishFormData>({
     name: '',
     description: '',
-    image: null,
+    image: '',
     ingredients: []
   });
   const [errors, setErrors] = useState({ name: '' });
@@ -352,7 +352,13 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
       const ingredientsData = {
         ingredients: formData.ingredients.map(ingredient => ({
           barcode: ingredient.barcode,
-          quantity: ingredient.quantity.toString() // El API espera quantity como string
+          quantity: ingredient.quantity.toString(), // El API espera quantity como string
+          name: ingredient.name,
+          brand: ingredient.brand,
+          carbohydrates: ingredient.carbohydrates,
+          fat: ingredient.fat,
+          proteins: ingredient.proteins,
+          calories: ingredient.calories
         }))
       };
 

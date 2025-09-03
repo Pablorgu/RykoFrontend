@@ -93,8 +93,6 @@ export default function ProfileScreen() {
           const userId = await getCurrentUserId();
           if (userId) {
             const fullProfile = await getUserProfile(userId);
-            console.log('Datos del usuario:', fullProfile);
-            console.log("cumpleaños:", fullProfile.birthdate)
             setUser(fullProfile);
             if (fullProfile) {
               setFormData(prev => ({
@@ -260,8 +258,7 @@ const updateMacro = (
       fatPct: formData.fatPct,
       intolerances: formData.intolerances
     };
-    console.log("dto a guardar", dto);
-    console.log("pcts:", formData.proteinPct, formData.carbsPct, formData.fatPct)
+    
     const success = await updateUserProfile(dto);
     if (success) {
       setShowSnackbar(true);
