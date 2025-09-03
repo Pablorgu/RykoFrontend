@@ -162,8 +162,7 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
         // Fetch complete ingredient information using the new endpoint
         const ingredientsResponse = await api.get(`/dish/${id}/food-items`);
         const ingredients = ingredientsResponse.data;
-        console.log('ingredients', ingredients);
-        
+
         // Transform the API data to match our Ingredient interface
         const transformedIngredients = ingredients.map((item: DishFoodItem) => ({
           barcode: item.foodItem.barcode,
@@ -347,7 +346,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
         UserId: currentUser
       };
 
-      console.log('Actualizando datos del plato:', dishData);
       const dishResponse = await api.put(`/dishes/${id}`, dishData);
 
       // Actualizar ingredientes por separado
@@ -358,12 +356,10 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
         }))
       };
 
-      console.log('Actualizando ingredientes del plato:', ingredientsData);
       const ingredientsResponse = await api.put(`/dishes/${id}/ingredients`, ingredientsData);
 
       if ((dishResponse.status === 200 || dishResponse.status === 201) && 
           (ingredientsResponse.status === 200 || ingredientsResponse.status === 201)) {
-        console.log('Plato e ingredientes actualizados exitosamente');
         setToastMessage('¡Plato actualizado!');
         setShowToast(true);
         setTimeout(() => {

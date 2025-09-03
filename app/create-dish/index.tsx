@@ -211,7 +211,6 @@ async function pickImage() {
   
     try {
       const currentUser = await getCurrentUserId();
-      console.log("current user: ", currentUser)
       if (!currentUser) {
         console.error('No se pudo obtener el usuario actual');
         alert('Error obteniendo información del usuario.');
@@ -230,13 +229,10 @@ async function pickImage() {
         }))
       };
   
-      console.log('Enviando datos del plato:', dishData);
-  
  
       const response = await api.post('/dishes/create', dishData);
       
       if (response.status === 201 || response.status === 200) {
-        console.log('Plato guardado exitosamente:', response.data);
         setShowToast(true);
         setTimeout(() => {
           setShowToast(false);

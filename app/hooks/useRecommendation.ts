@@ -50,9 +50,8 @@ export function useRecommendation(
       if (response.data) {
         // Always capture the reason from diagnostics
         const reasonValue = response.data.diagnostics?.reason || undefined;
-        console.log('Setting reason to:', reasonValue);
         setReason(reasonValue);
-        
+
         if (response.data.recommendation) {
           setCurrent(response.data.recommendation);
         } else {
@@ -110,29 +109,19 @@ export function useRecommendation(
       if (newExclude.length > 0) {
         url += `?exclude=${newExclude.join(",")}`;
       }
- 
+
       const response = await client.get<RecommendationResp>(url);
-      console.log(
-        "Respuesta completa:",
-        JSON.stringify(response.data, null, 2)
-      );
-      console.log("Diagnostics:", response.data.diagnostics);
-      console.log("Reason linea 111:", response.data.diagnostics?.reason);
       if (response.data) {
         // Always capture the reason from diagnostics
         const reasonValue = response.data.diagnostics?.reason || undefined;
-        console.log('Setting reason to:', reasonValue);
-        console.log('Reason type:', typeof reasonValue);
         setReason(reasonValue);
-        
+
         if (response.data.recommendation) {
           setCurrent(response.data.recommendation);
         } else {
-          console.error("No se pudo obtener una recomendación");
           setCurrent(null);
         }
       } else {
-        console.error("No se pudo obtener una recomendación");
       }
     } catch (err: any) {
       console.error(

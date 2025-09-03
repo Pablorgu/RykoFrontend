@@ -24,7 +24,6 @@ export async function getCurrentUserId(): Promise<number | null> {
 export async function getUserProfile(userId: number): Promise<any | null> {
   try {
     const { data } = await api.get(`/users/profile/${userId}`);
-    console.log("Perfil del usuario obtenido:", data);
     return data;
   } catch (error) {
     console.error("Error obteniendo perfil del usuario:", error);

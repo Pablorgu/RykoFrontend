@@ -5,10 +5,8 @@ const TOKEN_KEY = "userToken";
 
 export async function storeToken(token: string): Promise<void> {
   if (Platform.OS === "web") {
-    console.log("web");
     sessionStorage.setItem(TOKEN_KEY, token);
   } else {
-    console.log("ios");
     await SecureStore.setItemAsync(TOKEN_KEY, token);
   }
 }

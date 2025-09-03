@@ -58,10 +58,6 @@ export async function registerLocal(
   }
 }
 
-export async function loginWithGoogle(token: string) {
-  console.log("JWT:", token);
-}
-
 export async function logout(): Promise<void> {
   const { logout } = useAuthStore.getState();
   await logout();

@@ -62,14 +62,10 @@ export function RecommendationCard({
   }, [recommendation?.dishId, recommendation?.macros]);
   
   // Check if no more dishes available
-  console.log('Reason value:', reason);
-  console.log('Reason type:', typeof reason);
   
   const noMoreDishes = reason === 'All dishes were excluded by filters' || 
                       reason === 'Unexpected error: could not select any dish' ||
                       (reason && reason.includes('could not select any dish'));
-  
-  console.log('No more dishes check:', noMoreDishes);
   
   if (noMoreDishes) {
     return (
