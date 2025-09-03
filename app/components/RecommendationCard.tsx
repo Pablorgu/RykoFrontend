@@ -186,17 +186,8 @@ export function RecommendationCard({
               
               {/* Scale Factor */}
               <Text className="text-zinc-300 text-sm mb-4">
-                Factor de escala: {recommendation?.scale || 1}x
+                Factor de escala: {Math.round((recommendation?.scale || 1) * 10) / 10}x
               </Text>
-              
-              {/* Score Badge */}
-              {recommendation?.score && (
-                <View className="bg-purple-600 rounded-full px-3 py-1 self-start mb-4">
-                  <Text className="text-white text-sm font-medium">
-                    Puntuación: {Math.round(recommendation.score)}
-                  </Text>
-                </View>
-              )}
               
               {/* Nutrients */}
               {recommendation?.macros && (
