@@ -40,10 +40,13 @@ export function useRecommendation(
     setLoading(true);
 
     try {
-      const response = await client.get<RecommendationResp>(
-        `/recommendation/${date}`
-      );
+      // Construir la URL según la estructura del backend:
+      let url = `/recommendation/${date}`;
+      if (exclude.length > 0) {
+        url += `?exclude=${exclude.join(",")}`;
+      }
 
+      const response = await client.get<RecommendationResp>(url);
       if (response.data && response.data.recommendation) {
         setCurrent(response.data.recommendation);
         setReason(response.data.diagnostics?.reason || undefined);
@@ -59,6 +62,7 @@ export function useRecommendation(
       setLoading(false);
     }
   }, [date, mealType]);
+
   const accept = useCallback(async () => {
     if (!current || !date || !mealType) return;
 
@@ -87,14 +91,33 @@ export function useRecommendation(
     }
 
     // Add current dish to exclude list
-    setExclude((prev) => {
-      const newExclude = [...prev, current.dishId];
-      return newExclude;
-    });
+    const newExclude = [...exclude, current.dishId];
+    setExclude(newExclude);
 
-    // Load new recommendation
-    await loadRecommendation();
-  }, [current, loadRecommendation]);
+    // Load new recommendation with updated exclude list
+    setLoading(true);
+    try {
+      let url = `/recommendation/${date}`;
+      if (newExclude.length > 0) {
+        url += `?exclude=${newExclude.join(",")}`;
+      }
+
+      const response = await client.get<RecommendationResp>(url);
+      if (response.data && response.data.recommendation) {
+        setCurrent(response.data.recommendation);
+        setReason(response.data.diagnostics?.reason || undefined);
+      } else {
+        console.error("No se pudo obtener una recomendación");
+      }
+    } catch (err: any) {
+      console.error(
+        "Error al cargar recomendación:",
+        err.response?.data?.message || err.message
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [current, exclude, date]);
 
   const reject = useCallback(() => {
     reset();

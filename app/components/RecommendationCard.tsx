@@ -10,7 +10,7 @@ interface RecommendationCardProps {
   loading: boolean;
   onAccept: () => void;
   onReject: () => void;
-  onTryAnother: () => void;
+  onTryAnother: () => void; 
   onClose: () => void;
 }
 
