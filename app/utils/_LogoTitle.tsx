@@ -6,7 +6,7 @@ const logoSize = 50
 
 export function LogoTitle() {
   return (
-    <View className="flex-row items-center">
+    <View className="flex-row items-center justify-center">
       <Text
         className="text-white font-bold"
         style={{ fontSize: logoSize }}
@@ -16,10 +16,11 @@ export function LogoTitle() {
 
       <Logo
         width={logoSize}
-        height={logoSize * 0.77}
+        height={logoSize * 0.80}
         style={{
-          transform: [{ scaleX: 1.2 }],
+          transform: [{ scaleX: 1.2 }, { scaleY: 1 }],
           marginLeft: -6,
+          marginTop: 2,
         }}
       />
     </View>

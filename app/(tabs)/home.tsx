@@ -9,6 +9,7 @@ import { Dish, MEAL_ORDER } from '../(types)/domain';
 import { MealCarousel } from '../utils/home/_MealCarousel';
 import { DayTotals } from '../utils/home/_DayTotals';
 import { DAILY_TIPS } from '../(config)/_dailytips';
+import { LogoTitle } from '../utils/_LogoTitle';
 
 
 export default function HomeScreen() {
@@ -123,9 +124,9 @@ export default function HomeScreen() {
       >
         {/* Header con navegación de fechas */}
         <View className="px-5 py-4 border-b border-zinc-800">
-          <Text className="text-2xl font-semibold text-zinc-100 mb-3">
-            Bienvenido
-          </Text>
+          <View className="mb-6 items-center justify-center">
+            <LogoTitle />
+          </View>
           
           {/* Navegador de fechas */}
           <View className="flex-row items-center justify-between">
@@ -170,7 +171,7 @@ export default function HomeScreen() {
         </View>
         
         {/* Meal carousel*/}
-        <View className="pt-5">
+        <View className="pt-8">
           <Text className="text-lg font-semibold text-zinc-100 px-5 mb-4">
             Comidas de {isToday ? 'hoy' : formatDate(selectedDate).toLowerCase()}
           </Text>
