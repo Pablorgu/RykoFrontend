@@ -1,23 +1,19 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { router } from 'expo-router';
+import { View, Text, Pressable, SafeAreaView, ScrollView, Dimensions } from 'react-native';
+import { Link, router, useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FloatingLabelInput from '../utils/_FloatingLabel';
+import { LogoLetters } from '../utils/_LogoLetters';
+import Logo from '../../assets/aguacate.svg';
 import client from '../api/client';
 
 const ForgotPasswordScreen = () => {
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [emailError, setEmailError] = useState('');
 
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -56,107 +52,87 @@ const ForgotPasswordScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView 
+    <SafeAreaView className="bg-black h-screen" style={{ paddingTop: insets.top }}>
+      <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-1 bg-zinc-900 px-6 py-8">
-          <View className="flex-1 justify-center">
-            <View className="mb-8">
-              <Text className="text-white text-3xl font-bold mb-2">
-                Recuperar contraseña
-              </Text>
-              <Text className="text-zinc-400 text-base">
-                Te enviaremos un código de 6 dígitos si el correo existe
-              </Text>
-            </View>
+        <View className="flex-1 px-4 mt-5">
+          <View className="items-center">
+            <LogoLetters />
+          </View>
 
-            <View className="mb-6">
-              <Text className="text-white text-sm font-medium mb-2">
-                Correo electrónico
-              </Text>
-              <TextInput
-                testID="emailInput"
-                accessibilityLabel="Campo de correo electrónico"
+          <View className="flex-1 flex-col items-center justify-center">
+            <View style={{
+              width: '90%',
+              maxWidth: 500,
+              gap: 24,
+            }}>
+              <View className="mb-6">
+                <Text className="text-white text-2xl font-bold text-center mb-2">
+                  Recuperar contraseña
+                </Text>
+                <Text className="text-gray-400 text-center text-base">
+                  Introduce tu correo electrónico y te enviaremos un código para restablecer tu contraseña.
+                </Text>
+              </View>
+
+              {message && (
+                <View className={`p-4 rounded-lg mb-4 ${
+                  messageType === 'success' ? 'bg-green-900/20 border border-green-600/30' : 'bg-red-900/20 border border-red-600/30'
+                }`}>
+                  <Text className={`text-center ${
+                    messageType === 'success' ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {message}
+                  </Text>
+                </View>
+              )}
+
+              <FloatingLabelInput
+                label="Correo electrónico"
                 value={email}
                 onChangeText={setEmail}
-                placeholder="tu@email.com"
-                placeholderTextColor="#71717a"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!loading}
-                className={`bg-zinc-800 text-white px-4 py-3 rounded-lg text-base ${
-                  email && !validateEmail(email) ? 'border border-red-500' : ''
-                }`}
+                inputProps={{ 
+                  keyboardType: 'email-address', 
+                  autoCapitalize: 'none',
+                  testID: 'email-input',
+                  accessibilityLabel: 'Campo de correo electrónico'
+                }}
               />
-              {email && !validateEmail(email) && (
-                <Text className="text-red-400 text-sm mt-1">
-                  Ingresa un correo válido
-                </Text>
+              
+              {emailError && (
+                <Text className="text-red-400 text-sm pl-1 -mt-4">{emailError}</Text>
               )}
-            </View>
 
-            {message && (
-              <View className={`p-4 rounded-lg mb-4 ${
-                messageType === 'success' ? 'bg-green-900/20 border border-green-500/30' : 'bg-red-900/20 border border-red-500/30'
-              }`}>
-                <Text className={`text-center ${
-                  messageType === 'success' ? 'text-green-400' : 'text-red-400'
+              <Pressable
+                onPress={handleSendCode}
+                disabled={loading}
+                className={`w-full py-3 rounded mb-6 justify-center items-center h-[44px] ${
+                  loading ? 'bg-gray-700' : 'bg-lime-400'
+                }`}
+                testID="send-code-button"
+                accessibilityLabel="Enviar código de recuperación"
+              >
+                <Text className={`font-bold ${
+                  loading ? 'text-gray-400' : 'text-black'
                 }`}>
-                  {message}
+                  {loading ? 'Enviando...' : 'Enviar código'}
                 </Text>
-                {messageType === 'success' && (
-                  <Text className="text-zinc-400 text-sm text-center mt-2">
-                    Redirigiendo en 2 segundos...
+              </Pressable>
+
+              <Link href="/login" asChild>
+                <Pressable className="w-full items-center">
+                  <Text className="text-green-400 underline">
+                    ¿Recordaste tu contraseña? Inicia sesión
                   </Text>
-                )}
-              </View>
-            )}
-
-            <TouchableOpacity
-              testID="sendCodeBtn"
-              accessibilityLabel="Botón enviar código"
-              onPress={handleSendCode}
-              disabled={!isFormValid || messageType === 'success'}
-              className={`py-3 rounded-lg mb-4 ${
-                isFormValid && messageType !== 'success'
-                  ? 'bg-green-600 active:bg-green-700'
-                  : 'bg-zinc-700'
-              }`}
-            >
-              <View className="flex-row items-center justify-center">
-                {loading && (
-                  <ActivityIndicator 
-                    size="small" 
-                    color="white" 
-                    style={{ marginRight: 8 }}
-                  />
-                )}
-                <Text className={`text-center font-semibold ${
-                  isFormValid && messageType !== 'success' ? 'text-white' : 'text-zinc-400'
-                }`}>
-                  {loading ? 'Enviando...' : messageType === 'success' ? 'Código enviado' : 'Enviar código'}
-                </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="py-2"
-            >
-              <Text className="text-green-400 text-center">
-                Volver al inicio de sesión
-              </Text>
-            </TouchableOpacity>
+                </Pressable>
+              </Link>
+            </View>
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

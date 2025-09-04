@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
+import { View, Text, Pressable, SafeAreaView, ScrollView, Dimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import FloatingLabelInput from '../utils/_FloatingLabel';
+import { LogoLetters } from '../utils/_LogoLetters';
+import Logo from '../../assets/aguacate.svg';
 import client from '../api/client';
 
 const ResetPasswordScreen = () => {
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
   const [email, setEmail] = useState((params.email as string) || '');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -25,6 +19,8 @@ const ResetPasswordScreen = () => {
   const [resendCooldown, setResendCooldown] = useState(0);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
+  const [codeError, setCodeError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   // Cooldown timer for code resend
   useEffect(() => {
@@ -57,11 +53,28 @@ const ResetPasswordScreen = () => {
     !loading;
 
   const handleResetPassword = async () => {
-    if (!isFormValid) return;
-
-    setLoading(true);
+    // Reset errors
+    setCodeError('');
+    setPasswordError('');
     setMessage('');
     setMessageType('');
+
+    // Validate form
+    let hasErrors = false;
+    
+    if (!validateCode(code)) {
+      setCodeError('El código debe tener 6 dígitos');
+      hasErrors = true;
+    }
+    
+    if (!validatePassword(newPassword)) {
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
+      hasErrors = true;
+    }
+    
+    if (hasErrors) return;
+
+    setLoading(true);
     
     try {
       await client.post('/auth/reset-password', {
@@ -108,193 +121,133 @@ const ResetPasswordScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={{ flex: 1 }} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView 
+    <SafeAreaView className="bg-black h-screen" style={{ paddingTop: insets.top }}>
+      <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-1 bg-zinc-900 px-6 py-8">
-          <View className="flex-1 justify-center">
-            <View className="mb-8">
-              <Text className="text-white text-3xl font-bold mb-2">
-                Nueva contraseña
-              </Text>
-              <Text className="text-zinc-400 text-base">
-                Ingresa el código que recibiste y tu nueva contraseña
-              </Text>
-            </View>
+        <View className="flex-1 px-4 mt-5">
+          <View className="items-center">
+            <LogoLetters />
+          </View>
 
-            {!params.email && (
-              <View className="mb-6">
-                <Text className="text-white text-sm font-medium mb-2">
-                  Correo electrónico
+          <View className="flex-1 flex-col items-center justify-center">
+            <View style={{
+              width: '90%',
+              maxWidth: 500,
+              gap: 20,
+            }}>
+              <View className="mb-4">
+                <Text className="text-white text-2xl font-bold text-center mb-2">
+                  Restablecer contraseña
                 </Text>
-                <TextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="tu@email.com"
-                  placeholderTextColor="#71717a"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!loading}
-                  className={`bg-zinc-800 text-white px-4 py-3 rounded-lg text-base ${
-                    email && !validateEmail(email) ? 'border border-red-500' : ''
-                  }`}
-                />
+                <Text className="text-gray-400 text-center text-base">
+                  Introduce el código que recibiste en tu correo y tu nueva contraseña.
+                </Text>
               </View>
-            )}
 
-            <View className="mb-6">
-              <Text className="text-white text-sm font-medium mb-2">
-                Código de 6 dígitos
-              </Text>
-              <TextInput
-                testID="codeInput"
-                accessibilityLabel="Campo de código de verificación"
-                value={code}
-                onChangeText={(text) => setCode(text.replace(/[^0-9]/g, ''))}
-                placeholder="123456"
-                placeholderTextColor="#71717a"
-                keyboardType="numeric"
-                maxLength={6}
-                editable={!loading}
-                className={`bg-zinc-800 text-white px-4 py-3 rounded-lg text-base font-mono tracking-widest text-center ${
-                  code && !validateCode(code) ? 'border border-red-500' : ''
-                }`}
-              />
-              {code && !validateCode(code) && (
-                <Text className="text-red-400 text-sm mt-1">
-                  El código debe tener exactamente 6 dígitos
-                </Text>
+              {message && (
+                <View className={`p-4 rounded-lg mb-4 ${
+                  messageType === 'success' ? 'bg-green-900/20 border border-green-600/30' : 'bg-red-900/20 border border-red-600/30'
+                }`}>
+                  <Text className={`text-center ${
+                    messageType === 'success' ? 'text-green-400' : 'text-red-400'
+                  }`}>
+                    {message}
+                  </Text>
+                </View>
               )}
-            </View>
 
-            <View className="mb-6">
-              <Text className="text-white text-sm font-medium mb-2">
-                Nueva contraseña
-              </Text>
+              <FloatingLabelInput
+                label="Código de verificación"
+                value={code}
+                onChangeText={setCode}
+                inputProps={{ 
+                  keyboardType: 'numeric',
+                  maxLength: 6,
+                  testID: 'code-input',
+                  accessibilityLabel: 'Campo de código de verificación',
+                }}
+              />
+              
+              {codeError && (
+                <Text className="text-red-400 text-sm pl-1 -mt-4">{codeError}</Text>
+              )}
+
               <View className="relative">
-                <TextInput
-                  testID="newPwdInput"
-                  accessibilityLabel="Campo de nueva contraseña"
+                <FloatingLabelInput
+                  label="Nueva contraseña"
                   value={newPassword}
                   onChangeText={setNewPassword}
-                  placeholder="Mínimo 8 caracteres"
-                  placeholderTextColor="#71717a"
-                  secureTextEntry={!showPassword}
-                  editable={!loading}
-                  className={`bg-zinc-800 text-white px-4 py-3 pr-12 rounded-lg text-base ${
-                    newPassword && !validatePassword(newPassword) ? 'border border-red-500' : ''
-                  }`}
+                  inputProps={{ 
+                    secureTextEntry: !showPassword,
+                    testID: 'password-input',
+                    accessibilityLabel: 'Campo de nueva contraseña'
+                  }}
                 />
-                <TouchableOpacity
+                <Pressable
                   onPress={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3"
+                  className="absolute right-4 top-4"
+                  testID="toggle-password-visibility"
+                  accessibilityLabel={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 >
-                  <Ionicons
-                    name={showPassword ? 'eye-off' : 'eye'}
-                    size={20}
-                    color="#71717a"
-                  />
-                </TouchableOpacity>
+                  <Text className="text-gray-400 text-lg">{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
+                </Pressable>
               </View>
-              {newPassword && !validatePassword(newPassword) && (
-                <Text className="text-red-400 text-sm mt-1">
-                  La contraseña debe tener al menos 8 caracteres
-                </Text>
+              
+              {passwordError && (
+                <Text className="text-red-400 text-sm pl-1 -mt-4">{passwordError}</Text>
               )}
-            </View>
 
-            {message && (
-              <View className={`p-4 rounded-lg mb-4 ${
-                messageType === 'success' ? 'bg-green-900/20 border border-green-500/30' : 'bg-red-900/20 border border-red-500/30'
-              }`}>
-                <Text className={`text-center ${
-                  messageType === 'success' ? 'text-green-400' : 'text-red-400'
+              <Pressable
+                onPress={handleResetPassword}
+                disabled={loading}
+                className={`w-full py-3 rounded mb-4 justify-center items-center h-[44px] ${
+                  loading ? 'bg-gray-700' : 'bg-lime-400'
+                }`}
+                testID="reset-password-button"
+                accessibilityLabel="Restablecer contraseña"
+              >
+                <Text className={`font-bold ${
+                  loading ? 'text-gray-400' : 'text-black'
                 }`}>
-                  {message}
+                  {loading ? 'Restableciendo...' : 'Restablecer contraseña'}
                 </Text>
-                {messageType === 'success' && message.includes('Contraseña actualizada') && (
-                  <Text className="text-zinc-400 text-sm text-center mt-2">
-                    Redirigiendo al login en 2 segundos...
-                  </Text>
-                )}
-              </View>
-            )}
+              </Pressable>
 
-            <TouchableOpacity
-              testID="resetBtn"
-              accessibilityLabel="Botón cambiar contraseña"
-              onPress={handleResetPassword}
-              disabled={!isFormValid || (messageType === 'success' && message.includes('Contraseña actualizada'))}
-              className={`py-3 rounded-lg mb-4 ${
-                isFormValid && !(messageType === 'success' && message.includes('Contraseña actualizada'))
-                  ? 'bg-green-600 active:bg-green-700'
-                  : 'bg-zinc-700'
-              }`}
-            >
-              <View className="flex-row items-center justify-center">
-                {loading && (
-                  <ActivityIndicator 
-                    size="small" 
-                    color="white" 
-                    style={{ marginRight: 8 }}
-                  />
-                )}
-                <Text className={`text-center font-semibold ${
-                  isFormValid && !(messageType === 'success' && message.includes('Contraseña actualizada')) ? 'text-white' : 'text-zinc-400'
-                }`}>
-                  {loading ? 'Cambiando...' : (messageType === 'success' && message.includes('Contraseña actualizada')) ? 'Contraseña cambiada' : 'Cambiar contraseña'}
-                </Text>
+              <View className="flex-row items-center w-full mb-4">
+                <View className="flex-1 h-px bg-gray-700" />
+                <Text className="text-gray-400 mx-2">¿No recibiste el código?</Text>
+                <View className="flex-1 h-px bg-gray-700" />
               </View>
-            </TouchableOpacity>
 
-            <TouchableOpacity
-              testID="resendBtn"
-              accessibilityLabel="Botón reenviar código"
-              onPress={handleResendCode}
-              disabled={!validateEmail(email) || resendCooldown > 0 || resendLoading}
-              className="py-2 mb-4"
-            >
-              <View className="flex-row items-center justify-center">
-                {resendLoading && (
-                  <ActivityIndicator 
-                    size="small" 
-                    color="#22c55e" 
-                    style={{ marginRight: 8 }}
-                  />
-                )}
-                <Text className={`text-center ${
-                  resendCooldown > 0 || resendLoading || !validateEmail(email)
-                    ? 'text-zinc-500'
-                    : 'text-green-400'
+              <Pressable
+                onPress={handleResendCode}
+                disabled={resendLoading || resendCooldown > 0}
+                className={`w-full py-3 rounded justify-center items-center h-[44px] border ${
+                  resendLoading || resendCooldown > 0
+                    ? 'border-gray-700 bg-gray-800'
+                    : 'border-green-600 bg-transparent'
+                }`}
+                testID="resend-code-button"
+                accessibilityLabel="Reenviar código de verificación"
+              >
+                <Text className={`font-semibold ${
+                  resendLoading || resendCooldown > 0 ? 'text-gray-500' : 'text-green-400'
                 }`}>
-                  {resendCooldown > 0 
-                    ? `Reenviar código (${resendCooldown}s)`
-                    : resendLoading
+                  {resendLoading
                     ? 'Reenviando...'
+                    : resendCooldown > 0
+                    ? `Reenviar en ${resendCooldown}s`
                     : 'Reenviar código'
                   }
                 </Text>
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="py-2"
-            >
-              <Text className="text-green-400 text-center">
-                Volver
-              </Text>
-            </TouchableOpacity>
+              </Pressable>
+            </View>
           </View>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

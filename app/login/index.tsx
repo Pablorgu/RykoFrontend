@@ -18,7 +18,7 @@ import * as WebBrowser from 'expo-web-browser';
 
 const screenWidth = Dimensions.get('window').width;
 const MAX_LOGO = 400;
-const logoSize = Math.min(screenWidth * 0.5, MAX_LOGO);
+const logoSize = Math.min(screenWidth * 0.3, MAX_LOGO);
 WebBrowser.maybeCompleteAuthSession();
 
 export default function Login() {
