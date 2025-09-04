@@ -88,6 +88,14 @@ export default function Login() {
                 inputProps={{ secureTextEntry: true }}
               />
 
+              <Link href="/forgot-password" asChild>
+                <Pressable className="w-full items-end mb-4">
+                  <Text className="text-green-400 text-sm">
+                    ¿Olvidaste tu contraseña?
+                  </Text>
+                </Pressable>
+              </Link>
+
               <Pressable onPress={handleLogin}
                 className="w-full bg-lime-400 py-3 rounded mb-6 justify-center items-center h-[44px]"
               >
