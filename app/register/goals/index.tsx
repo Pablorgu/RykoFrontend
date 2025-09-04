@@ -57,9 +57,8 @@ export default function RegisterGoals() {
       errors.aim = 'Debes seleccionar un objetivo'
     }
     
-    if (!calorieGoal || isNaN(cg) || cg <= 0) {
-      errors.calorieGoal = 'Las calorías deben ser un número mayor a 0'
-    } else if (cg < 800 || cg > 5000) {
+    // Validación opcional para calorías - solo si se proporciona un valor
+    if (calorieGoal && (!isNaN(cg) && (cg < 0 || cg > 10000))) {
       errors.calorieGoal = 'Las calorías deben estar entre 800 y 5000'
     }
     
@@ -69,15 +68,12 @@ export default function RegisterGoals() {
 
   const w = parseFloat(weight)
   const h = parseFloat(height)
-  const cg = parseInt(calorieGoal, 10)
   const isStepValid =
     !isNaN(w) &&
     w > 0 &&
     !isNaN(h) &&
     h > 0 &&
     !!aim &&
-    !isNaN(cg) &&
-    cg > 0 &&
     Object.keys(fieldErrors).length === 0
 
   // Animated fade-in
@@ -101,7 +97,7 @@ export default function RegisterGoals() {
       weight: parseInt(weight),
       height: parseInt(height),
       aim: aim || undefined,
-      calorieGoal: parseInt(calorieGoal),
+      calorieGoal: calorieGoal ? parseInt(calorieGoal) : -1, 
       intolerances,
       birthdate: profile.birthdate 
         ? (profile.birthdate instanceof Date 
@@ -214,7 +210,7 @@ export default function RegisterGoals() {
                   )}
 
                   <FloatingLabelInput
-                    label="Meta de calorías diarias"
+                    label="Meta de calorías diarias (opcional)"
                     value={calorieGoal}
                     onChangeText={(text) => {
                       setCalorieGoal(text)
@@ -229,6 +225,9 @@ export default function RegisterGoals() {
                   {fieldErrors.calorieGoal && (
                     <Text className="text-red-500 text-sm mt-1 ml-2">{fieldErrors.calorieGoal}</Text>
                   )}
+                  <Text className="text-gray-500 text-xs -mt-5 ml-2">
+                    💡 Si no especificas calorías, la calcularemos en base a tus objetivos
+                  </Text>
 
                 <FloatingLabelMultiSelect
                   label="Intolerancias (opcional)"
