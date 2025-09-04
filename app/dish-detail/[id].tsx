@@ -696,7 +696,7 @@ const cancelDelete = () => {
 
         {/* Toast */}
         {showToast && (
-          <View className="absolute top-20 left-4 right-4 bg-app-accent-secondary rounded-lg p-3 items-center">
+          <View className="absolute top-20 left-4 right-4 bg-app-accent-success rounded-lg p-3 items-center">
             <Text className="text-app-text-primary font-medium">{toastMessage}</Text>
           </View>
         )}
