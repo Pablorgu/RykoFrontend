@@ -1,5 +1,12 @@
 import api from "../api/client";
-import { Dish, Day, DayDto, MealItemDto, MealType } from "../(types)/domain";
+import {
+  Dish,
+  DishSummary,
+  Day,
+  DayDto,
+  MealItemDto,
+  MealType,
+} from "../(types)/domain";
 
 // Get a dish by ID
 export const getDishById = async (id: string): Promise<Dish | null> => {
@@ -12,8 +19,27 @@ export const getDishById = async (id: string): Promise<Dish | null> => {
   }
 };
 
-// Search dishes by name and user
+// Search dishes by name and user (optimized with precalculated nutrients)
 export const searchDishes = async (
+  name: string,
+  userId: number
+): Promise<DishSummary[]> => {
+  try {
+    const response = await api.get("/dishes/filter/summary", {
+      params: {
+        name: name,
+        userId: userId,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error searching dishes:", error);
+    return [];
+  }
+};
+
+// Search dishes by name and user (detailed version - for backward compatibility)
+export const searchDishesDetailed = async (
   name: string,
   userId: number
 ): Promise<Dish[]> => {
@@ -31,13 +57,24 @@ export const searchDishes = async (
   }
 };
 
+// Get all dishes for a specific user (optimized with precalculated nutrients)
+export const getAllDishes = async (userId: number): Promise<DishSummary[]> => {
+  try {
+    const response = await api.get(`/dishes/user/${userId}/summary`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all dishes for user:", error);
+    return [];
+  }
+};
+
 // Get all dishes for a specific user
-export const getAllDishes = async (userId: number): Promise<Dish[]> => {
+export const getAllDishesDetailed = async (userId: number): Promise<Dish[]> => {
   try {
     const response = await api.get(`/dishes/user/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching all dishes for user:", error);
+    console.error("Error fetching all detailed dishes for user:", error);
     return [];
   }
 };

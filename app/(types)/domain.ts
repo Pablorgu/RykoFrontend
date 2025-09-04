@@ -20,6 +20,13 @@ export type Dish = {
   ingredients: Ingredient[];
   imageUrl?: string;
 };
+// Optimized version of the dish for listings (without detailed ingredients)
+export type DishSummary = {
+  id: string;
+  name: string;
+  imageUrl?: string;
+  nutrients: Nutrients;
+};
 
 export type MealType = "breakfast" | "lunch" | "snack" | "dinner" | "extras";
 

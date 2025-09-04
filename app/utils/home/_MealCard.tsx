@@ -4,13 +4,14 @@ import { DishItem } from './_DishItem';
 import { NutrientBadges } from '../common/_NutrientBadges';
 import { useDayStore } from '../../(store)/dayStore';
 import { nutrientsForMealAsync, nutrientsForDish } from '../../(types)/nutrition';
-import { MEAL_DISPLAY_NAMES, MealType, Dish, Nutrients } from '../../(types)/domain';
 import { searchDishes, getAllDishes } from '../../services/dishService';
 import { getCurrentUserId } from '../../services/_user';
 import { DishSearchItem } from './_DishSearchItem';
 import { useRecommendation } from '../../hooks/useRecommendation';
 import { RecommendationCard } from '../../components/RecommendationCard';
 import { Ionicons } from '@expo/vector-icons';
+
+import { Dish, DishSummary, MEAL_DISPLAY_NAMES, MealType, Nutrients } from "../../(types)/domain";
 
 interface MealCardProps {
   mealType: MealType;
@@ -22,7 +23,7 @@ export function MealCard({ mealType }: MealCardProps) {
   const { day, addDishToMeal, removeDishFromMeal, loadDayData } = useDayStore();
   const [showModal, setShowModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Dish[]>([]);
+  const [searchResults, setSearchResults] = useState<DishSummary[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [mealNutrients, setMealNutrients] = useState<Nutrients>({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
