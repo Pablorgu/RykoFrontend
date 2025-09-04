@@ -78,22 +78,34 @@ export function MealCard({ mealType }: MealCardProps) {
     }
   };
 
-  // Función para buscar platos
+  // Función para buscar platos filtrando en frontend
   const handleSearch = async (query: string) => {
-    if (query.trim().length < 2 || !userId) {
-      // Si no hay query, cargar todos los platos
-      if (query.trim().length === 0) {
-        await loadAllDishes();
-      } else {
-        setSearchResults([]);
-      }
+    if (!userId) return;
+
+    // Si no hay query, cargar todos los platos
+    if (query.trim().length === 0) {
+      await loadAllDishes();
       return;
     }
     
     setSearchLoading(true);
     try {
-      const results = await searchDishes(query, userId);
-      setSearchResults(results);
+      // Cargar todos los platos si no los tenemos
+      if (searchResults.length === 0 && query.trim().length > 0) {
+        const allDishes = await getAllDishes(userId);
+        // Filtrar en el frontend
+        const filteredDishes = allDishes.filter(dish => 
+          dish.name.toLowerCase().includes(query.trim().toLowerCase())
+        );
+        setSearchResults(filteredDishes);
+      } else {
+        // Filtrar los resultados existentes
+        const allDishes = await getAllDishes(userId);
+        const filteredDishes = allDishes.filter(dish => 
+          dish.name.toLowerCase().includes(query.trim().toLowerCase())
+        );
+        setSearchResults(filteredDishes);
+      }
     } catch (error) {
       console.error('Error searching dishes:', error);
       setSearchResults([]);
@@ -103,12 +115,14 @@ export function MealCard({ mealType }: MealCardProps) {
   };
   
   useEffect(() => {
+    if (!userId) return;
+    
     const timeoutId = setTimeout(() => {
       handleSearch(searchQuery);
     }, 300);
     
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, userId]);
   
   const handleAddDish = async (dishId: string) => {
     await addDishToMeal(mealType, dishId);
@@ -214,8 +228,9 @@ export function MealCard({ mealType }: MealCardProps) {
         <TouchableOpacity
           onPress={() => {
             setShowModal(true);
+            setSearchQuery('');
             // Load all dishes when the modal is opened
-            if (userId && searchResults.length === 0 && searchQuery.trim() === '') {
+            if (userId) {
               loadAllDishes();
             }
           }}
@@ -292,17 +307,29 @@ export function MealCard({ mealType }: MealCardProps) {
             />
           </View>
           
-          <FlatList
-            data={searchResults}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <DishSearchItem 
-                dish={item} 
-                onPress={handleAddDish}
-              />
-            )}
-            className="flex-1"
-          />
+          {searchLoading ? (
+            <View className="flex-1 justify-center items-center">
+              <Text className="text-zinc-400 text-base">Buscando platos...</Text>
+            </View>
+          ) : searchResults.length === 0 && searchQuery.trim().length > 0 ? (
+            <View className="flex-1 justify-center items-center">
+              <Text className="text-zinc-400 text-base">No se encontraron platos</Text>
+              <Text className="text-zinc-500 text-sm mt-2">Intenta con otro término de búsqueda</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={searchResults}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <DishSearchItem 
+                  dish={item} 
+                  onPress={handleAddDish}
+                />
+              )}
+              className="flex-1"
+              showsVerticalScrollIndicator={false}
+            />
+          )}
         </View>
       </Modal>
       
