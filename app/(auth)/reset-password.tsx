@@ -141,8 +141,11 @@ const ResetPasswordScreen = () => {
                 <Text className="text-white text-2xl font-bold text-center mb-2">
                   Restablecer contraseña
                 </Text>
-                <Text className="text-gray-400 text-center text-base">
+                <Text className="text-gray-400 text-center text-base mb-3">
                   Introduce el código que recibiste en tu correo y tu nueva contraseña.
+                </Text>
+                <Text className="text-gray-500 text-center text-sm">
+                  💡 Revisa tu carpeta de spam si no encuentras el código
                 </Text>
               </View>
 

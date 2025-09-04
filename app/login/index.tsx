@@ -56,19 +56,19 @@ export default function Login() {
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
-        <View className="flex-1 px-4 mt-5">
-          <View className="items-center">
+        <View className="flex-1 px-4 mt-2">
+          <View className="items-center mb-4">
             <LogoLetters />
           </View>
 
           <View className="flex-col items-center justify-center">
-            <View className="w-full flex-1 items-center mt-10 mb-10">
+            <View className="w-full items-center mb-6">
               <Logo width={logoSize} height={logoSize} />
             </View>
             <View style={{
               width: '90%',
               maxWidth: 500,
-              gap: 24,
+              gap: 16,
             }}>
               <FloatingLabelInput
                 label="Correo electronico"
@@ -78,7 +78,7 @@ export default function Login() {
               />
 
               {emailError !== '' && (
-                <Text className="text-red-500 text-base pl-1 mb-2 -mt-6">{emailError}</Text>
+                <Text className="text-red-500 text-base pl-1 -mt-4 mb-1">{emailError}</Text>
               )}
 
               <FloatingLabelInput
@@ -89,26 +89,26 @@ export default function Login() {
               />
 
               <Link href="/forgot-password" asChild>
-                <Pressable className="w-full items-end mb-4">
-                  <Text className="text-green-400 text-sm">
+                <Pressable className="w-full items-end -mt-2 mb-4">
+                  <Text className="text-green-400 text-sm underline">
                     ¿Olvidaste tu contraseña?
                   </Text>
                 </Pressable>
               </Link>
 
               <Pressable onPress={handleLogin}
-                className="w-full bg-lime-400 py-3 rounded mb-6 justify-center items-center h-[44px]"
+                className="w-full bg-lime-400 py-3 rounded mb-2 justify-center items-center h-[44px]"
               >
                 <Text className="font-bold text-black">Inicia sesión</Text>
               </Pressable>
 
-              <View className="flex-row items-center w-full mb-4">
+              <View className="flex-row items-center w-full mb-2">
                 <View className="flex-1 h-px bg-gray-700" />
                 <Text className="text-gray-400 mx-2">ó</Text>
                 <View className="flex-1 h-px bg-gray-700" />
               </View>
 
-              <Pressable onPress={authWithGoogle} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-6">
+              <Pressable onPress={authWithGoogle} className="w-full flex-row items-center justify-center bg-gray-900 py-3 rounded mb-3">
                 <GoogleIcon width={24} height={24} className="mr-2" />
                 <Text className="text-white font-semibold mx-2">
                   Inicia sesión con Google
