@@ -25,6 +25,7 @@ export default function RegisterAccount() {
   const [loading, setLoading] = useState(false);
 
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const isPasswordValid = password.length >= 6
   const isPasswordMatch = password.length > 0 && password === confirmPassword
 
   const [emailError, setEmailError] = useState('');
@@ -50,7 +51,10 @@ export default function RegisterAccount() {
       valid = false
     }
 
-    if (!isPasswordMatch) {
+    if (!isPasswordValid) {
+      setPasswordError('La contraseña debe tener al menos 6 caracteres')
+      valid = false
+    } else if (!isPasswordMatch) {
       setPasswordError('Las contraseñas no coinciden')
       valid = false
     }
