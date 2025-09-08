@@ -241,6 +241,12 @@ const updateMacro = (
 
 
   const handleSave = async () => {
+    // Validar que los porcentajes de macros sumen 100%
+    const macroTotal = formData.proteinPct + formData.carbsPct + formData.fatPct;
+    if (macroTotal !== 100) {
+      return; // No permitir guardar si no suman 100%
+    }
+
     setLoading(true);
     try {
       const dto: UserProfileDto = {
@@ -263,11 +269,9 @@ const updateMacro = (
     if (success) {
       setShowSnackbar(true);
       setTimeout(() => setShowSnackbar(false), 2000);
-    } else {
-      Alert.alert('Error', 'No se pudo actualizar el perfil');
     }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error inesperado');
+      console.error('Error al actualizar perfil:', error);
     } finally {
       setLoading(false);
     }
@@ -529,6 +533,15 @@ const toggleOption = (opt: string) => {
       
       {/* Sticky Bottom Bar */}
       <View className="absolute bottom-0 left-0 right-0 bg-black border-t border-gray-800 px-6 py-4">
+        {/* Error message for macro validation */}
+        {!isMacroValid && (
+          <View className="bg-red-500 px-4 py-3 rounded-xl mb-3">
+            <Text className="text-white font-medium text-center">
+              Los porcentajes de macronutrientes deben sumar exactamente 100%
+            </Text>
+          </View>
+        )}
+        
         <Pressable
           className="bg-[#A3FF57] py-3 rounded-2xl mb-3"
           onPress={handleSave}
