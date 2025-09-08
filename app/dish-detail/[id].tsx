@@ -72,6 +72,7 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
@@ -326,11 +327,12 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
   }
 
   const saveDish = async () => {
-    if (!valid) {
+    if (!valid || isSaving) {
       if (!formData.name.trim()) setErrors({ name: 'Requerido' });
       return;
     }
 
+    setIsSaving(true);
     try {
       const currentUser = await getCurrentUserId();
       if (!currentUser) {
@@ -371,14 +373,18 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
         setTimeout(() => {
           setShowToast(false);
           router.push('/plates');
-        }, 2000);
+        }, 1000); // Reducido de 2000ms a 1000ms
       }
     } catch (error: any) {
       console.error('Error actualizando el plato:', error);
       const errorMessage = error.response?.data?.message ||
         error.message ||
         'Error desconocido al actualizar el plato';
-      alert(`Error al actualizar el plato: ${errorMessage}`);
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 3000);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -652,11 +658,22 @@ const cancelDelete = () => {
                       />
                     </View>
                     <Pressable
-                      className="bg-app-accent-primary rounded-lg p-3"
+                      className={`rounded-lg p-3 ${
+                        searchLoading ? 'bg-app-surface-secondary' : 'bg-app-accent-primary'
+                      }`}
                       onPress={handleSearch}
-                      disabled={searchQuery.trim().length < 2}
+                      disabled={searchQuery.trim().length < 2 || searchLoading}
                     >
-                      <Ionicons name="search" size={20} color="black" />
+                      {searchLoading ? (
+                        <View className="flex-row items-center">
+                          <ActivityIndicator size="small" color="#A3FF57" style={{ marginRight: 8 }} />
+                          <Text className="text-app-accent-primary text-sm">
+                            Buscando alimentos...
+                          </Text>
+                        </View>
+                      ) : (
+                        <Ionicons name="search" size={20} color="black" />
+                      )}
                     </Pressable>
                   </View>
                 </View>
@@ -683,13 +700,22 @@ const cancelDelete = () => {
         {isEditing && (
           <View className="absolute bottom-0 left-0 right-0 bg-app-bg-primary bg-opacity-90 p-4">
             <Pressable
-              className={`w-full py-4 rounded-2xl items-center ${
-                valid ? 'bg-app-accent-primary' : 'bg-app-surface-tertiary'
+              className={`w-full py-4 rounded-2xl items-center flex-row justify-center ${
+                valid && !isSaving ? 'bg-app-accent-primary' : 'bg-app-surface-tertiary'
               }`}
               onPress={saveDish}
-              disabled={!valid}
+              disabled={!valid || isSaving}
             >
-              <Text className="text-app-surface-tertiary font-semibold text-lg">Guardar Cambios</Text>
+              {isSaving && (
+                <ActivityIndicator 
+                  color="#18181B" 
+                  size="small" 
+                  style={{ marginRight: 8 }} 
+                />
+              )}
+              <Text className="text-app-surface-tertiary font-semibold text-lg">
+                {isSaving ? 'Guardando...' : 'Guardar Cambios'}
+              </Text>
             </Pressable>
           </View>
         )}

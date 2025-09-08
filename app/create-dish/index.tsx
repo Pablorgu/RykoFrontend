@@ -45,6 +45,7 @@ export default function CreateDishScreen() {
   const [formData, setFormData] = useState<DishFormData>({ name: '', description: '', image: null, ingredients: [] });
   const [errors, setErrors] = useState({ name: '' });
   const [showToast, setShowToast] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [results, setResults] = useState<Food[]>([]);
@@ -204,11 +205,13 @@ async function pickImage() {
 
 
   const saveDish = async () => {
-    if (!valid) {
+    if (!valid || isSaving) {
       if (!formData.name.trim()) setErrors({ name: 'Requerido' });
       return;
     }
   
+    setIsSaving(true);
+    
     try {
       const currentUser = await getCurrentUserId();
       if (!currentUser) {
@@ -235,15 +238,13 @@ async function pickImage() {
         }))
       };
   
- 
       const response = await api.post('/dishes/create', dishData);
       
       if (response.status === 201 || response.status === 200) {
         setShowToast(true);
         setTimeout(() => {
-          setShowToast(false);
           router.push('/plates');
-        }, 2000);
+        }, 1000);
       }
     } catch (error: any) {
       console.error('Error guardando el plato:', error);
@@ -253,6 +254,8 @@ async function pickImage() {
                           'Error desconocido al guardar el plato';
       
       alert(`Error al guardar el plato: ${errorMessage}`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -424,13 +427,25 @@ async function pickImage() {
                   />
                 </View>
                 <Pressable 
-                  className="bg-app-accent-primary rounded-lg p-3"
+                  className={`rounded-lg p-3 ${
+                    loading ? 'bg-app-surface-secondary' : 'bg-app-accent-primary'
+                  }`}
                   onPress={handleSearch}
-                  disabled={searchQuery.trim().length < 2}
+                  disabled={searchQuery.trim().length < 2 || loading}
                 >
-                  <Ionicons name="search" size={20} color="black" />
+                  {loading ? (
+                    <View className="flex-row items-center">
+                      <ActivityIndicator size="small" color="#A3FF57" style={{ marginRight: 8 }} />
+                      <Text className="text-app-accent-primary text-sm">
+                        Buscando alimentos...
+                      </Text>
+                    </View>
+                  ) : (
+                    <Ionicons name="search" size={20} color="black" />
+                  )}
                 </Pressable>
               </View>
+
             </View>
             {/* Ingredients */}
             {formData.ingredients.length > 0 && (
@@ -449,8 +464,25 @@ async function pickImage() {
         </KeyboardAvoidingView>
         {/* Save button */}
         <View className="absolute bottom-0 left-0 right-0 bg-app-bg-primary bg-opacity-90 p-4">
-          <Pressable className={`w-full py-4 rounded-2xl items-center ${valid ? 'bg-app-accent-primary' : 'bg-app-surface-secondary/50'}`} onPress={saveDish} disabled={!valid}>
-            <Text className={`${valid ? 'text-app-surface-tertiary' : 'text-app-text-primary'  } font-semibold text-lg`}>Guardar Plato</Text>
+          <Pressable 
+            className={`w-full py-4 rounded-2xl items-center flex-row justify-center ${
+              valid && !isSaving ? 'bg-app-accent-primary' : 'bg-app-surface-secondary/50'
+            }`} 
+            onPress={saveDish} 
+            disabled={!valid || isSaving}
+          >
+            {isSaving && (
+              <ActivityIndicator 
+                color={valid ? "#000000" : "#ffffff"} 
+                size="small" 
+                style={{ marginRight: 8 }} 
+              />
+            )}
+            <Text className={`${
+              valid && !isSaving ? 'text-app-surface-tertiary' : 'text-app-text-primary'
+            } font-semibold text-lg`}>
+              {isSaving ? 'Guardando...' : 'Guardar Plato'}
+            </Text>
           </Pressable>
         </View>
         {/* Toast */}
