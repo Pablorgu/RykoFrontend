@@ -241,10 +241,10 @@ const updateMacro = (
 
 
   const handleSave = async () => {
-    // Validar que los porcentajes de macros sumen 100%
+    // Validate that macro percentages add up to 100%
     const macroTotal = formData.proteinPct + formData.carbsPct + formData.fatPct;
     if (macroTotal !== 100) {
-      return; // No permitir guardar si no suman 100%
+      return; // Do not allow saving if macros don't add up to 100%
     }
 
     setLoading(true);
