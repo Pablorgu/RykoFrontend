@@ -25,6 +25,7 @@ export function MealCard({ mealType }: MealCardProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<DishSummary[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [addingDish, setAddingDish] = useState(false);
   const [userId, setUserId] = useState<number | null>(null);
   const [mealNutrients, setMealNutrients] = useState<Nutrients>({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
   
@@ -126,10 +127,18 @@ export function MealCard({ mealType }: MealCardProps) {
   }, [searchQuery, userId]);
   
   const handleAddDish = async (dishId: string) => {
-    await addDishToMeal(mealType, dishId);
-    setShowModal(false);
-    setSearchQuery('');
-    setSearchResults([]);
+    
+    setAddingDish(true);
+    try {
+      await addDishToMeal(mealType, dishId);
+      setShowModal(false);
+      setSearchQuery('');
+      setSearchResults([]);
+    } catch (error) {
+      console.error('Error adding dish to meal:', error);
+    } finally {
+      setAddingDish(false);
+    }
   };
 
   const handleRemoveDish = async (mealDishId: number) => {
@@ -325,6 +334,7 @@ export function MealCard({ mealType }: MealCardProps) {
                 <DishSearchItem 
                   dish={item} 
                   onPress={handleAddDish}
+                  disabled={addingDish}
                 />
               )}
               className="flex-1"

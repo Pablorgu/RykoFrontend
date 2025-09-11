@@ -5,14 +5,16 @@ import { DishSummary } from '../../(types)/domain';
 interface DishSearchItemProps {
   dish: DishSummary;
   onPress: (dishId: string) => void;
+  disabled?: boolean;
 }
 
-export function DishSearchItem({ dish, onPress }: DishSearchItemProps) {
+export function DishSearchItem({ dish, onPress, disabled = false }: DishSearchItemProps) {
 
   return (
     <TouchableOpacity
-      className="p-4 border-b border-zinc-800"
-      onPress={() => onPress(dish.id)}
+      className={`p-4 border-b border-zinc-800 ${disabled ? 'opacity-50' : ''}`}
+      onPress={() => !disabled && onPress(dish.id)}
+      disabled={disabled}
     >
       <Text className="text-zinc-100 font-medium">{dish.name}</Text>
       <Text className="text-zinc-400 text-sm mt-1">
