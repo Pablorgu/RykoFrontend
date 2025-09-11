@@ -30,6 +30,7 @@ export function RecommendationCard({
   const [dish, setDish] = useState<Dish | null>(null);
   const [dishLoading, setDishLoading] = useState(true);
   const [nutrients, setNutrients] = useState<Nutrients>({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
+  const [accepting, setAccepting] = useState(false);
   const isSmall = screenWidth < 400;
   const cardWidth = isSmall ? screenWidth - 40 : screenWidth - 60;
   
@@ -62,7 +63,6 @@ export function RecommendationCard({
   }, [recommendation?.dishId, recommendation?.macros]);
   
   // Check if no more dishes available
-  
   const noMoreDishes = reason === 'All dishes were excluded by filters' || 
                       reason === 'Unexpected error: could not select any dish' ||
                       (reason && reason.includes('could not select any dish'));
@@ -279,13 +279,21 @@ export function RecommendationCard({
               
               {/* Accept Button */}
               <TouchableOpacity
-                onPress={onAccept}
-                disabled={loading}
+                onPress={async () => {
+                  if (accepting || loading) return;
+                  setAccepting(true);
+                  try {
+                    await onAccept();
+                  } finally {
+                    setAccepting(false);
+                  }
+                }}
+                disabled={loading || accepting}
                 className={`flex-1 bg-app-accent-primary rounded-lg py-2.5 px-3 flex-row items-center justify-center ${
-                  loading ? 'opacity-50' : ''
+                  (loading || accepting) ? 'opacity-50' : ''
                 }`}
               >
-                {loading ? (
+                {(loading || accepting) ? (
                   <Ionicons name="refresh-outline" size={16} color="#000" className="mr-1" />
                 ) : (
                   <Ionicons name="checkmark-outline" size={16} color="#000" style={{ marginRight: 4 }} />
