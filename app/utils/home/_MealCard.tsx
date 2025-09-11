@@ -12,6 +12,7 @@ import { RecommendationCard } from '../../components/RecommendationCard';
 import { Ionicons } from '@expo/vector-icons';
 
 import { Dish, DishSummary, MEAL_DISPLAY_NAMES, MealType, Nutrients } from "../../(types)/domain";
+import { router } from 'expo-router';
 
 interface MealCardProps {
   mealType: MealType;
@@ -325,6 +326,21 @@ export function MealCard({ mealType }: MealCardProps) {
             <View className="flex-1 justify-center items-center">
               <Text className="text-zinc-400 text-base">No se encontraron platos</Text>
               <Text className="text-zinc-500 text-sm mt-2">Intenta con otro término de búsqueda</Text>
+            </View>
+          ) : searchResults.length === 0 && searchQuery.trim().length === 0 ? (
+            <View className="flex-1 justify-center items-center px-8">
+              <Ionicons name="restaurant-outline" size={48} color="#71717a" className="mb-4" />
+              <Text className="text-zinc-400 text-base text-center mb-2">No tienes platos creados</Text>
+              <Text className="text-zinc-500 text-sm text-center mb-4">Crea tus platos en la sección Plates para poder añadirlos a tus comidas</Text>
+              <TouchableOpacity 
+                onPress={() => {
+                  setShowModal(false);
+                  router.push('/plates');
+                }}
+                className="bg-app-accent-primary rounded-lg px-4 py-2"
+              >
+                <Text className="text-black font-medium">Ir a Plates</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <FlatList
