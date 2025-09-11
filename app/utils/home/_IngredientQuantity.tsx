@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
-import Slider from '@react-native-community/slider';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import { THEME_COLORS } from '../../(config)/_colors';
 
 interface IngredientQuantityProps {
@@ -79,16 +80,31 @@ export function IngredientQuantity({
       {/* Slider with usable size */}
       <View className="flex-1 mx-2">
         <Slider
-          style={{ height: 30 }}
-          minimumValue={min}
-          maximumValue={max}
+          min={min}
+          max={max}
           step={step}
           value={value}
-          onValueChange={onChange}
-          minimumTrackTintColor={THEME_COLORS.accent.success}
-          maximumTrackTintColor="#52525B"
-          thumbTintColor={THEME_COLORS.accent.success}
-          accessibilityLabel={`Cantidad de ${ingredientName}`}
+          onChange={(newValue: number | number[]) => {
+            const val = Array.isArray(newValue) ? newValue[0] : newValue;
+            onChange(val);
+          }}
+          styles={{
+            track: {
+              backgroundColor: THEME_COLORS.accent.success,
+            },
+            rail: {
+              backgroundColor: '#52525B',
+            },
+            handle: {
+              backgroundColor: THEME_COLORS.accent.success,
+              borderColor: THEME_COLORS.accent.success,
+              boxShadow: `0 0 0 2px ${THEME_COLORS.accent.success}20`,
+            },
+          }}
+          style={{
+            width: '100%',
+            margin: '15px 0',
+          }}
         />
       </View>
       

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, Pressable } from 'react-native';
-import Slider from '@react-native-community/slider';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import { Ionicons } from '@expo/vector-icons';
+import { THEME_COLORS } from '../(config)/_colors';
 
 interface QuantitySliderProps {
   value: number;
@@ -41,12 +43,14 @@ export default function QuantitySlider({
     setIsSliding(true);
   }, []);
 
-  const handleSliderChange = useCallback((newValue: number) => {
-    setSliderValue(newValue);
+  const handleSliderChange = useCallback((newValue: number | number[]) => {
+    const value = Array.isArray(newValue) ? newValue[0] : newValue;
+    setSliderValue(value);
   }, []);
 
-  const handleSliderComplete = useCallback((newValue: number) => {
-    const roundedValue = Math.max(minimumValue, Math.round(newValue));
+  const handleSliderComplete = useCallback((newValue: number | number[]) => {
+    const value = Array.isArray(newValue) ? newValue[0] : newValue;
+    const roundedValue = Math.max(minimumValue, Math.round(value));
     setSliderValue(roundedValue);
     setIsSliding(false);
     onValueChange(roundedValue);
@@ -61,8 +65,10 @@ export default function QuantitySlider({
       <View className="flex-row justify-between items-center mb-3">
         <Text className="text-slate-300 text-sm font-medium">{label}</Text>
         <View className="flex-row items-center">
-          <View className="bg-[#A3FF57] px-3 py-1 rounded-full mr-2">
-            <Text className="text-black font-bold text-sm">{Math.round(displayQuantity)}g</Text>
+          <View className="px-3 py-1 rounded-full mr-2">
+            <Text className="text-app-accent-success text-lg font-mono font-semibold mb-2">
+              {value}g
+            </Text>
           </View>
           {showRemoveButton && onRemove && (
             <Pressable
@@ -78,19 +84,33 @@ export default function QuantitySlider({
 
       {!disabled ? (
         <View className="bg-app-surface-secondary rounded-full p-1">
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={minimumValue}
-            maximumValue={maximumValue}
-            value={sliderValue}
-            onSlidingStart={handleSliderStart}
-            onValueChange={handleSliderChange}
-            onSlidingComplete={handleSliderComplete}
-            minimumTrackTintColor="#A3FF57"
-            maximumTrackTintColor="#475569"
-            thumbTintColor="#A3FF57"
-            step={step}
-          />
+          <View style={{ overflow: 'hidden' }}>
+            <Slider
+              min={minimumValue}
+              max={maximumValue}
+              value={sliderValue}
+              step={step}
+              onChange={handleSliderChange}
+              onChangeComplete={handleSliderComplete}
+              styles={{
+                track: {
+                  backgroundColor: THEME_COLORS.accent.success,
+                },
+                rail: {
+                  backgroundColor: '#52525B',
+                },
+                handle: {
+                  backgroundColor: THEME_COLORS.accent.success,
+                  borderColor: THEME_COLORS.accent.success,
+                  boxShadow: `0 0 0 2px ${THEME_COLORS.accent.success}20`,
+                },
+              }}
+              style={{
+                width: '100%',
+                margin: '20px 0',
+              }}
+            />
+          </View>
         </View>
       ) : (
         <View className="bg-slate-600 rounded-full p-3">

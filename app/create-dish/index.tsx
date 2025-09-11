@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
