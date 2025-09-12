@@ -538,13 +538,6 @@ const cancelDelete = () => {
                 <Ionicons name="trash-outline" size={24} color="#ef4444" />
               </Pressable>
             )}
-            <Pressable onPress={() => setIsEditing(!isEditing)}>
-              <Ionicons 
-                name={isEditing ? 'eye-outline' : 'create-outline'} 
-                size={24} 
-                color="white" 
-              />
-            </Pressable>
           </View>
         </View>
 
