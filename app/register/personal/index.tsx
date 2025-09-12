@@ -20,6 +20,7 @@ import { DatePickerField } from '../../utils/_DateTimePicker'
 import { useUserProfile } from '../../context/UserProfileContext'
 import { updateUserProfile } from '../../services/_user';
 import { useAuthStore } from '../../(store)/authStore';
+import { COUNTRIES } from '../../(config)/_countries';
 
 export default function RegisterPersonal() {
   const insets = useSafeAreaInsets()
@@ -167,11 +168,10 @@ export default function RegisterPersonal() {
                   label="País (opcional)"
                   value={country}
                   onValueChange={setCountry}
-                  options={[
-                    { label: 'España', value: 'es' },
-                    { label: 'México', value: 'mx' },
-                    { label: 'Argentina', value: 'ar' },
-                  ]}
+                  options={COUNTRIES.map(country => ({
+                    label: country.name,
+                    value: country.code
+                  }))}
                 />
 
                 {error && (
