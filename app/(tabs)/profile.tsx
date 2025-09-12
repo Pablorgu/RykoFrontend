@@ -119,7 +119,6 @@ export default function ProfileScreen() {
           }
         }
       } catch (error) {
-        console.error('Error al obtener datos del usuario:', error);
       } finally {
         setLoading(false);
       }
@@ -271,7 +270,6 @@ const updateMacro = (
       setTimeout(() => setShowSnackbar(false), 2000);
     }
     } catch (error) {
-      console.error('Error al actualizar perfil:', error);
     } finally {
       setLoading(false);
     }
@@ -310,7 +308,6 @@ const updateMacro = (
       authLogout();
       router.replace('/login');
     } catch (error) {
-      console.error('Error during logout:', error);
     }
   };
 
