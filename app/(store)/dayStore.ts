@@ -56,7 +56,6 @@ export const useDayStore = create<DayStore>((set, get) => ({
         set({ day: emptyDay, loading: false });
       }
     } catch (error) {
-      console.error("Error loading day data:", error);
       set({ error: "Error cargando datos del día", loading: false });
     }
   },
@@ -75,11 +74,11 @@ export const useDayStore = create<DayStore>((set, get) => ({
     set((state) => {
       const newDay = {
         ...state.day,
-        meals: state.day.meals.map(meal => 
-          meal.type === mealType 
+        meals: state.day.meals.map((meal) =>
+          meal.type === mealType
             ? { ...meal, items: [...meal.items, optimisticMealDish] }
             : meal
-        )
+        ),
       };
       return { day: newDay, error: null };
     });
@@ -100,7 +99,7 @@ export const useDayStore = create<DayStore>((set, get) => ({
         set((state) => {
           const newDay = {
             ...state.day,
-            meals: state.day.meals.map(meal => {
+            meals: state.day.meals.map((meal) => {
               if (meal.type === mealType) {
                 const tempIndex = meal.items.findIndex(
                   (item) => item.mealDishId === -1
@@ -119,13 +118,12 @@ export const useDayStore = create<DayStore>((set, get) => ({
                 }
               }
               return meal;
-            })
+            }),
           };
           return { day: newDay, error: null };
         });
       }
     } catch (error) {
-      console.error("Error adding dish to meal:", error);
       // Rollback on failure
       set({
         day: currentDay,
@@ -141,7 +139,7 @@ export const useDayStore = create<DayStore>((set, get) => ({
     set((state) => {
       const newDay = {
         ...state.day,
-        meals: state.day.meals.map(meal => {
+        meals: state.day.meals.map((meal) => {
           if (meal.type === mealType) {
             const itemIndex = meal.items.findIndex(
               (item) => item.mealDishId === mealDishId
@@ -153,7 +151,7 @@ export const useDayStore = create<DayStore>((set, get) => ({
             }
           }
           return meal;
-        })
+        }),
       };
       return { day: newDay, error: null };
     });
@@ -174,7 +172,6 @@ export const useDayStore = create<DayStore>((set, get) => ({
         });
       }
     } catch (error) {
-      console.error("Error removing dish from meal:", error);
       // Rollback on failure
       set({
         day: currentDay,
@@ -191,53 +188,52 @@ export const useDayStore = create<DayStore>((set, get) => ({
   ) => {
     const currentDay = get().day;
     const ingredientIdNumber = parseInt(ingredientId);
-  
+
     // Validate mealDishId not undefined
     if (mealDishId === undefined || mealDishId === null) {
-      console.error("mealDishId is undefined or null");
       const error = "Error: ID de plato no válido";
       set({ error });
       throw new Error(error);
     }
-  
+
     // Optimistic UI update with deep copy
     set((state) => {
       const newDay = {
         ...state.day,
-        meals: state.day.meals.map(meal => {
+        meals: state.day.meals.map((meal) => {
           if (meal.type === mealType) {
             return {
               ...meal,
-              items: meal.items.map(item => {
+              items: meal.items.map((item) => {
                 if (item.mealDishId === mealDishId) {
                   const existingOverrideIndex = item.overrides.findIndex(
                     (o) => o.ingredientId === ingredientId
                   );
-                  
+
                   let newOverrides;
                   if (existingOverrideIndex >= 0) {
-                    newOverrides = item.overrides.map((override, index) => 
-                      index === existingOverrideIndex 
+                    newOverrides = item.overrides.map((override, index) =>
+                      index === existingOverrideIndex
                         ? { ...override, grams }
                         : override
-                  );
+                    );
                   } else {
                     newOverrides = [...item.overrides, { ingredientId, grams }];
                   }
-                  
+
                   return {
                     ...item,
-                    overrides: newOverrides
+                    overrides: newOverrides,
                   };
                 }
                 return item;
-              })
+              }),
             };
           }
           return meal;
-        })
+        }),
       };
-  
+
       return { day: newDay, error: null };
     });
 
@@ -261,7 +257,6 @@ export const useDayStore = create<DayStore>((set, get) => ({
         throw new Error(error);
       }
     } catch (error) {
-      console.error("Error updating ingredient override:", error);
       // Rollback on failure
       const errorMessage = "Error actualizando cantidad de ingrediente";
       set({
