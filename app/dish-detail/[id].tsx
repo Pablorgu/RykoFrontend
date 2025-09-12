@@ -185,7 +185,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
           ingredients: transformedIngredients
         });
       } catch (error) {
-        console.error('Error cargando el plato:', error);
         setToastMessage('Error al cargar el plato');
         setShowToast(true);
         setTimeout(() => setShowToast(false), 3000);
@@ -205,7 +204,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
       });
       setResults(data);
     } catch (error) {
-      console.error('Error fetching foods:', error);
       setResults([]);
     } finally {
       setSearchLoading(false);
@@ -323,7 +321,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
       const resp = await api.post('/upload/image', form, { timeout: 30000 });
       setFormData(d => ({ ...d, image: resp.data.url }));
     } catch (err: any) {
-      console.error('Error subiendo imagen:', err?.response?.data || err?.message || err);
       alert(`Error al subir la imagen: ${err?.response?.data?.message || err?.message || 'desconocido'}`);
     }
   }
@@ -338,7 +335,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
     try {
       const currentUser = await getCurrentUserId();
       if (!currentUser) {
-        console.error('No se pudo obtener el usuario actual');
         alert('Error obteniendo información del usuario.');
         return;
       }
@@ -378,7 +374,6 @@ export default function DishDetailScreen({ readOnly = false }: DishDetailProps) 
         }, 1000); // Reducido de 2000ms a 1000ms
       }
     } catch (error: any) {
-      console.error('Error actualizando el plato:', error);
       const errorMessage = error.response?.data?.message ||
         error.message ||
         'Error desconocido al actualizar el plato';

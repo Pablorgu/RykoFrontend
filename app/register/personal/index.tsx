@@ -97,7 +97,6 @@ export default function RegisterPersonal() {
         setError('No se pudieron guardar los datos. Inténtalo de nuevo.');
       }
     } catch (error) {
-      console.error('Error al actualizar perfil:', error);
       setError('Ocurrió un error inesperado. Inténtalo de nuevo.');
     } finally {
       setIsLoading(false)

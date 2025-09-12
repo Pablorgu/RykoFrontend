@@ -34,7 +34,6 @@ export function DishItem({
         const fetchedDish = await getDishById(dishId);
         setDish(fetchedDish);
       } catch (error) {
-        console.error('Error fetching dish:', error);
       } finally {
         setLoading(false);
       }

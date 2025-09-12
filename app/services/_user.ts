@@ -16,7 +16,6 @@ export async function getCurrentUserId(): Promise<number | null> {
     const { user: updatedUser } = useAuthStore.getState();
     return updatedUser?.id || null;
   } catch (error) {
-    console.error("Error obteniendo ID del usuario:", error);
     return null;
   }
 }
@@ -26,7 +25,6 @@ export async function getUserProfile(userId: number): Promise<any | null> {
     const { data } = await api.get(`/users/profile/${userId}`);
     return data;
   } catch (error) {
-    console.error("Error obteniendo perfil del usuario:", error);
     return null;
   }
 }
@@ -46,7 +44,6 @@ export async function updateUserProfile(
 
     return true;
   } catch (error) {
-    console.error("Error actualizando perfil de usuario:", error);
     return false;
   }
 }
