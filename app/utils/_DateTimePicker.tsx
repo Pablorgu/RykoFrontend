@@ -75,7 +75,7 @@ export function DatePickerField({
             }}
             onDayPress={(day: DateData) => {
               const [y, m, d] = day.dateString.split('-').map(Number);
-              const newDate = new Date(y, m - 1, d);
+              const newDate = new Date(Date.UTC(y, m - 1, d));
               setSelectedDate(newDate);
               onChange(newDate);
               setOpen(false);
