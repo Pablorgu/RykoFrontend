@@ -70,7 +70,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       await get().loadUserProfile();
       set({ isHydrated: true });
     } catch (error) {
-      console.error("Error logging in with token:", error);
       await get().logout();
     } finally {
       set({ isLoading: false });
@@ -87,8 +86,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         get().setToken(token);
         await get().loadUserProfile();
       }
-    } catch (error) {
-      console.error("Error initializing auth:", error);
     } finally {
       set({ isLoading: false, isInitialized: true, isHydrated: true });
     }
@@ -109,7 +106,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         const { data } = await api.get<User>("/auth/me");
         set({ user: data });
       } catch (error: any) {
-        console.error("Error loading user profile:", error);
         if (error.response?.status === 401) {
           await get().logout();
         }
