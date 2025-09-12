@@ -78,7 +78,6 @@ export default function CreateDishScreen() {
       });
       setResults(data);
     } catch (error) {
-      console.error('Error fetching foods:', error);
       setResults([]);
     } finally {
       setLoading(false);
@@ -200,7 +199,6 @@ async function pickImage() {
     // 6) Save the URL returned by the backend in the dish state
     setFormData(d => ({ ...d, image: resp.data.url }));
   } catch (err: any) {
-    console.error('Error subiendo imagen:', err?.response?.data || err?.message || err);
     alert(`Error al subir la imagen: ${err?.response?.data?.message || err?.message || 'desconocido'}`);
   }
 }
@@ -217,7 +215,6 @@ async function pickImage() {
     try {
       const currentUser = await getCurrentUserId();
       if (!currentUser) {
-        console.error('No se pudo obtener el usuario actual');
         alert('Error obteniendo información del usuario.');
         return;
       }
@@ -249,8 +246,6 @@ async function pickImage() {
         }, 1000);
       }
     } catch (error: any) {
-      console.error('Error guardando el plato:', error);
-      
       const errorMessage = error.response?.data?.message || 
                           error.message || 
                           'Error desconocido al guardar el plato';
