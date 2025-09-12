@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, TextInput } from 'react-native';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { Ionicons } from '@expo/vector-icons';
@@ -30,6 +30,8 @@ export default function QuantitySlider({
 }: QuantitySliderProps) {
   const [sliderValue, setSliderValue] = useState(value);
   const [isSliding, setIsSliding] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value.toString());
 
   useEffect(() => {
     if (!isSliding) {
@@ -60,30 +62,112 @@ export default function QuantitySlider({
     onRemove?.();
   }, [onRemove]);
 
+  const handleEditStart = () => {
+    setIsEditing(true);
+    setInputValue(value.toString());
+  };
+
+  const handleEditEnd = () => {
+    const numValue = parseFloat(inputValue);
+    if (!isNaN(numValue) && numValue > 0) {
+      const clampedValue = Math.max(minimumValue, numValue);
+      onValueChange(clampedValue);
+    }
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (text: string) => {
+    const cleanText = text.replace(/[^0-9.]/g, '');
+    setInputValue(cleanText);
+  };
+
+  const handleDecrease = () => {
+    const newValue = Math.max(minimumValue, value - step);
+    onValueChange(newValue);
+  };
+
+  const handleIncrease = () => {
+    const newValue = Math.min(maximumValue, value + step);
+    onValueChange(newValue);
+  };
+
   return (
     <View className="mb-4">
-      <View className="flex-row justify-between items-center mb-3">
-        <Text className="text-slate-300 text-sm font-medium">{label}</Text>
+      <View className="flex-row justify-between items-center mb-2">
+        <Text className="text-zinc-200 text-sm font-medium">{label}</Text>
         <View className="flex-row items-center">
-          <View className="px-3 py-1 rounded-full mr-2">
-            <Text className="text-app-accent-success text-lg font-mono font-semibold mb-2">
-              {value}g
-            </Text>
+          <View className="bg-zinc-800/40 border border-zinc-700/30 px-3 py-1.5 rounded-lg mr-2">
+            {isEditing ? (
+              <TextInput
+                value={inputValue}
+                onChangeText={handleInputChange}
+                onBlur={handleEditEnd}
+                onSubmitEditing={handleEditEnd}
+                keyboardType="numeric"
+                selectTextOnFocus
+                autoFocus
+                className="text-app-accent-success text-base font-mono font-semibold min-w-[40px] text-center"
+                style={{ minWidth: 40 }}
+              />
+            ) : (
+              <Pressable onPress={handleEditStart}>
+                <Text className="text-app-accent-success text-base font-mono font-semibold">
+                  {value}g
+                </Text>
+              </Pressable>
+            )}
           </View>
           {showRemoveButton && onRemove && (
             <Pressable
               onPress={handleRemove}
-              className="bg-red-500 rounded-full p-2"
-              style={{ elevation: 3 }}
+              className="bg-red-500/90 hover:bg-red-500 rounded-lg p-1.5 border border-red-400/20"
+              style={{ elevation: 2 }}
             >
-              <Ionicons name="trash" size={14} color="white" />
+              <Ionicons name="trash" size={12} color="white" />
             </Pressable>
           )}
         </View>
       </View>
 
+      {/* Controles integrados con slider */}
+      <View className="flex-row items-center">
+        <Pressable
+          onPress={handleDecrease}
+          disabled={disabled || value <= minimumValue}
+          className={`bg-zinc-800/60 border border-zinc-700/40 rounded-lg w-8 h-8 items-center justify-center mr-2 ${
+            disabled || value <= minimumValue ? 'opacity-40' : 'active:bg-zinc-700/60'
+          }`}
+        >
+          <Ionicons 
+            name="remove" 
+            size={14} 
+            color={disabled || value <= minimumValue ? '#52525b' : '#e4e4e7'} 
+          />
+        </Pressable>
+        
+        <View className="flex-1 mx-1">
+          <Text className="text-zinc-500 text-xs text-center mb-1">
+            {minimumValue}g - {maximumValue}g
+          </Text>
+        </View>
+        
+        <Pressable
+          onPress={handleIncrease}
+          disabled={disabled || value >= maximumValue}
+          className={`bg-zinc-800/60 border border-zinc-700/40 rounded-lg w-8 h-8 items-center justify-center ml-2 ${
+            disabled || value >= maximumValue ? 'opacity-40' : 'active:bg-zinc-700/60'
+          }`}
+        >
+          <Ionicons 
+            name="add" 
+            size={14} 
+            color={disabled || value >= maximumValue ? '#52525b' : '#e4e4e7'} 
+          />
+        </Pressable>
+      </View>
+
       {!disabled ? (
-        <View className="bg-app-surface-secondary rounded-full p-1">
+        <View className="bg-app-surface-secondary rounded-lg p-0.5">
           <View style={{ overflow: 'hidden' }}>
             <Slider
               min={minimumValue}
@@ -107,13 +191,13 @@ export default function QuantitySlider({
               }}
               style={{
                 width: '100%',
-                margin: '20px 0',
+                margin: '12px 0',
               }}
             />
           </View>
         </View>
       ) : (
-        <View className="bg-slate-600 rounded-full p-3">
+        <View className="bg-slate-600 rounded-lg p-2">
           <Text className="text-center text-slate-300 text-sm">Solo lectura</Text>
         </View>
       )}

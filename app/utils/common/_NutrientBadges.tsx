@@ -42,7 +42,7 @@ export function NutrientBadges({
     },
     { 
       label: 'Proteínas', 
-      short: 'P', 
+      short: <Ionicons name="barbell-outline" size={16} color={macros.protein} />, 
       value: Math.round(nutrients.protein), 
       color: "bg-app-macro-protein",
       unit: 'g',
@@ -51,7 +51,7 @@ export function NutrientBadges({
     },
     { 
       label: 'Carbohidratos', 
-      short: 'C', 
+      short: <Ionicons name="battery-charging-outline" size={16} color={macros.carbs} />, 
       value: Math.round(nutrients.carbs), 
       color: "bg-app-macro-carbs",
       unit: 'g',
@@ -60,7 +60,7 @@ export function NutrientBadges({
     },
     { 
       label: 'Grasas', 
-      short: 'G', 
+      short: <Ionicons name="water-outline" size={16} color={macros.fat} />, 
       value: Math.round(nutrients.fat), 
       color: "bg-app-macro-fat",
       unit: 'g',

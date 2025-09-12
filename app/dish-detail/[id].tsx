@@ -31,7 +31,8 @@ import { getCurrentUserId } from '../services/_user';
 import * as ImagePicker from 'expo-image-picker';
 import QuantitySlider from '../utils/_QuantitySlider';
 import { deleteDish } from '../services/dishService';
-
+import { THEME_COLORS } from '../(config)/_colors';
+import FoodItem from '../utils/_FoodItem';
 interface Food {
   barcode: any;
   name: string;
@@ -479,28 +480,32 @@ const cancelDelete = () => {
 
         <View className="flex-row justify-between bg-app-surface-tertiary rounded-lg p-3">
           <View className="items-center flex-1">
-            <View className="bg-app-macro-carbs rounded-full px-2 py-1 mb-1">
-              <Text className="text-white text-xs font-bold">C</Text>
+            <View className="flex-row items-center mb-2">
+              <Ionicons name="battery-charging-outline" size={16} color={THEME_COLORS.macros.carbs} style={{ marginRight: 4 }} />
+              <Text className="text-app-text-primary font-bold text-sm">{carbs}g</Text>
             </View>
-            <Text className="text-app-text-primary font-semibold text-sm">{carbs}g</Text>
+            <Text className="text-app-text-secondary text-xs">Carbohidratos</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-app-macro-protein rounded-full px-2 py-1 mb-1">
-              <Text className="text-white text-xs font-bold">P</Text>
+            <View className="flex-row items-center mb-2">
+              <Ionicons name="barbell-outline" size={16} color={THEME_COLORS.macros.protein} style={{ marginRight: 4 }} />
+              <Text className="text-app-text-primary font-bold text-sm">{protein}g</Text>
             </View>
-            <Text className="text-app-text-primary font-semibold text-sm">{protein}g</Text>
+            <Text className="text-app-text-secondary text-xs">Proteínas</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-app-macro-fat rounded-full px-2 py-1 mb-1">
-              <Text className="text-white text-xs font-bold">G</Text>
+            <View className="flex-row items-center mb-2">
+              <Ionicons name="water-outline" size={16} color={THEME_COLORS.macros.fat} style={{ marginRight: 4 }} />
+              <Text className="text-app-text-primary font-bold text-sm">{fat}g</Text>
             </View>
-            <Text className="text-app-text-primary font-semibold text-sm">{fat}g</Text>
+            <Text className="text-app-text-secondary text-xs">Grasas</Text>
           </View>
           <View className="items-center flex-1">
-            <View className="bg-app-macro-calories rounded-full px-2 py-1 mb-1">
-              <Text className="text-white text-xs font-bold">Cal</Text>
+            <View className="flex-row items-center mb-2">
+              <Ionicons name="flash-outline" size={16} color={THEME_COLORS.macros.calories} style={{ marginRight: 4 }} />
+              <Text className="text-app-text-primary font-bold text-sm">{calories}</Text>
             </View>
-            <Text className="text-white font-semibold text-sm">{calories}</Text>
+            <Text className="text-app-text-secondary text-xs">Kilocalorías</Text>
           </View>
         </View>
       </View>
@@ -737,7 +742,7 @@ const cancelDelete = () => {
           handleIndicatorStyle={{ backgroundColor: '#64748B', width: 40 }}
         >
           <View className="p-4 flex-1">
-            <View className="flex-row items-center justify-between mb-4">
+            <View className="flex-row items-center justify-between mb-2">
               <Text className="text-app-text-primary text-lg font-semibold">Buscar alimentos</Text>
               {searchLoading && (
                 <View className="flex-row items-center">
@@ -746,6 +751,7 @@ const cancelDelete = () => {
                 </View>
               )}
             </View>
+            <Text className="text-app-text-secondary text-xs mb-4">Valores nutricionales por cada 100g</Text>
 
             <TextInput
               value={searchQuery}
@@ -796,32 +802,7 @@ const cancelDelete = () => {
                 data={results}
                 keyExtractor={(item) => item.barcode}
                 renderItem={({ item: food }) => (
-                  <Pressable
-                    className="flex-row justify-between items-center bg-app-surface-secondary rounded-xl p-4 mb-3 shadow-sm"
-                    onPress={() => addIngredient(food)}
-                    style={{ elevation: 2 }}
-                  >
-                    <View className="flex-1">
-                      <Text className="text-app-text-primary font-semibold text-base">{food.name}</Text>
-                      {food.brand && (
-                        <Text className="text-app-text-tertiary text-sm mt-1">{food.brand}</Text>
-                      )}
-                      <View className="flex-row mt-2">
-                        <View className="bg-app-macro-carbs px-2 py-1 rounded-full mr-2">
-                          <Text className="text-white text-xs font-medium">C: {food.carbohydrates}g</Text>
-                        </View>
-                        <View className="bg-app-macro-protein px-2 py-1 rounded-full mr-2">
-                          <Text className="text-white text-xs font-medium">P: {food.proteins}g</Text>
-                        </View>
-                        <View className="bg-app-macro-fat px-2 py-1 rounded-full">
-                          <Text className="text-white text-xs font-medium">G: {food.fat}g</Text>
-                        </View>
-                      </View>
-                    </View>
-                    <View className="bg-app-accent-primary rounded-full p-2">
-                      <Ionicons name="add" size={24} color="black" />
-                    </View>
-                  </Pressable>
+                  <FoodItem food={food} onPress={addIngredient} />
                 )}
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={true}
