@@ -14,7 +14,6 @@ export const getDishById = async (id: string): Promise<Dish | null> => {
     const response = await api.get(`/dishes/${id}/detailed`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching dish:", error);
     return null;
   }
 };
@@ -33,7 +32,6 @@ export const searchDishes = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error searching dishes:", error);
     return [];
   }
 };
@@ -52,7 +50,6 @@ export const searchDishesDetailed = async (
     });
     return response.data;
   } catch (error) {
-    console.error("Error searching dishes:", error);
     return [];
   }
 };
@@ -63,7 +60,6 @@ export const getAllDishes = async (userId: number): Promise<DishSummary[]> => {
     const response = await api.get(`/dishes/user/${userId}/summary`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching all dishes for user:", error);
     return [];
   }
 };
@@ -74,7 +70,6 @@ export const getAllDishesDetailed = async (userId: number): Promise<Dish[]> => {
     const response = await api.get(`/dishes/user/${userId}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching all detailed dishes for user:", error);
     return [];
   }
 };
@@ -85,7 +80,6 @@ export const getDayData = async (date: string): Promise<DayDto | null> => {
     const response = await api.get(`/day/${date}`);
     return response.data;
   } catch (error) {
-    console.error("Error fetching day data:", error);
     return null;
   }
 };
@@ -106,7 +100,6 @@ export const addDishToMeal = async (
     );
     return response.data;
   } catch (error) {
-    console.error("Error adding dish to meal:", error);
     return null;
   }
 };
@@ -126,7 +119,6 @@ export const updateIngredientGrams = async (
     );
     return true;
   } catch (error) {
-    console.error("Error updating ingredient grams:", error);
     return false;
   }
 };
@@ -143,7 +135,6 @@ export const removeDishFromMeal = async (
     );
     return response.status === 204 ? true : response.data;
   } catch (error) {
-    console.error("Error removing dish from meal:", error);
     return false;
   }
 };
@@ -192,7 +183,6 @@ export const deleteDish = async (id: string): Promise<boolean> => {
     await api.delete(`/dishes/${id}`);
     return true;
   } catch (error) {
-    console.error("Error deleting dish:", error);
     return false;
   }
 };
