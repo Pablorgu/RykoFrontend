@@ -75,18 +75,46 @@ export function useRecommendation(
     if (!current || !date || !mealType) return;
 
     try {
-      // Nota: Esta URL puede necesitar ajuste según la implementación real del backend
-      await client.post(`/day/${date}/meals/${mealType}/dishes`, {
-        dishId: current.dishId,
-        scale: current.scale,
-        overrides: current.overrides,
-      });
+      const response = await client.post(
+        `/day/${date}/meals/${mealType}/dishes/with-scale`,
+        {
+          dishId: current.dishId,
+          scaleFactor: current.scale,
+        }
+      );
 
-      // Update local state
-      await addDishToMeal(mealType, current.dishId.toString());
+      // Update only the specific meal optimistically
+      if (response.data) {
+        const mealData = response.data;
+        const { day } = useDayStore.getState();
 
+        // Update only the specific meal without affecting carousel position
+        const updatedDay = {
+          ...day,
+          meals: day.meals.map((meal) =>
+            meal.type === mealType
+              ? {
+                  ...meal,
+                  items: [
+                    ...meal.items,
+                    {
+                      mealDishId: mealData.mealDishId,
+                      dishId: mealData.dishId.toString(),
+                      overrides: mealData.overrides.map((override: any) => ({
+                        ingredientId: override.ingredientId.toString(),
+                        grams: override.grams,
+                      })),
+                    },
+                  ],
+                }
+              : meal
+          ),
+        };
+
+        // Update the store with the new day
+        useDayStore.setState({ day: updatedDay });
+      }
       reset();
-      Alert.alert("Éxito", "Plato añadido correctamente");
     } catch (error) {
       console.error("Error accepting recommendation:", error);
       Alert.alert("Error", "No se pudo añadir el plato");
@@ -148,4 +176,7 @@ export function useRecommendation(
     reject,
     reset,
   };
+}
+function loadDayData(date: string) {
+  throw new Error("Function not implemented.");
 }
