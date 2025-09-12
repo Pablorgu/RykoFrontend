@@ -53,7 +53,6 @@ export function RecommendationCard({
         };
         setNutrients(calculatedNutrients);
       } catch (error) {
-        console.error('Error fetching dish:', error);
       } finally {
         setDishLoading(false);
       }

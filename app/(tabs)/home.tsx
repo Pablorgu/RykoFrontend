@@ -58,7 +58,6 @@ export default function HomeScreen() {
           const nutrients = await nutrientsForDayAsync(day);
           setDayNutrients(nutrients);
         } catch (error) {
-          console.error('Error calculating day nutrients:', error);
           setDayNutrients({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
         }
       } else {

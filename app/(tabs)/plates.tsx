@@ -174,7 +174,6 @@ export default function plates() {
       
       setDishes(dishesData);
     } catch (error: any) {
-      console.error('Error fetching user dishes:', error);
       setError(error.response?.data?.message || 'Error al cargar los platos');
     } finally {
       setLoading(false);

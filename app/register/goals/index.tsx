@@ -117,7 +117,6 @@ export default function RegisterGoals() {
         setError('No se pudo completar el registro. Inténtalo de nuevo.')
       }
     } catch (err) {
-      console.error('Error en registro:', err)
       setError('Ocurrió un error durante el registro. Inténtalo de nuevo.')
     } finally {
       setIsLoading(false)
