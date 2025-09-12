@@ -53,7 +53,6 @@ export async function registerLocal(
 
     return true;
   } catch (error) {
-    console.error("Error en registro:", error);
     return false;
   }
 }
