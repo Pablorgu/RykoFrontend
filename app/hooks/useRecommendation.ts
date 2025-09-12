@@ -116,17 +116,11 @@ export function useRecommendation(
         if (response.data.recommendation) {
           setCurrent(response.data.recommendation);
         } else {
-          console.error("No se pudo obtener una recomendación");
           setCurrent(null);
         }
       } else {
-        console.error("No se pudo obtener una recomendación");
       }
     } catch (err: any) {
-      console.error(
-        "Error al cargar recomendación:",
-        err.response?.data?.message || err.message
-      );
     } finally {
       setLoading(false);
     }
@@ -177,7 +171,6 @@ export function useRecommendation(
       }
       reset();
     } catch (error) {
-      console.error("Error accepting recommendation:", error);
       Alert.alert("Error", "No se pudo añadir el plato");
     }
   }, [current, date, mealType, reset, addDishToMeal]);
@@ -227,10 +220,6 @@ export function useRecommendation(
       } else {
       }
     } catch (err: any) {
-      console.error(
-        "Error al cargar recomendación:",
-        err.response?.data?.message || err.message
-      );
     } finally {
       setLoading(false);
     }
