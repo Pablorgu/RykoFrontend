@@ -46,7 +46,6 @@ export function MealCard({ mealType }: MealCardProps) {
           const nutrients = await nutrientsForMealAsync(meal);
           setMealNutrients(nutrients);
         } catch (error) {
-          console.error('Error calculating meal nutrients:', error);
           setMealNutrients({ kcal: 0, protein: 0, carbs: 0, fat: 0 });
         }
       } else {
@@ -74,7 +73,6 @@ export function MealCard({ mealType }: MealCardProps) {
       const allDishes = await getAllDishes(userId);
       setSearchResults(allDishes);
     } catch (error) {
-      console.error('Error loading all dishes:', error);
       setSearchResults([]);
     } finally {
       setSearchLoading(false);
@@ -110,7 +108,6 @@ export function MealCard({ mealType }: MealCardProps) {
         setSearchResults(filteredDishes);
       }
     } catch (error) {
-      console.error('Error searching dishes:', error);
       setSearchResults([]);
     } finally {
       setSearchLoading(false);
@@ -136,7 +133,6 @@ export function MealCard({ mealType }: MealCardProps) {
       setSearchQuery('');
       setSearchResults([]);
     } catch (error) {
-      console.error('Error adding dish to meal:', error);
     } finally {
       setAddingDish(false);
     }
