@@ -30,7 +30,6 @@ export const authWithGoogle = async (): Promise<void> => {
       await WebBrowser.openAuthSessionAsync(authUrl, redirectUri);
     }
   } catch (error) {
-    console.error("Error en autenticación con Google:", error);
     throw error;
   }
 };
